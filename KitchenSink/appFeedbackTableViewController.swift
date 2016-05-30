@@ -22,7 +22,7 @@ class appFeedbackTableViewController: UITableViewController, MFMailComposeViewCo
     @IBOutlet weak var mailAddressLabel: UILabel!
     @IBOutlet weak var snapshotLabel: UILabel!
     
-    let mailAddress = "mailer@cisco.com"
+    let mailAddress = "devsupport@ciscospark.com"
     var imagePicker = UIImagePickerController()
     var snapshotImage: UIImage!
     let snapshotFileName = "snapshot.png"
@@ -53,16 +53,17 @@ class appFeedbackTableViewController: UITableViewController, MFMailComposeViewCo
     
     func showActionSheet() {
         let optionMenu = UIAlertController(title: nil, message: "Choose Topic", preferredStyle: .ActionSheet)
-
+        
         let uiAction = UIAlertAction(title: "UI", style: .Default, handler: {
             (alert: UIAlertAction!) -> Void in
             self.topicLabel.text = "UI"
         })
+        
         let sdkAction = UIAlertAction(title: "SDK", style: .Default, handler: {
             (alert: UIAlertAction!) -> Void in
             self.topicLabel.text = "SDK"
         })
-
+        
         let devicesAction = UIAlertAction(title: "Supported devices", style: .Default, handler: {
             (alert: UIAlertAction!) -> Void in
             self.topicLabel.text = "Supported devices"
@@ -77,7 +78,7 @@ class appFeedbackTableViewController: UITableViewController, MFMailComposeViewCo
         optionMenu.addAction(sdkAction)
         optionMenu.addAction(devicesAction)
         optionMenu.addAction(featureAction)
-
+        
         presentViewController(optionMenu, animated: true, completion: nil)
     }
     
@@ -106,7 +107,7 @@ class appFeedbackTableViewController: UITableViewController, MFMailComposeViewCo
         mailComposerVC.mailComposeDelegate = self
         
         mailComposerVC.setToRecipients([mailAddress])
-        mailComposerVC.setSubject("[\(topicLabel.text!)]Feedback on Kitchen Sink demo app")
+        mailComposerVC.setSubject("[\(topicLabel.text!)] Feedback on Kitchen Sink demo app")
         mailComposerVC.setMessageBody(userCommentsText.text, isHTML: false)
         
         if (snapshotImage != nil) {

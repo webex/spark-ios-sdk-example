@@ -32,6 +32,14 @@ class VideoCallViewController: UIViewController {
     @IBOutlet weak var toggleFacingModeButton: UIButton!
     @IBOutlet weak var toggleLoudSpeakerButton: UIButton!
     @IBOutlet weak var hangupButton: UIButton!
+    @IBOutlet weak var homeButton: UIButton!
+    
+    @IBOutlet weak var remoteViewHeight: NSLayoutConstraint!
+    @IBOutlet weak var remoteViewLeading: NSLayoutConstraint!
+    @IBOutlet weak var remoteViewTop: NSLayoutConstraint!
+    @IBOutlet weak var remoteViewTrailing: NSLayoutConstraint!
+    @IBOutlet weak var selfViewWidth: NSLayoutConstraint!
+    @IBOutlet weak var selfViewHeight: NSLayoutConstraint!
     
     var call: Call!
     
@@ -187,6 +195,29 @@ class VideoCallViewController: UIViewController {
             popoverController.sourceRect = self.view.bounds
             popoverController.permittedArrowDirections = .Any
         }
+    }
+    
+    override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        if traitCollection.verticalSizeClass == .Regular{
+            remoteViewTop.constant = 40
+            remoteViewLeading.constant = 10
+            remoteViewTrailing.constant = 100
+            remoteViewHeight.constant = 200
+            selfViewWidth.constant = 70
+            selfViewHeight.constant = 100
+            homeButton.hidden = false
+        } else {
+            remoteViewTop.constant = 0
+            remoteViewLeading.constant = 0
+            remoteViewTrailing.constant = 0
+            remoteViewHeight.constant = view.bounds.height
+            selfViewWidth.constant = 100
+            selfViewHeight.constant = 70
+            homeButton.hidden = true
+        }
+        updateViewConstraints()
     }
 }
 
