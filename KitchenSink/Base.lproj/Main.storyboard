@@ -1323,6 +1323,7 @@
                                             <constraints>
                                                 <constraint firstItem="lKv-d5-GWP" firstAttribute="leading" secondItem="x6d-0y-8gx" secondAttribute="leadingMargin" constant="7" id="0Hj-LO-hus"/>
                                                 <constraint firstItem="9rK-0z-Nms" firstAttribute="centerY" secondItem="x6d-0y-8gx" secondAttribute="centerY" id="duV-YY-JvU"/>
+                                                <constraint firstItem="9rK-0z-Nms" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="lKv-d5-GWP" secondAttribute="trailing" constant="5" id="fp7-wt-ClH"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="9rK-0z-Nms" secondAttribute="trailing" constant="5" id="oXz-0j-DDV"/>
                                                 <constraint firstItem="lKv-d5-GWP" firstAttribute="centerY" secondItem="x6d-0y-8gx" secondAttribute="centerY" id="siN-om-kf0"/>
                                             </constraints>
