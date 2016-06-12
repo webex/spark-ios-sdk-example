@@ -142,7 +142,11 @@ class VideoCallViewController: UIViewController {
     }
     
     @IBAction func gotoHome(sender: AnyObject) {
-        dismissCallView()
+        if call.status != .Disconnected {
+            showEndCallAlert()
+        } else {
+            dismissCallView()
+        }
     }
     
     // MARK: - UI views
@@ -151,7 +155,7 @@ class VideoCallViewController: UIViewController {
         if presentingViewController!.isKindOfClass(UINavigationController) {
             let navigationController = presentingViewController as! UINavigationController
             presentingViewController!.dismissViewControllerAnimated(true, completion: nil)
-            navigationController.popViewControllerAnimated(true)
+            navigationController.popToRootViewControllerAnimated(true)
         } else if presentingViewController!.presentingViewController!.isKindOfClass(UINavigationController) {
             let navigationController = presentingViewController!.presentingViewController! as! UINavigationController
             presentingViewController!.presentingViewController!.dismissViewControllerAnimated(true, completion: nil)
@@ -218,6 +222,20 @@ class VideoCallViewController: UIViewController {
             homeButton.hidden = true
         }
         updateViewConstraints()
+    }
+    
+    func showEndCallAlert() {
+        let alert = UIAlertController(title: nil, message: "Do you want to end current call?", preferredStyle: .Alert)
+        
+        let endCallHandler = {
+            (action: UIAlertAction!) in
+            alert.dismissViewControllerAnimated(true, completion: nil)
+            self.call.hangup(nil)
+            self.dismissCallView()
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "End call", style: .Default, handler: endCallHandler))
+        presentViewController(alert, animated: true, completion: nil)
     }
 }
 
