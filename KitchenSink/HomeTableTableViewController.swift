@@ -76,4 +76,13 @@ class HomeTableTableViewController: UITableViewController {
         alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: dismissHandler))
         presentViewController(alert, animated: true, completion: nil)
     }
+    
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        
+        if indexPath.section == 1 && indexPath.row == 4 {
+            Spark.deauthorize()
+            dismissViewControllerAnimated(true, completion: nil)
+        }
+    }
 }

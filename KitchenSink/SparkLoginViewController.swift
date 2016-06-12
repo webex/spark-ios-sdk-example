@@ -42,6 +42,7 @@ class SparkLoginViewController: UIViewController {
     
     func handleAuth() {
         if Spark.authorized() {
+            view.hideToastActivity()
             passAuth()
         } else {
             view.hideToastActivity()
