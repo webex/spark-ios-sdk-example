@@ -24,7 +24,6 @@ class SparkLoginViewController: UIViewController {
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        view.makeToastActivity(.Center)
         handleAuth()
         updateStatusLabel()
     }
@@ -41,12 +40,13 @@ class SparkLoginViewController: UIViewController {
     }
     
     func handleAuth() {
-        if Spark.authorized() {
-            view.hideToastActivity()
-            passAuth()
-        } else {
-            view.hideToastActivity()
+        guard Spark.authorized() else {
+            return
         }
+        
+        view.makeToastActivity(.Center)
+        passAuth()
+        view.hideToastActivity()
     }
     
     func passAuth() {

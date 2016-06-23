@@ -74,8 +74,7 @@ Below is code snippets of the SDK calling in the demo.
     }
     
     // Make a call
-    let renderView = RenderView(local: videoCallViewController.selfView, remote: videoCallViewController.remoteView)
-    let call = Spark.phone.dial(email, renderView: renderView) { success in
+    let call = Spark.phone.dial(email, option: MediaOption.AudioVideo(local: videoCallViewController.selfView, remote: videoCallViewController.remoteView)) { success in
         if !success {
             print("Failed to dial call.")
         }
@@ -88,7 +87,7 @@ Below is code snippets of the SDK calling in the demo.
     }
     
     // Answer and reject call
-    call.answer(renderView, completionHandler: nil)
+    call.answer(option: MediaOption.AudioVideo(local: videoCallViewController.selfView, remote: videoCallViewController.remoteView), completionHandler: nil)
     call.reject(nil)
     ```
     
@@ -100,5 +99,3 @@ Below is code snippets of the SDK calling in the demo.
    Of course, you aren't allowed to submit to the App Store a binary for an unsupported achitecture, so the solution is to "manually" remove the unneeded architectures from the final binary, before submitting it.  
    Daniel Kennett came up with a nice solution and provides this script to add to the build phase.  
    http://stackoverflow.com/questions/30547283/submit-to-app-store-issues
-   
-   Note this script only work in Release scheme and use for achive binary.

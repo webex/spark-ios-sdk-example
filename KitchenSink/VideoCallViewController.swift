@@ -15,90 +15,109 @@
 import UIKit
 import SparkSDK
 
-class VideoCallViewController: UIViewController {
+class VideoCallViewController: UIViewController, CallObserver {
     
-    enum TitleStatusLabel: String {
-        case Calling
-        case Incall = "In-call"
-        case Disconnected
-    }
-    
-    @IBOutlet weak var statusLabel: UILabel!
-    @IBOutlet weak var TitleLabel: UILabel!
     @IBOutlet weak var selfView: MediaRenderView!
     @IBOutlet weak var remoteView: MediaRenderView!
-    @IBOutlet weak var toggleSendingAudioButton: UIButton!
-    @IBOutlet weak var toggleSendingVideoButton: UIButton!
-    @IBOutlet weak var toggleFacingModeButton: UIButton!
-    @IBOutlet weak var toggleLoudSpeakerButton: UIButton!
+    
+    @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var disconnectionTypeLabel: UILabel!
+    
     @IBOutlet weak var hangupButton: UIButton!
     @IBOutlet weak var homeButton: UIButton!
     
+    @IBOutlet weak var facingModeSwitch: UISwitch!
+    @IBOutlet weak var loudSpeakerSwitch: UISwitch!
+    @IBOutlet weak var sendingVideoSwitch: UISwitch!
+    @IBOutlet weak var sendingAudioSwitch: UISwitch!
+    @IBOutlet weak var receivingVideoSwitch: UISwitch!
+    @IBOutlet weak var receivingAudioSwitch: UISwitch!
+    
+    @IBOutlet weak var switchContainerView: UIView!
+    @IBOutlet weak var avatarContainerView: UIImageView!
+    
     @IBOutlet weak var remoteViewHeight: NSLayoutConstraint!
-    @IBOutlet weak var remoteViewLeading: NSLayoutConstraint!
     @IBOutlet weak var remoteViewTop: NSLayoutConstraint!
-    @IBOutlet weak var remoteViewTrailing: NSLayoutConstraint!
     @IBOutlet weak var selfViewWidth: NSLayoutConstraint!
     @IBOutlet weak var selfViewHeight: NSLayoutConstraint!
     
     var call: Call!
+    var remoteAddr = ""
+    
+    private var remoteDisplayName = ""
+    private var remoteAvatarUrl = ""
+    private var avatarImageView = UIImageView()
+    private var remoteDisplayNameLabel = UILabel()
     
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        statusLabel.text = ""
+        setupAvata()
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(VideoCallViewController.onCallRinging), name: Notifications.Call.Ringing, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(VideoCallViewController.onCallConnected), name: Notifications.Call.Connected, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(VideoCallViewController.onCallDisconnected), name: Notifications.Call.Disconnected, object: nil)
+        updateUIStatus()
+        CallNotificationCenter.sharedInstance.addObserver(self)
     }
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        CallNotificationCenter.sharedInstance.removeObserver(self)
     }
     
-    // MARK: - Call events handling
-    
-    @objc func onCallRinging() {
-        updateTitleLabelToCalling()
-        updateStatusLabel()
+    override func viewDidLayoutSubviews() {
+        updateAvatarContainerView()
     }
     
-    @objc func onCallConnected() {
-        updateTitleLabelToIncall()
-        updateStatusLabel()
+    // MARK: - Landscape
+    
+    override func updateViewConstraints() {
+        super.updateViewConstraints()
+        
+        if UIDevice.currentDevice().orientation.isLandscape.boolValue {
+            remoteViewTop.constant = 0
+            remoteViewHeight.constant = view.bounds.height
+            selfViewWidth.constant = 100
+            selfViewHeight.constant = 70
+            homeButton.hidden = true
+            disconnectionTypeLabel.hidden = true
+            showCallControllView(false)
+        } else {
+            remoteViewTop.constant = 40
+            remoteViewHeight.constant = 180
+            selfViewWidth.constant = 70
+            selfViewHeight.constant = 100
+            homeButton.hidden = false
+            disconnectionTypeLabel.hidden = !isCallDisconnected()
+            showCallControllView(true)
+        }
     }
     
-    @objc func onCallDisconnected() {
-        updateTitleLabelToDisconnected()
-        updateStatusLabel()
-        hideCallView()
+    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        updateViewConstraints()
+        updateAvatarContainerView()
+    }
+    
+    // MARK: - CallObserver
+    
+    func callDidBeginRinging(call: Call) {
+        updateUIStatus()
+    }
+    
+    func callDidConnect(call: Call) {
+        updateUIStatus()
+    }
+    
+    func callDidDisconnect(call: Call, disconnectionType: DisconnectionType) {
+        updateUIStatus()
+        showDisconnectionType(disconnectionType)
         presentRateView()
     }
     
-    func updateStatusLabel() {
-        statusLabel.text = "call status: " + call.status.rawValue
-        statusLabel.text = statusLabel.text! + "\nsendingVideo: " + call.sendingVideo.description
-        statusLabel.text = statusLabel.text! + "\nsendingAudio: " + call.sendingAudio.description
-        statusLabel.text = statusLabel.text! + "\nfacingMode: " + call.facingMode.rawValue
-        statusLabel.text = statusLabel.text! + "\nloudSpeaker: " + call.loudSpeaker.description
-    }
-    
-    func updateTitleLabelToCalling() {
-        TitleLabel.text = TitleStatusLabel.Calling.rawValue
-    }
-    
-    func updateTitleLabelToIncall() {
-        TitleLabel.text = TitleStatusLabel.Incall.rawValue
-    }
-    
-    func updateTitleLabelToDisconnected() {
-        TitleLabel.text = TitleStatusLabel.Disconnected.rawValue
+    func remoteMediaDidChange(call: Call, mediaChangeType: MediaChangeType) {
+        updateAvatarViewVisibility()
     }
     
     // MARK: - Call control
@@ -108,7 +127,6 @@ class VideoCallViewController: UIViewController {
             if !success {
                 print("Failed to hangup call.")
             } else {
-                //self.dismissCallView()
                 self.presentRateView()
             }
         }
@@ -116,80 +134,168 @@ class VideoCallViewController: UIViewController {
     
     @IBAction func toggleFacingMode(sender: AnyObject) {
         call.toggleFacingMode()
-        updateStatusLabel()
+        facingModeSwitch.on = isFacingMode(call.facingMode)
     }
     
     @IBAction func toggleLoudSpeaker(sender: AnyObject) {
         call.toggleLoudSpeaker(!call.loudSpeaker)
-        updateStatusLabel()
+        loudSpeakerSwitch.on = call.loudSpeaker
     }
     
-    @IBAction func toggleSendingAudio(sender:UIButton) {
-        call.toggleSendingAudio()
-        toggleSendingAudioButton.selected = !call.sendingAudio
-        updateStatusLabel()
-    }
-    
-    @IBAction func toggleSendingVideo(sender:UIButton) {
+    @IBAction func toggleSendingVideo(sender: AnyObject) {
         call.toggleSendingVideo()
-        toggleSendingVideoButton.selected = !call.sendingVideo
-        updateStatusLabel()
-        if toggleSendingVideoButton.selected {
-            hideSelfView()
-        } else {
-            showSelfView()
-        }
+        sendingVideoSwitch.on = call.sendingVideo
+        showSelfView(sendingVideoSwitch.on)
+    }
+    
+    @IBAction func toggleSendingAudio(sender: AnyObject) {
+        call.toggleSendingAudio()
+        sendingAudioSwitch.on = call.sendingAudio
+    }
+    
+    @IBAction func toggleReceivingVideo(sender: AnyObject) {
+        call.toggleReceivingVideo()
+        receivingVideoSwitch.on = call.receivingVideo
+        updateAvatarViewVisibility()
+    }
+    
+    @IBAction func toggleReceivingAudio(sender: AnyObject) {
+        call.toggleReceivingAudio()
+        receivingAudioSwitch.on = call.receivingAudio
     }
     
     @IBAction func gotoHome(sender: AnyObject) {
-        if call.status != .Disconnected {
-            showEndCallAlert()
-        } else {
+        if isCallDisconnected() {
             dismissCallView()
+        } else {
+            showEndCallAlert()
         }
     }
     
     // MARK: - UI views
     
-    func dismissCallView() {
-        if presentingViewController!.isKindOfClass(UINavigationController) {
-            let navigationController = presentingViewController as! UINavigationController
-            presentingViewController!.dismissViewControllerAnimated(true, completion: nil)
-            navigationController.popToRootViewControllerAnimated(true)
-        } else if presentingViewController!.presentingViewController!.isKindOfClass(UINavigationController) {
-            let navigationController = presentingViewController!.presentingViewController! as! UINavigationController
-            presentingViewController!.presentingViewController!.dismissViewControllerAnimated(true, completion: nil)
-            navigationController.popViewControllerAnimated(true)
+    private func setupAvata() {
+        avatarContainerView.addSubview(avatarImageView)
+        avatarContainerView.addSubview(remoteDisplayNameLabel)
+        
+        let profile = Utils.fetchUserProfile(remoteAddr)
+        remoteDisplayName = profile.displayName
+        remoteAvatarUrl = profile.avatarUrl
+        
+        fetchAvataImage()
+    }
+    
+    private func updateUIStatus() {
+        updateStatusLabel()
+        updateSwitches()
+        updateAvatarViewVisibility()
+        
+        if isCallDisconnected() {
+            hideCallView()
         }
     }
     
-    func hideCallView() {
-        hideSelfView()
-        hideRemoteView()
-        hideCallControllView()
+    private func showDisconnectionType(type: DisconnectionType) {
+        let disconnectionType = type.rawValue
+        disconnectionTypeLabel.text = disconnectionTypeLabel.text! + disconnectionType
+        disconnectionTypeLabel.hidden = false
     }
     
-    func showSelfView() {
-        selfView.hidden = false
+    private func updateStatusLabel() {
+        statusLabel.text = call.status.rawValue
     }
     
-    func hideSelfView() {
-        selfView.hidden = true
+    private func updateSwitches() {
+        facingModeSwitch.on = isFacingMode(Spark.phone.defaultFacingMode)
+        loudSpeakerSwitch.on = Spark.phone.defaultLoudSpeaker
+        sendingVideoSwitch.on = call.sendingVideo
+        sendingAudioSwitch.on = call.sendingAudio
+        receivingVideoSwitch.on = call.receivingVideo
+        receivingAudioSwitch.on = call.receivingAudio
+        
+        if !VideoAudioSetup.sharedInstance.isVideoEnabled() {
+            facingModeSwitch.enabled = false
+            sendingVideoSwitch.enabled = false
+            receivingVideoSwitch.enabled = false
+        }
     }
     
-    func hideRemoteView() {
-        remoteView.hidden = true
+    private func updateAvatarContainerView() {
+        avatarContainerView.image = UIImage(named: "Wallpaper")
+        avatarContainerView.frame = remoteView.frame
+        updateAvatarImageView()
     }
     
-    func hideCallControllView() {
-        toggleFacingModeButton.hidden = true
-        toggleLoudSpeakerButton.hidden = true
-        toggleSendingVideoButton.hidden = true
-        toggleSendingAudioButton.hidden = true
-        hangupButton.hidden = true
+    private func updateAvatarImageView() {
+        let w_avatar = avatarContainerView.frame.height/3
+        let h_avatar = avatarContainerView.frame.height/3
+        let x_avatar = (avatarContainerView.frame.width - w_avatar)/2
+        let y_avatar = (avatarContainerView.frame.height - h_avatar)/2
+        avatarImageView.frame = CGRectMake(x_avatar, y_avatar, w_avatar, h_avatar)
+        avatarImageView.layer.cornerRadius = w_avatar/2
+        avatarImageView.layer.masksToBounds = true
+        
+        let w_name = avatarContainerView.frame.width
+        let h_name = (avatarContainerView.frame.height - h_avatar)/2
+        let x_name = CGFloat(0)
+        let y_name = avatarContainerView.frame.height - h_name
+        remoteDisplayNameLabel.frame = CGRectMake(x_name, y_name, w_name, h_name)
+        remoteDisplayNameLabel.text = remoteDisplayName
+        remoteDisplayNameLabel.textAlignment = NSTextAlignment.Center
     }
     
-    func presentRateView() {
+    private func updateAvatarViewVisibility() {
+        if !isCallConnected() {
+            showAvatarContainerView(true)
+            return
+        }
+        
+        if !call.receivingVideo || !call.remoteSendingVideo {
+            showAvatarContainerView(true)
+            
+        } else {
+            showAvatarContainerView(false)
+        }
+    }
+    
+    private func fetchAvataImage() {
+        Utils.downloadAvatarImage(remoteAvatarUrl, completionHandler: {
+            self.avatarImageView.image = $0
+        })
+    }
+    
+    private func dismissCallView() {
+        if presentingViewController!.isKindOfClass(UINavigationController) {
+            let navigationController = presentingViewController as! UINavigationController
+            dismissViewControllerAnimated(true, completion: nil)
+            navigationController.popToRootViewControllerAnimated(true)
+        }
+    }
+    
+    private func hideCallView() {
+        showSelfView(false)
+        showCallControllView(false)
+    }
+    
+    private func showSelfView(shown: Bool) {
+        selfView.hidden = !shown
+    }
+    
+    private func showCallControllView(shown: Bool) {
+        if isCallDisconnected() {
+            switchContainerView.hidden = true
+            hangupButton.hidden = true
+        } else {
+            switchContainerView.hidden = !shown
+            hangupButton.hidden = !shown
+        }
+    }
+    
+    private func showAvatarContainerView(shown: Bool) {
+        avatarContainerView.hidden = !shown
+    }
+    
+    private func presentRateView() {
         let rateViewController = storyboard?.instantiateViewControllerWithIdentifier("CallFeedbackViewController") as! CallFeedbackViewController
         rateViewController.call = self.call
         rateViewController.modalPresentationStyle = .FullScreen
@@ -201,30 +307,7 @@ class VideoCallViewController: UIViewController {
         }
     }
     
-    override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        
-        if traitCollection.verticalSizeClass == .Regular{
-            remoteViewTop.constant = 40
-            remoteViewLeading.constant = 10
-            remoteViewTrailing.constant = 100
-            remoteViewHeight.constant = 200
-            selfViewWidth.constant = 70
-            selfViewHeight.constant = 100
-            homeButton.hidden = false
-        } else {
-            remoteViewTop.constant = 0
-            remoteViewLeading.constant = 0
-            remoteViewTrailing.constant = 0
-            remoteViewHeight.constant = view.bounds.height
-            selfViewWidth.constant = 100
-            selfViewHeight.constant = 70
-            homeButton.hidden = true
-        }
-        updateViewConstraints()
-    }
-    
-    func showEndCallAlert() {
+    private func showEndCallAlert() {
         let alert = UIAlertController(title: nil, message: "Do you want to end current call?", preferredStyle: .Alert)
         
         let endCallHandler = {
@@ -236,6 +319,20 @@ class VideoCallViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
         alert.addAction(UIAlertAction(title: "End call", style: .Default, handler: endCallHandler))
         presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    // MARK: - Utils
+    
+    private func isFacingMode(mode: Call.FacingMode) -> Bool {
+        return mode == Call.FacingMode.User
+    }
+    
+    private func isCallConnected() -> Bool {
+        return call.status == Call.Status.Connected
+    }
+    
+    private func isCallDisconnected() -> Bool {
+        return call.status == Call.Status.Disconnected
     }
 }
 

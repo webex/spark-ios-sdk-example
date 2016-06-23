@@ -7,13 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		042A4A711D114DC8002697D3 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042A4A701D114DC8002697D3 /* Utils.swift */; };
+		042A4A751D12532E002697D3 /* PersonTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042A4A741D12532E002697D3 /* PersonTableViewCell.swift */; };
 		04419ABA1CE065E0002BAFC2 /* IncomingCallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04419AB91CE065E0002BAFC2 /* IncomingCallViewController.swift */; };
 		0471A2561CDB429B00C6647E /* HomeTableTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0471A2551CDB429B00C6647E /* HomeTableTableViewController.swift */; };
 		0471A2581CDC438300C6647E /* SparkLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0471A2571CDC438300C6647E /* SparkLoginViewController.swift */; };
 		0471A25A1CDC5ECD00C6647E /* VideoCallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0471A2591CDC5ECD00C6647E /* VideoCallViewController.swift */; };
 		0471A25C1CDC655200C6647E /* InitiateCallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0471A25B1CDC655200C6647E /* InitiateCallViewController.swift */; };
 		0471A25E1CDC6BF600C6647E /* CallToastViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0471A25D1CDC6BF600C6647E /* CallToastViewController.swift */; };
-		0476F5651CEEB69400889801 /* appFeedbackTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0476F5641CEEB69400889801 /* appFeedbackTableViewController.swift */; };
+		0476F5651CEEB69400889801 /* AppFeedbackTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0476F5641CEEB69400889801 /* AppFeedbackTableViewController.swift */; };
 		048969351CDB34AB008966FA /* VideoAudioSetupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048969341CDB34AB008966FA /* VideoAudioSetupViewController.swift */; };
 		04AE18261CDAD3D800A8F078 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04AE18251CDAD3D800A8F078 /* AppDelegate.swift */; };
 		04AE18281CDAD3D800A8F078 /* StartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04AE18271CDAD3D800A8F078 /* StartViewController.swift */; };
@@ -22,26 +24,35 @@
 		04AE18301CDAD3D800A8F078 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 04AE182E1CDAD3D800A8F078 /* LaunchScreen.storyboard */; };
 		04D9882A1CEDAEBF00C18422 /* CallFeedbackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D988291CEDAEBF00C18422 /* CallFeedbackViewController.swift */; };
 		12A1611E1DA4EFA48208E5D8 /* Pods_KitchenSink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A779AB3A31B809D134C73D0C /* Pods_KitchenSink.framework */; };
+		3D8194C41D1A73B200D4D4E3 /* IncomingCallDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8194C31D1A73B200D4D4E3 /* IncomingCallDelegate.swift */; };
+		5D40D3631D17A48C00558921 /* VideoAudioSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D40D3621D17A48C00558921 /* VideoAudioSetup.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		04419AB91CE065E0002BAFC2 /* IncomingCallViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = IncomingCallViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		0471A2551CDB429B00C6647E /* HomeTableTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = HomeTableTableViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		0471A2571CDC438300C6647E /* SparkLoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SparkLoginViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		0471A2591CDC5ECD00C6647E /* VideoCallViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = VideoCallViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		0471A25B1CDC655200C6647E /* InitiateCallViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = InitiateCallViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		0471A25D1CDC6BF600C6647E /* CallToastViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CallToastViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		0476F5641CEEB69400889801 /* appFeedbackTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = appFeedbackTableViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		048969341CDB34AB008966FA /* VideoAudioSetupViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = VideoAudioSetupViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		042A4A701D114DC8002697D3 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		042A4A741D12532E002697D3 /* PersonTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonTableViewCell.swift; sourceTree = "<group>"; };
+		04419AB91CE065E0002BAFC2 /* IncomingCallViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IncomingCallViewController.swift; sourceTree = "<group>"; };
+		0471A2551CDB429B00C6647E /* HomeTableTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeTableTableViewController.swift; sourceTree = "<group>"; };
+		0471A2571CDC438300C6647E /* SparkLoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SparkLoginViewController.swift; sourceTree = "<group>"; };
+		0471A2591CDC5ECD00C6647E /* VideoCallViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoCallViewController.swift; sourceTree = "<group>"; };
+		0471A25B1CDC655200C6647E /* InitiateCallViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InitiateCallViewController.swift; sourceTree = "<group>"; };
+		0471A25D1CDC6BF600C6647E /* CallToastViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallToastViewController.swift; sourceTree = "<group>"; };
+		0476F5641CEEB69400889801 /* AppFeedbackTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppFeedbackTableViewController.swift; sourceTree = "<group>"; };
+		048969341CDB34AB008966FA /* VideoAudioSetupViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoAudioSetupViewController.swift; sourceTree = "<group>"; };
 		04AE18221CDAD3D800A8F078 /* KitchenSink.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KitchenSink.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		04AE18251CDAD3D800A8F078 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		04AE18271CDAD3D800A8F078 /* StartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = StartViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		04AE18251CDAD3D800A8F078 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		04AE18271CDAD3D800A8F078 /* StartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartViewController.swift; sourceTree = "<group>"; };
 		04AE182A1CDAD3D800A8F078 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		04AE182C1CDAD3D800A8F078 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		04AE182F1CDAD3D800A8F078 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		04AE18311CDAD3D800A8F078 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		04D988291CEDAEBF00C18422 /* CallFeedbackViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CallFeedbackViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		04D988291CEDAEBF00C18422 /* CallFeedbackViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallFeedbackViewController.swift; sourceTree = "<group>"; };
+		277E22BA829A2166B4679129 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
+		3D8194C31D1A73B200D4D4E3 /* IncomingCallDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IncomingCallDelegate.swift; sourceTree = "<group>"; };
+		5D40D3621D17A48C00558921 /* VideoAudioSetup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoAudioSetup.swift; sourceTree = "<group>"; };
 		64CD6C6BBEEF5EBA5E4702E7 /* Pods-KitchenSink.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink.debug.xcconfig"; path = "Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink.debug.xcconfig"; sourceTree = "<group>"; };
+		657C43FB45F7E9767BC98E93 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		87B55BD44833FEC88DC1F273 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A779AB3A31B809D134C73D0C /* Pods_KitchenSink.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D10621478BD9E68749DD77A3 /* Pods-KitchenSink.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink.release.xcconfig"; path = "Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -79,21 +90,25 @@
 		04AE18241CDAD3D800A8F078 /* KitchenSink */ = {
 			isa = PBXGroup;
 			children = (
+				04AE182C1CDAD3D800A8F078 /* Assets.xcassets */,
+				04AE18311CDAD3D800A8F078 /* Info.plist */,
+				04AE182E1CDAD3D800A8F078 /* LaunchScreen.storyboard */,
+				04AE18291CDAD3D800A8F078 /* Main.storyboard */,
 				04AE18251CDAD3D800A8F078 /* AppDelegate.swift */,
-				0476F5641CEEB69400889801 /* appFeedbackTableViewController.swift */,
+				0476F5641CEEB69400889801 /* AppFeedbackTableViewController.swift */,
+				04D988291CEDAEBF00C18422 /* CallFeedbackViewController.swift */,
 				0471A25D1CDC6BF600C6647E /* CallToastViewController.swift */,
 				0471A2551CDB429B00C6647E /* HomeTableTableViewController.swift */,
 				04419AB91CE065E0002BAFC2 /* IncomingCallViewController.swift */,
+				3D8194C31D1A73B200D4D4E3 /* IncomingCallDelegate.swift */,
 				0471A25B1CDC655200C6647E /* InitiateCallViewController.swift */,
-				04D988291CEDAEBF00C18422 /* CallFeedbackViewController.swift */,
+				042A4A741D12532E002697D3 /* PersonTableViewCell.swift */,
 				0471A2571CDC438300C6647E /* SparkLoginViewController.swift */,
 				04AE18271CDAD3D800A8F078 /* StartViewController.swift */,
+				042A4A701D114DC8002697D3 /* Utils.swift */,
+				5D40D3621D17A48C00558921 /* VideoAudioSetup.swift */,
 				048969341CDB34AB008966FA /* VideoAudioSetupViewController.swift */,
 				0471A2591CDC5ECD00C6647E /* VideoCallViewController.swift */,
-				04AE18291CDAD3D800A8F078 /* Main.storyboard */,
-				04AE182C1CDAD3D800A8F078 /* Assets.xcassets */,
-				04AE182E1CDAD3D800A8F078 /* LaunchScreen.storyboard */,
-				04AE18311CDAD3D800A8F078 /* Info.plist */,
 			);
 			path = KitchenSink;
 			sourceTree = "<group>";
@@ -101,6 +116,8 @@
 		54914B81CE99B6BC8363D655 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
+				657C43FB45F7E9767BC98E93 /* Pods.debug.xcconfig */,
+				277E22BA829A2166B4679129 /* Pods.release.xcconfig */,
 				64CD6C6BBEEF5EBA5E4702E7 /* Pods-KitchenSink.debug.xcconfig */,
 				D10621478BD9E68749DD77A3 /* Pods-KitchenSink.release.xcconfig */,
 			);
@@ -110,6 +127,7 @@
 		A9158AFF5A79BE6326DB8A14 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				87B55BD44833FEC88DC1F273 /* Pods.framework */,
 				A779AB3A31B809D134C73D0C /* Pods_KitchenSink.framework */,
 			);
 			name = Frameworks;
@@ -128,7 +146,7 @@
 				04AE18201CDAD3D800A8F078 /* Resources */,
 				C67BA3D95E6683C9DCA04CE2 /* 📦 Embed Pods Frameworks */,
 				D702690831E3AE770BF4A333 /* 📦 Copy Pods Resources */,
-				04ACAE971CFD5EC300F03AD0 /* ShellScript */,
+				7F0B45B024C0464C047CFA0C /* Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -151,7 +169,6 @@
 				TargetAttributes = {
 					04AE18211CDAD3D800A8F078 = {
 						CreatedOnToolsVersion = 7.3;
-						DevelopmentTeam = 8WH79Q3W4T;
 					};
 				};
 			};
@@ -187,18 +204,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		04ACAE971CFD5EC300F03AD0 /* ShellScript */ = {
+		7F0B45B024C0464C047CFA0C /* Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "APP_PATH=\"${TARGET_BUILD_DIR}/${WRAPPER_NAME}\"\n\n# This script loops through the frameworks embedded in the application and\n# removes unused architectures.\nfind \"$APP_PATH\" -name '*.framework' -type d | while read -r FRAMEWORK\ndo\nFRAMEWORK_EXECUTABLE_NAME=$(defaults read \"$FRAMEWORK/Info.plist\" CFBundleExecutable)\nFRAMEWORK_EXECUTABLE_PATH=\"$FRAMEWORK/$FRAMEWORK_EXECUTABLE_NAME\"\necho \"Executable is $FRAMEWORK_EXECUTABLE_PATH\"\n\nEXTRACTED_ARCHS=()\n\nfor ARCH in $ARCHS\ndo\necho \"Extracting $ARCH from $FRAMEWORK_EXECUTABLE_NAME\"\nlipo -extract \"$ARCH\" \"$FRAMEWORK_EXECUTABLE_PATH\" -o \"$FRAMEWORK_EXECUTABLE_PATH-$ARCH\"\nEXTRACTED_ARCHS+=(\"$FRAMEWORK_EXECUTABLE_PATH-$ARCH\")\ndone\n\necho \"Merging extracted architectures: ${ARCHS}\"\nlipo -o \"$FRAMEWORK_EXECUTABLE_PATH-merged\" -create \"${EXTRACTED_ARCHS[@]}\"\nrm \"${EXTRACTED_ARCHS[@]}\"\n\necho \"Replacing original executable with thinned version\"\nrm \"$FRAMEWORK_EXECUTABLE_PATH\"\nmv \"$FRAMEWORK_EXECUTABLE_PATH-merged\" \"$FRAMEWORK_EXECUTABLE_PATH\"\n\ndone";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
 		};
 		C67BA3D95E6683C9DCA04CE2 /* 📦 Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -252,17 +271,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0476F5651CEEB69400889801 /* appFeedbackTableViewController.swift in Sources */,
+				0476F5651CEEB69400889801 /* AppFeedbackTableViewController.swift in Sources */,
+				042A4A751D12532E002697D3 /* PersonTableViewCell.swift in Sources */,
 				04D9882A1CEDAEBF00C18422 /* CallFeedbackViewController.swift in Sources */,
 				04AE18281CDAD3D800A8F078 /* StartViewController.swift in Sources */,
 				04419ABA1CE065E0002BAFC2 /* IncomingCallViewController.swift in Sources */,
 				0471A25A1CDC5ECD00C6647E /* VideoCallViewController.swift in Sources */,
 				0471A25C1CDC655200C6647E /* InitiateCallViewController.swift in Sources */,
 				0471A2561CDB429B00C6647E /* HomeTableTableViewController.swift in Sources */,
+				3D8194C41D1A73B200D4D4E3 /* IncomingCallDelegate.swift in Sources */,
 				04AE18261CDAD3D800A8F078 /* AppDelegate.swift in Sources */,
 				048969351CDB34AB008966FA /* VideoAudioSetupViewController.swift in Sources */,
+				5D40D3631D17A48C00558921 /* VideoAudioSetup.swift in Sources */,
 				0471A25E1CDC6BF600C6647E /* CallToastViewController.swift in Sources */,
 				0471A2581CDC438300C6647E /* SparkLoginViewController.swift in Sources */,
+				042A4A711D114DC8002697D3 /* Utils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -378,7 +401,6 @@
 			baseConfigurationReference = 64CD6C6BBEEF5EBA5E4702E7 /* Pods-KitchenSink.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = KitchenSink/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.KitchenSinkDemo;
@@ -391,7 +413,6 @@
 			baseConfigurationReference = D10621478BD9E68749DD77A3 /* Pods-KitchenSink.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = KitchenSink/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.KitchenSinkDemo;

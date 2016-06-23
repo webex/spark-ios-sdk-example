@@ -15,14 +15,17 @@
 import UIKit
 import SparkSDK
 
-class CallToastViewController: UIViewController {
+class CallToastViewController: UIViewController, CallObserver {
     
+    @IBOutlet weak var avatarImage: UIImageView!
     @IBOutlet weak var nameLabel: UILabel!
     
     var call: Call!
-    var name: String?
-    var avatar: String?
-    var videoCallViewController: VideoCallViewController!
+    var incomingCallDelegate: IncomingCallDelegate!
+    
+    private var name = ""
+    private var avatar = ""
+    
     
     // MARK: - Life cycle
     
@@ -33,91 +36,72 @@ class CallToastViewController: UIViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(CallToastViewController.onCallConnected), name: Notifications.Call.Connected, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(CallToastViewController.onCallDisconnected), name: Notifications.Call.Disconnected, object: nil)
+        CallNotificationCenter.sharedInstance.addObserver(self)
     }
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-        NSNotificationCenter.defaultCenter().removeObserver(self)
-    }
-    
-    func setupView() {
-        requestHostsProfile()
-        nameLabel.text = name
-        videoCallViewController = storyboard?.instantiateViewControllerWithIdentifier("VideoCallViewController") as? VideoCallViewController!
-    }
-    
-    // MARK: - People API
-    
-    func requestHostsProfile() {
-        if Spark.authorized() {
-            let email = call.from
-            if email != "" {
-                let host = (try? Spark.people.list(email: email))?[0]
-                name = host?.displayName
-                avatar = host?.avatar
-            }
-        }
+        CallNotificationCenter.sharedInstance.removeObserver(self)
     }
     
     // MARK: - Call answer/reject
     
     @IBAction func answerButtonPressed(sender: AnyObject) {
-        Spark.phone.requestAccessForMedia() { granted in
-            if granted {
-                self.presentVideoCallView()
-                let renderView = RenderView(local: self.videoCallViewController.selfView, remote: self.videoCallViewController.remoteView)
-                self.call.answer(renderView, completionHandler: nil)
-            } else {
-                self.call.reject(nil)
-                self.showCameraMicrophoneAccessDeniedAlert()
-            }
-        }
+        incomingCallDelegate.didAnswerIncomingCall()
+        dismissView()
     }
     
     @IBAction func declineButtonPressed(sender: AnyObject) {
-        call.reject(nil)
+        incomingCallDelegate.didDeclineIncomingCall()
         dismissView()
     }
     
-    // MARK: - Call events
+    // MARK: - CallObserver
     
-    @objc func onCallDisconnected() {
+    func callDidBeginRinging(call: Call) {
+    }
+    
+    func callDidConnect(call: Call) {
+    }
+    
+    func callDidDisconnect(call: Call, disconnectionType: DisconnectionType) {
         dismissView()
     }
     
-    @objc func onCallConnected() {
-        dismissView()
+    func remoteMediaDidChange(call: Call, mediaChangeType: MediaChangeType) {
     }
     
     // MARK: - UI views
     
-    func dismissView() {
+    private func setupView() {
+        fetchUserProfile()
+        fetchAvataImage()
+        updateDisplayName()
+    }
+    
+    private func fetchAvataImage() {
+        Utils.downloadAvatarImage(avatar, completionHandler: {
+            self.avatarImage.image = $0
+        })
+    }
+    
+    private func updateDisplayName() {
+        nameLabel.text = name
+    }
+    
+    private func dismissView() {
         dismissViewControllerAnimated(false, completion: nil)
     }
+
+    // MARK: - People API
     
-    func presentVideoCallView() {
-        videoCallViewController.call = self.call
-        videoCallViewController.modalPresentationStyle = .FullScreen
-        self.presentViewController(videoCallViewController, animated: true, completion: nil)
-        if let popoverController = videoCallViewController.popoverPresentationController {
-            popoverController.sourceView = self.view
-            popoverController.sourceRect = self.view.bounds
-            popoverController.permittedArrowDirections = .Any
+    private func fetchUserProfile() {
+        if Spark.authorized() {
+            if let email = call.from {
+                let profile = Utils.fetchUserProfile(email)
+                name = profile.displayName
+                avatar = profile.avatarUrl
+            }
         }
-    }
-    
-    func showCameraMicrophoneAccessDeniedAlert() {
-        let alert = UIAlertController(title: "Access Denied", message: "Calling requires access to the camera and microphone. To fix this, go to Settings|Privacy|Camera and Settings|Privacy|Microphone, find this app and grant access.", preferredStyle: .Alert)
-        
-        let dismissHandler = {
-            (action: UIAlertAction!) in
-            alert.dismissViewControllerAnimated(true, completion: nil)
-            self.dismissView()
-        }
-        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: dismissHandler))
-        presentViewController(alert, animated: true, completion: nil)
     }
 }
-

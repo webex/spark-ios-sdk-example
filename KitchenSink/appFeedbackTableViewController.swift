@@ -15,7 +15,7 @@
 import UIKit
 import MessageUI
 
-class appFeedbackTableViewController: UITableViewController, MFMailComposeViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class AppFeedbackTableViewController: UITableViewController, MFMailComposeViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     @IBOutlet weak var topicLabel: UILabel!
     @IBOutlet weak var userCommentsText: UITextView!

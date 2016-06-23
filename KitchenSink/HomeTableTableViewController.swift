@@ -19,7 +19,7 @@ class HomeTableTableViewController: UITableViewController {
     
     @IBOutlet weak var statusLabel: UILabel!
     
-    var registerState = "connecting"
+    private var registerState = "connecting"
     
     // MARK: - Life cycle
     
@@ -32,9 +32,9 @@ class HomeTableTableViewController: UITableViewController {
     // MARK: - Phone register
     
     func registerPhone() {
-        Spark.phone.requestAccessForMedia() { granted in
+        Spark.phone.requestMediaAccess(Phone.MediaAccessType.AudioVideo) { granted in
             if !granted {
-                self.showCameraMicrophoneAccessDeniedAlert()
+                Utils.showCameraMicrophoneAccessDeniedAlert(self)
             }
         }
         Spark.phone.register() { success in
@@ -48,34 +48,7 @@ class HomeTableTableViewController: UITableViewController {
         }
     }
     
-    // MARK: - UI views
-    
-    func updateStatusLabel() {
-        statusLabel.text = "powered by SDK v" + Spark.version
-        statusLabel.text = statusLabel.text! + "\nregistration to Cisco Cloud : " + registerState
-    }
-    
-    func showPhoneRegisterFailAlert() {
-        let alert = UIAlertController(title: "Alert", message: "Phone Register Fail", preferredStyle: .Alert)
-        
-        let dismissHandler = {
-            (action: UIAlertAction!) in
-            alert.dismissViewControllerAnimated(true, completion: nil)
-        }
-        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: dismissHandler))
-        presentViewController(alert, animated: true, completion: nil)
-    }
-    
-    func showCameraMicrophoneAccessDeniedAlert() {
-        let alert = UIAlertController(title: "Access Denied", message: "Calling requires access to the camera and microphone. To fix this, go to Settings|Privacy|Camera and Settings|Privacy|Microphone, find this app and grant access.", preferredStyle: .Alert)
-        
-        let dismissHandler = {
-            (action: UIAlertAction!) in
-            alert.dismissViewControllerAnimated(true, completion: nil)
-        }
-        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: dismissHandler))
-        presentViewController(alert, animated: true, completion: nil)
-    }
+    // MARK: - UITableViewController
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
@@ -84,5 +57,19 @@ class HomeTableTableViewController: UITableViewController {
             Spark.deauthorize()
             dismissViewControllerAnimated(true, completion: nil)
         }
+    }
+    
+    // MARK: - UI views
+    
+    private func updateStatusLabel() {
+        statusLabel.text = "powered by SDK v" + Spark.version
+        statusLabel.text = statusLabel.text! + "\nregistration to Cisco cloud : " + registerState
+    }
+    
+    private func showPhoneRegisterFailAlert() {
+        let alert = UIAlertController(title: "Alert", message: "Phone register fail", preferredStyle: .Alert)
+        
+        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+        presentViewController(alert, animated: true, completion: nil)
     }
 }
