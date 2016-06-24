@@ -503,7 +503,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="567" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="video/audio setup" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n5m-oR-K2J">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Video/Audio setup" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n5m-oR-K2J">
                                                     <rect key="frame" x="28" y="5" width="511" height="40"/>
                                                     <color key="backgroundColor" red="0.062745098040000002" green="0.33333333329999998" blue="0.57254901960000004" alpha="1" colorSpace="calibratedRGB"/>
                                                     <constraints>
@@ -549,7 +549,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="567" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="initiate call" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uCB-z5-ydM">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Initiate call" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uCB-z5-ydM">
                                                     <rect key="frame" x="28" y="5" width="511" height="40"/>
                                                     <color key="backgroundColor" red="0.062745098040000002" green="0.33333333329999998" blue="0.57254901960000004" alpha="1" colorSpace="calibratedRGB"/>
                                                     <constraints>
@@ -595,7 +595,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="567" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="incoming call" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9OF-T9-rf4">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Incoming call" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9OF-T9-rf4">
                                                     <rect key="frame" x="28" y="5" width="511" height="40"/>
                                                     <color key="backgroundColor" red="0.062745098040000002" green="0.33333333329999998" blue="0.57254901960000004" alpha="1" colorSpace="calibratedRGB"/>
                                                     <constraints>
@@ -641,7 +641,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="567" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="send demo app feedback" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Q4t-3Z-1jB">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Send demo app feedback" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Q4t-3Z-1jB">
                                                     <rect key="frame" x="28" y="5" width="511" height="40"/>
                                                     <color key="backgroundColor" red="0.062745098040000002" green="0.33333333329999998" blue="0.57254901960000004" alpha="1" colorSpace="calibratedRGB"/>
                                                     <constraints>
@@ -691,7 +691,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="567" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="logout" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mBO-ni-HUm">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Logout" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mBO-ni-HUm">
                                                     <rect key="frame" x="28" y="5" width="511" height="40"/>
                                                     <color key="backgroundColor" red="0.062745098040000002" green="0.33333333329999998" blue="0.57254901960000004" alpha="1" colorSpace="calibratedRGB"/>
                                                     <constraints>
@@ -835,12 +835,12 @@
                         <variation key="default">
                             <mask key="constraints">
                                 <exclude reference="WFR-I9-kaH"/>
-                                <exclude reference="En6-iv-YEs"/>
-                                <exclude reference="ker-Ey-ZDr"/>
-                                <exclude reference="zxF-n1-JAx"/>
                                 <exclude reference="4vX-gD-5ue"/>
                                 <exclude reference="99p-0w-ifm"/>
                                 <exclude reference="bx7-4s-I55"/>
+                                <exclude reference="En6-iv-YEs"/>
+                                <exclude reference="ker-Ey-ZDr"/>
+                                <exclude reference="zxF-n1-JAx"/>
                             </mask>
                         </variation>
                     </view>
@@ -1776,7 +1776,7 @@
                             <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Disconnection type: " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0mx-qC-3cN">
                                 <rect key="frame" x="222" y="290" width="157" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="textColor" red="0.26274509800000001" green="0.66274509800000003" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>

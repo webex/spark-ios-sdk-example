@@ -55,6 +55,6 @@ class SparkLoginViewController: UIViewController {
     }
     
     func updateStatusLabel() {
-        statusLabel.text = "powered by SDK v" + Spark.version
+        statusLabel.text = "Powered by SDK v" + Spark.version
     }
 }

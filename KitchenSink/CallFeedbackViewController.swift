@@ -62,9 +62,9 @@ class CallFeedbackViewController: UIViewController, UITextFieldDelegate {
     }
 
     func updateStatusLabel() {
-        statusLabel.text = "user rating: " + String(Int(callRateView.rating))
-        statusLabel.text = statusLabel.text! + "\nuser comments : " + userCommentsTextField.text!
-        statusLabel.text = statusLabel.text! + "\ninclude logs : " + includeLogSwitch.on.description
+        statusLabel.text = "User rating: " + String(Int(callRateView.rating))
+        statusLabel.text = statusLabel.text! + "\nUser comments : " + userCommentsTextField.text!
+        statusLabel.text = statusLabel.text! + "\nInclude logs : " + includeLogSwitch.on.description
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {

@@ -62,8 +62,8 @@ class HomeTableTableViewController: UITableViewController {
     // MARK: - UI views
     
     private func updateStatusLabel() {
-        statusLabel.text = "powered by SDK v" + Spark.version
-        statusLabel.text = statusLabel.text! + "\nregistration to Cisco cloud : " + registerState
+        statusLabel.text = "Powered by SDK v" + Spark.version
+        statusLabel.text = statusLabel.text! + "\nRegistration to Cisco cloud : " + registerState
     }
     
     private func showPhoneRegisterFailAlert() {
