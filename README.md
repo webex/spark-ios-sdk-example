@@ -65,14 +65,6 @@ Below is code snippets of the SDK calling in the demo.
     @IBOutlet weak var selfView: MediaRenderView!
     @IBOutlet weak var remoteView: MediaRenderView!
     
-    // Calling events
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(VideoCallViewController.onCallRinging), name: Notifications.Call.Ringing, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(VideoCallViewController.onCallConnected), name: Notifications.Call.Connected, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(VideoCallViewController.onCallDisconnected), name: Notifications.Call.Disconnected, object: nil)
-    }
-    
     // Make a call
     let call = Spark.phone.dial(email, option: MediaOption.AudioVideo(local: videoCallViewController.selfView, remote: videoCallViewController.remoteView)) { success in
         if !success {
@@ -81,9 +73,15 @@ Below is code snippets of the SDK calling in the demo.
     }
     
     // Recive a call
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(showCallToastView(_:)), name: Notifications.Phone.Incoming, ...)
-    @objc func showCallToastView(notification: NSNotification) {
-        let incomingCall = notification.call
+    class IncomingCallViewController: UIViewController, PhoneObserver {
+    override func viewWillAppear(...) {
+        PhoneNotificationCenter.sharedInstance.addObserver(self)
+    }
+    override func viewWillDisappear(...) {
+        PhoneNotificationCenter.sharedInstance.removeObserver(self)
+    }
+    func callIncoming(call: Call) {
+    // Show incoming call toast view
     }
     
     // Answer and reject call
