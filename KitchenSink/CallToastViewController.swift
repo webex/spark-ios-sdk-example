@@ -58,17 +58,8 @@ class CallToastViewController: UIViewController, CallObserver {
     
     // MARK: - CallObserver
     
-    func callDidBeginRinging(call: Call) {
-    }
-    
-    func callDidConnect(call: Call) {
-    }
-    
     func callDidDisconnect(call: Call, disconnectionType: DisconnectionType) {
         dismissView()
-    }
-    
-    func remoteMediaDidChange(call: Call, mediaChangeType: MediaChangeType) {
     }
     
     // MARK: - UI views

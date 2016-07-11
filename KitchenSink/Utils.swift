@@ -19,7 +19,7 @@ class Utils {
     static func fetchUserProfile(email: String) -> (displayName: String, avatarUrl: String) {
         var name = ""
         var avatar = ""
-        if !email.isEmpty {
+        if let email = EmailAddress.fromString(email) {
             // Person list is empty with SIP email address
             if let persons = try? Spark.people.list(email: email, max: 1) where !persons.isEmpty {
                 let person = persons[0]
@@ -27,7 +27,7 @@ class Utils {
                     name = displayName
                 } else {
                     // Fallback to raw dial string
-                    name = email
+                    name = email.toString()
                 }
                 if let avatarUrl = person.avatar {
                     avatar = avatarUrl

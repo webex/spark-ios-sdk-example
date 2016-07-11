@@ -25,6 +25,8 @@ class VideoCallViewController: UIViewController, CallObserver {
     
     @IBOutlet weak var hangupButton: UIButton!
     @IBOutlet weak var homeButton: UIButton!
+    @IBOutlet weak var dialpadButton: UIButton!
+    @IBOutlet weak var dialpadView: UICollectionView!
     
     @IBOutlet weak var facingModeSwitch: UISwitch!
     @IBOutlet weak var loudSpeakerSwitch: UISwitch!
@@ -48,6 +50,7 @@ class VideoCallViewController: UIViewController, CallObserver {
     private var remoteAvatarUrl = ""
     private var avatarImageView = UIImageView()
     private var remoteDisplayNameLabel = UILabel()
+    private let DTMFKeys = ["1", "2", "3", "A", "4", "5", "6", "B", "7", "8", "9", "C", "*", "0", "#", "D"]
     
     // MARK: - Life cycle
     
@@ -120,6 +123,10 @@ class VideoCallViewController: UIViewController, CallObserver {
         updateAvatarViewVisibility()
     }
     
+    func enableDTMFDidChange(call: Call, sendingDTMFEnabled: Bool) {
+        hideDialpadButton(!sendingDTMFEnabled)
+    }
+    
     // MARK: - Call control
     
     @IBAction func hangup(sender: AnyObject) {
@@ -172,6 +179,10 @@ class VideoCallViewController: UIViewController, CallObserver {
         }
     }
     
+    @IBAction func pressDialpadButton(sender: AnyObject) {
+        hideDialpadView(!dialpadView.hidden)
+    }
+    
     // MARK: - UI views
     
     private func setupAvata() {
@@ -189,6 +200,8 @@ class VideoCallViewController: UIViewController, CallObserver {
         updateStatusLabel()
         updateSwitches()
         updateAvatarViewVisibility()
+        hideDialpadButton(!call.sendingDTMFEnabled)
+        hideDialpadView(true)
         
         if isCallDisconnected() {
             hideCallView()
@@ -295,6 +308,17 @@ class VideoCallViewController: UIViewController, CallObserver {
         avatarContainerView.hidden = !shown
     }
     
+    private func hideDialpadView(hidden: Bool) {
+        dialpadView.hidden = hidden
+    }
+    
+    private func hideDialpadButton(hidden: Bool) {
+        dialpadButton.hidden = hidden
+        if hidden {
+            hideDialpadView(true)
+        }
+    }
+    
     private func presentRateView() {
         let rateViewController = storyboard?.instantiateViewControllerWithIdentifier("CallFeedbackViewController") as! CallFeedbackViewController
         rateViewController.call = self.call
@@ -336,3 +360,34 @@ class VideoCallViewController: UIViewController, CallObserver {
     }
 }
 
+extension VideoCallViewController : UICollectionViewDataSource {
+    
+    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return DTMFKeys.count
+    }
+    
+    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("dialpadCell", forIndexPath: indexPath)
+        
+        let dialButton = cell.viewWithTag(105) as! UILabel
+        dialButton.text = DTMFKeys[indexPath.item]
+        dialButton.layer.borderColor = UIColor.grayColor().CGColor;
+        return cell
+    }
+}
+
+extension VideoCallViewController : UICollectionViewDelegate {
+    
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        let cell = collectionView.cellForItemAtIndexPath(indexPath)
+        UIView.animateWithDuration(0.2, animations: {
+            cell?.alpha = 0.7
+            }, completion: { (finished: Bool) -> Void in
+                cell?.alpha = 1
+        })
+        
+        let dialButton = cell!.viewWithTag(105) as! UILabel
+        let dtmfEvent = dialButton.text
+        call.sendDTMF(dtmfEvent!, completionHandler: nil)
+    }
+}

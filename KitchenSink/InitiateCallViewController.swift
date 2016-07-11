@@ -98,8 +98,8 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
             return
         }
         
-        if searchString.containsString("@") {
-            Spark.people.list(email: searchString, max: 10) {
+        if let email = EmailAddress.fromString(searchString) {
+            Spark.people.list(email: email, max: 10) {
                 (response: ServiceResponse<[Person]>) in
                 
                 switch response.result {
@@ -143,7 +143,7 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
         let cell = tableView.dequeueReusableCellWithIdentifier("PersonCell", forIndexPath: indexPath) as! PersonTableViewCell
         let person = searchResult?[indexPath.row]
         let email = person?.emails?.first
-        cell.address = email
+        cell.address = email?.toString()
         cell.initiateCallViewController = self
         
         Utils.downloadAvatarImage(person?.avatar, completionHandler: {
