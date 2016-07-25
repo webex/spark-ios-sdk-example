@@ -119,8 +119,41 @@ class VideoCallViewController: UIViewController, CallObserver {
         presentRateView()
     }
     
-    func remoteMediaDidChange(call: Call, mediaChangeType: MediaChangeType) {
+    func remoteMediaDidChange(call: Call, remoteMediaChangeType: RemoteMediaChangeType) {
         updateAvatarViewVisibility()
+        
+        if (remoteMediaChangeType == .RemoteVideoOutputMuted) {
+            receivingVideoSwitch.on = false
+        } else if (remoteMediaChangeType == .RemoteVideoOutputUnmuted) {
+            receivingVideoSwitch.on = true
+        }
+        
+        if (remoteMediaChangeType == .RemoteAudioOutputMuted) {
+            receivingAudioSwitch.on = false
+        } else if (remoteMediaChangeType == .RemoteAudioOutputUnmuted) {
+            receivingAudioSwitch.on = true
+        }
+    }
+    
+    func localMediaDidChange(call: Call, localMediaChangeType: LocalMediaChangeType) {
+        switch localMediaChangeType {
+        case .LocalVideoMuted:
+            sendingVideoSwitch.on = false
+        case .LocalVideoUnmuted:
+            sendingVideoSwitch.on = true
+        case .LocalAudioMuted:
+            sendingAudioSwitch.on = false
+        case .LocalAudioUnmuted:
+            sendingAudioSwitch.on = true
+        }
+    }
+    
+    func facingModeDidChange(call: Call, facingMode: Call.FacingMode) {
+        facingModeSwitch.on = isFacingModeUser(call.facingMode)
+    }
+    
+    func loudSpeakerDidChange(call: Call, isLoudSpeakerSelected: Bool) {
+        loudSpeakerSwitch.on = isLoudSpeakerSelected
     }
     
     func enableDTMFDidChange(call: Call, sendingDTMFEnabled: Bool) {
@@ -133,6 +166,7 @@ class VideoCallViewController: UIViewController, CallObserver {
         call.hangup() { success in
             if !success {
                 print("Failed to hangup call.")
+                self.dismissCallView()
             } else {
                 self.presentRateView()
             }
@@ -141,11 +175,11 @@ class VideoCallViewController: UIViewController, CallObserver {
     
     @IBAction func toggleFacingMode(sender: AnyObject) {
         call.toggleFacingMode()
-        facingModeSwitch.on = isFacingMode(call.facingMode)
+        facingModeSwitch.on = isFacingModeUser(call.facingMode)
     }
     
     @IBAction func toggleLoudSpeaker(sender: AnyObject) {
-        call.toggleLoudSpeaker(!call.loudSpeaker)
+        call.toggleLoudSpeaker()
         loudSpeakerSwitch.on = call.loudSpeaker
     }
     
@@ -202,6 +236,7 @@ class VideoCallViewController: UIViewController, CallObserver {
         updateAvatarViewVisibility()
         hideDialpadButton(!call.sendingDTMFEnabled)
         hideDialpadView(true)
+        updateSelfViewVisibility()
         
         if isCallDisconnected() {
             hideCallView()
@@ -219,8 +254,8 @@ class VideoCallViewController: UIViewController, CallObserver {
     }
     
     private func updateSwitches() {
-        facingModeSwitch.on = isFacingMode(Spark.phone.defaultFacingMode)
-        loudSpeakerSwitch.on = Spark.phone.defaultLoudSpeaker
+        facingModeSwitch.on = isFacingModeUser(call.facingMode)
+        loudSpeakerSwitch.on = call.loudSpeaker
         sendingVideoSwitch.on = call.sendingVideo
         sendingAudioSwitch.on = call.sendingAudio
         receivingVideoSwitch.on = call.receivingVideo
@@ -265,10 +300,13 @@ class VideoCallViewController: UIViewController, CallObserver {
         
         if !call.receivingVideo || !call.remoteSendingVideo {
             showAvatarContainerView(true)
-            
         } else {
             showAvatarContainerView(false)
         }
+    }
+    
+    private func updateSelfViewVisibility() {
+        showSelfView(call.sendingVideo)
     }
     
     private func fetchAvataImage() {
@@ -301,6 +339,7 @@ class VideoCallViewController: UIViewController, CallObserver {
         } else {
             switchContainerView.hidden = !shown
             hangupButton.hidden = !shown
+            hideDialpadButton(!shown)
         }
     }
     
@@ -347,7 +386,7 @@ class VideoCallViewController: UIViewController, CallObserver {
     
     // MARK: - Utils
     
-    private func isFacingMode(mode: Call.FacingMode) -> Bool {
+    private func isFacingModeUser(mode: Call.FacingMode) -> Bool {
         return mode == Call.FacingMode.User
     }
     
@@ -359,6 +398,8 @@ class VideoCallViewController: UIViewController, CallObserver {
         return call.status == Call.Status.Disconnected
     }
 }
+
+// MARK: - DTMF dialpad view
 
 extension VideoCallViewController : UICollectionViewDataSource {
     

@@ -140,12 +140,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 04AE18341CDAD3D800A8F078 /* Build configuration list for PBXNativeTarget "KitchenSink" */;
 			buildPhases = (
-				DF6EFD13F9B0CB0663775320 /* 📦 Check Pods Manifest.lock */,
+				DF6EFD13F9B0CB0663775320 /* [CP] Check Pods Manifest.lock */,
 				04AE181E1CDAD3D800A8F078 /* Sources */,
 				04AE181F1CDAD3D800A8F078 /* Frameworks */,
 				04AE18201CDAD3D800A8F078 /* Resources */,
-				C67BA3D95E6683C9DCA04CE2 /* 📦 Embed Pods Frameworks */,
-				D702690831E3AE770BF4A333 /* 📦 Copy Pods Resources */,
+				C67BA3D95E6683C9DCA04CE2 /* [CP] Embed Pods Frameworks */,
+				D702690831E3AE770BF4A333 /* [CP] Copy Pods Resources */,
 				04DF251D1D1D14DB002390D0 /* ShellScript */,
 			);
 			buildRules = (
@@ -217,14 +217,14 @@
 			shellPath = /bin/sh;
 			shellScript = "APP_PATH=\"${TARGET_BUILD_DIR}/${WRAPPER_NAME}\"\n\n# This script loops through the frameworks embedded in the application and\n# removes unused architectures.\nfind \"$APP_PATH\" -name '*.framework' -type d | while read -r FRAMEWORK\ndo\nFRAMEWORK_EXECUTABLE_NAME=$(defaults read \"$FRAMEWORK/Info.plist\" CFBundleExecutable)\nFRAMEWORK_EXECUTABLE_PATH=\"$FRAMEWORK/$FRAMEWORK_EXECUTABLE_NAME\"\necho \"Executable is $FRAMEWORK_EXECUTABLE_PATH\"\n\nEXTRACTED_ARCHS=()\n\nfor ARCH in $ARCHS\ndo\necho \"Extracting $ARCH from $FRAMEWORK_EXECUTABLE_NAME\"\nlipo -extract \"$ARCH\" \"$FRAMEWORK_EXECUTABLE_PATH\" -o \"$FRAMEWORK_EXECUTABLE_PATH-$ARCH\"\nEXTRACTED_ARCHS+=(\"$FRAMEWORK_EXECUTABLE_PATH-$ARCH\")\ndone\n\necho \"Merging extracted architectures: ${ARCHS}\"\nlipo -o \"$FRAMEWORK_EXECUTABLE_PATH-merged\" -create \"${EXTRACTED_ARCHS[@]}\"\nrm \"${EXTRACTED_ARCHS[@]}\"\n\necho \"Replacing original executable with thinned version\"\nrm \"$FRAMEWORK_EXECUTABLE_PATH\"\nmv \"$FRAMEWORK_EXECUTABLE_PATH-merged\" \"$FRAMEWORK_EXECUTABLE_PATH\"\n\ndone";
 		};
-		C67BA3D95E6683C9DCA04CE2 /* 📦 Embed Pods Frameworks */ = {
+		C67BA3D95E6683C9DCA04CE2 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -232,14 +232,14 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D702690831E3AE770BF4A333 /* 📦 Copy Pods Resources */ = {
+		D702690831E3AE770BF4A333 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -247,14 +247,14 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		DF6EFD13F9B0CB0663775320 /* 📦 Check Pods Manifest.lock */ = {
+		DF6EFD13F9B0CB0663775320 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
