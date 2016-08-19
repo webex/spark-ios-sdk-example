@@ -28,7 +28,6 @@ Below is code snippets of the SDK calling in the demo.
 1. Setup SDK with Spark access token 
    ```swift
    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        
         let sparkAccessToken = "Yjc5ZTYyMDEt..."
         Spark.initWith(accessToken: sparkAccessToken)
         return true
@@ -37,7 +36,6 @@ Below is code snippets of the SDK calling in the demo.
 1. Setup SDK with app infomation, and authorize access to Spark service
    ```swift
    class LoginViewController: UIViewController {
-    
         @IBAction func loginWithSpark(sender: AnyObject) {
             let clientId = "C90f769..."
             let clientSecret = "64e252..."
@@ -81,7 +79,7 @@ Below is code snippets of the SDK calling in the demo.
         PhoneNotificationCenter.sharedInstance.removeObserver(self)
     }
     func callIncoming(call: Call) {
-    // Show incoming call toast view
+        // Show incoming call toast view
     }
     
     // Answer and reject call
