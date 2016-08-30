@@ -29,8 +29,8 @@ class CallToastViewController: UIViewController, CallObserver {
     var call: Call!
     var incomingCallDelegate: IncomingCallDelegate!
     
-    private var name = ""
-    private var avatar = ""
+    fileprivate var name = ""
+    fileprivate var avatar = ""
     
     
     // MARK: - Life cycle
@@ -40,59 +40,59 @@ class CallToastViewController: UIViewController, CallObserver {
         setupView()
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         CallNotificationCenter.sharedInstance.addObserver(self)
     }
     
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         CallNotificationCenter.sharedInstance.removeObserver(self)
     }
     
     // MARK: - Call answer/reject
     
-    @IBAction func answerButtonPressed(sender: AnyObject) {
+    @IBAction func answerButtonPressed(_ sender: AnyObject) {
         incomingCallDelegate.didAnswerIncomingCall()
         dismissView()
     }
     
-    @IBAction func declineButtonPressed(sender: AnyObject) {
+    @IBAction func declineButtonPressed(_ sender: AnyObject) {
         incomingCallDelegate.didDeclineIncomingCall()
         dismissView()
     }
     
     // MARK: - CallObserver
     
-    func callDidDisconnect(call: Call, disconnectionType: DisconnectionType) {
+    func callDidDisconnect(_ call: Call, disconnectionType: DisconnectionType) {
         dismissView()
     }
     
     // MARK: - UI views
     
-    private func setupView() {
+    fileprivate func setupView() {
         fetchUserProfile()
         fetchAvataImage()
         updateDisplayName()
     }
     
-    private func fetchAvataImage() {
+    fileprivate func fetchAvataImage() {
         Utils.downloadAvatarImage(avatar, completionHandler: {
             self.avatarImage.image = $0
         })
     }
     
-    private func updateDisplayName() {
+    fileprivate func updateDisplayName() {
         nameLabel.text = name
     }
     
-    private func dismissView() {
-        dismissViewControllerAnimated(false, completion: nil)
+    fileprivate func dismissView() {
+        dismiss(animated: false, completion: nil)
     }
 
     // MARK: - People API
     
-    private func fetchUserProfile() {
+    fileprivate func fetchUserProfile() {
         if Spark.authorized() {
             if let email = call.from {
                 let profile = Utils.fetchUserProfile(email)

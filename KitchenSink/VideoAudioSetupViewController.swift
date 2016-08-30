@@ -46,23 +46,23 @@ class VideoAudioSetupViewController: UIViewController {
     
     // MARK: - Speaker switch
     
-    @IBAction func toggleLoudSpeaker(sender: AnyObject) {
-        setup.setLoudSpeaker(defaultAudioSpeakerSwitch.on)
+    @IBAction func toggleLoudSpeaker(_ sender: AnyObject) {
+        setup.setLoudSpeaker(defaultAudioSpeakerSwitch.isOn)
         updateStatusLabel()
     }
     
-    @IBAction func toggleVideoMode(sender: AnyObject) {
-        setup.setVideoEnabled(defaultVideoSwitch.on)
+    @IBAction func toggleVideoMode(_ sender: AnyObject) {
+        setup.setVideoEnabled(defaultVideoSwitch.isOn)
         if !setup.isVideoEnabled() {
-            defaultCameraSwitch.enabled = false
+            defaultCameraSwitch.isEnabled = false
         } else {
-            defaultCameraSwitch.enabled = true
+            defaultCameraSwitch.isEnabled = true
         }
         updateStatusLabel()
     }
     
-    @IBAction func toggleFacingMode(sender: AnyObject) {
-        if defaultCameraSwitch.on {
+    @IBAction func toggleFacingMode(_ sender: AnyObject) {
+        if defaultCameraSwitch.isOn {
             setup.setFacingMode(Call.FacingMode.User)
         } else {
             setup.setFacingMode(Call.FacingMode.Environment)
@@ -73,7 +73,7 @@ class VideoAudioSetupViewController: UIViewController {
     func updateStatusLabel() {
         // Speaker
         let speakerStatus: String
-        if defaultAudioSpeakerSwitch.on {
+        if defaultAudioSpeakerSwitch.isOn {
             speakerStatus = "Speaker"
         } else {
             speakerStatus = "Non Speaker"
@@ -82,7 +82,7 @@ class VideoAudioSetupViewController: UIViewController {
         
         // Video mode
         let mediaOption: String
-        if defaultVideoSwitch.on {
+        if defaultVideoSwitch.isOn {
             mediaOption = "Audio + Video"
         } else {
             mediaOption = "Audio-Only"
@@ -91,9 +91,9 @@ class VideoAudioSetupViewController: UIViewController {
         
         // Camera
         let cameraStatus: String
-        if !defaultVideoSwitch.on {
+        if !defaultVideoSwitch.isOn {
             cameraStatus = "N/A"
-        } else if defaultCameraSwitch.on {
+        } else if defaultCameraSwitch.isOn {
             cameraStatus = "Front camera"
         } else {
             cameraStatus = "Back camera"

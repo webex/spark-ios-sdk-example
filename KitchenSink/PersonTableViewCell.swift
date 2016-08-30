@@ -27,10 +27,10 @@ class PersonTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         let selector = #selector(PersonTableViewCell.dial)
-        dialButton.addTarget(self, action: selector, forControlEvents: UIControlEvents.TouchUpInside)
+        dialButton.addTarget(self, action: selector, for: UIControlEvents.touchUpInside)
     }
     
-    func dial(sender: UIButton) {
+    func dial(_ sender: UIButton) {
         initiateCallViewController.dial(address!)
     }
 }

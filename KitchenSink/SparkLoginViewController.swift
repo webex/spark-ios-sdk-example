@@ -28,7 +28,7 @@ class SparkLoginViewController: UIViewController {
     
     // MARK: - Life cycle
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         handleAuth()
         updateStatusLabel()
@@ -36,7 +36,7 @@ class SparkLoginViewController: UIViewController {
     
     // MARK: - Login/Auth handling
     
-    @IBAction func loginWithSpark(sender: AnyObject) {
+    @IBAction func loginWithSpark(_ sender: AnyObject) {
         let clientId = "Cb3f891d2044fec65bfe36a8d1b3d69b3098448e9e0335c58bab42f5b94ad06c9"
         let clientSecret = "f2660da9c8b90a9cdfe713f7c115473b76da531bb7ec9c66fdb8ec1481585879"
         let scope = "spark:people_read spark:rooms_read spark:rooms_write spark:memberships_read spark:memberships_write spark:messages_read spark:messages_write"
@@ -50,14 +50,14 @@ class SparkLoginViewController: UIViewController {
             return
         }
         
-        view.makeToastActivity(.Center)
+        //view.makeToastActivity(.Center)
         passAuth()
         view.hideToastActivity()
     }
     
     func passAuth() {
-        let viewController = storyboard?.instantiateViewControllerWithIdentifier("HomeNavigationController") as! UINavigationController!
-        presentViewController(viewController, animated: false, completion: nil)
+        let viewController = storyboard?.instantiateViewController(withIdentifier: "HomeNavigationController") as! UINavigationController!
+        present(viewController!, animated: false, completion: nil)
     }
     
     func updateStatusLabel() {

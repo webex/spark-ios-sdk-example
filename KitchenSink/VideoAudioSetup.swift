@@ -18,9 +18,9 @@ import SparkSDK
 class VideoAudioSetup {
     
     static let sharedInstance = VideoAudioSetup()
-    private var videoEnabled = true
+    fileprivate var videoEnabled = true
     
-    func setFacingMode(mode: Call.FacingMode) {
+    func setFacingMode(_ mode: Call.FacingMode) {
         Spark.phone.defaultFacingMode = mode
     }
     
@@ -28,7 +28,7 @@ class VideoAudioSetup {
         return Spark.phone.defaultFacingMode
     }
     
-    func setLoudSpeaker(enable: Bool) {
+    func setLoudSpeaker(_ enable: Bool) {
         Spark.phone.defaultLoudSpeaker = enable
     }
     
@@ -36,7 +36,7 @@ class VideoAudioSetup {
         return Spark.phone.defaultLoudSpeaker
     }
     
-    func setVideoEnabled(enable: Bool) {
+    func setVideoEnabled(_ enable: Bool) {
         videoEnabled = enable
     }
     

@@ -48,32 +48,32 @@ class CallFeedbackViewController: UIViewController, UITextFieldDelegate {
     
     // MARK: - Call sendFeedback
     
-    @IBAction func sendFeedback(sender: AnyObject) {
-        call.sendFeedback(Int(callRateView.rating), comments: userCommentsTextField.text!, includeLogs: includeLogSwitch.on)
-        dismissViewControllerAnimated(true, completion: nil)
+    @IBAction func sendFeedback(_ sender: AnyObject) {
+        call.sendFeedback(Int(callRateView.rating), comments: userCommentsTextField.text!, includeLogs: includeLogSwitch.isOn)
+        dismiss(animated: true, completion: nil)
     }
     
     // MARK: - UI views
     
-    @IBAction func cancel(sender: AnyObject) {
-        dismissViewControllerAnimated(true, completion: nil)
+    @IBAction func cancel(_ sender: AnyObject) {
+        dismiss(animated: true, completion: nil)
     }
     
-    @IBAction func IncludeLogs(sender: AnyObject) {
+    @IBAction func IncludeLogs(_ sender: AnyObject) {
         updateStatusLabel()
     }
     
-    @IBAction func userCommentsChanged(sender: AnyObject) {
+    @IBAction func userCommentsChanged(_ sender: AnyObject) {
         updateStatusLabel()
     }
 
     func updateStatusLabel() {
         statusLabel.text = "User rating: " + String(Int(callRateView.rating))
         statusLabel.text = statusLabel.text! + "\nUser comments : " + userCommentsTextField.text!
-        statusLabel.text = statusLabel.text! + "\nInclude logs : " + includeLogSwitch.on.description
+        statusLabel.text = statusLabel.text! + "\nInclude logs : " + includeLogSwitch.isOn.description
     }
     
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         self.view.endEditing(true)
         updateStatusLabel()
         return false
