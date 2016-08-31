@@ -14,5 +14,6 @@ target 'KitchenSink' do
 	pod 'KeychainAccess', :git => 'https://github.com/asynchrony/KeychainAccess.git', :branch => 'swift-3.0'
 	pod 'CocoaLumberjack/Swift', :git => 'https://github.com/asynchrony/CocoaLumberjack.git', :branch => 'swift3'
 	pod 'Cosmos', git: 'https://github.com/marketplacer/Cosmos.git', tag: '6.0.0'
+    pod 'Toast-Swift', git: 'https://github.com/asynchrony/Toast-Swift.git', :branch => 'feature/swift-3.0'
 	
 end
