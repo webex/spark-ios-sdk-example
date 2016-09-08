@@ -39,12 +39,12 @@ class IncomingCallViewController: UIViewController, PhoneObserver, IncomingCallD
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        PhoneNotificationCenter.sharedInstance.addObserver(self)
+        PhoneNotificationCenter.sharedInstance.add(observer: self)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        PhoneNotificationCenter.sharedInstance.removeObserver(self)
+        PhoneNotificationCenter.sharedInstance.remove(observer: self)
     }
     
     // MARK: - PhoneObserver

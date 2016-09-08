@@ -42,12 +42,12 @@ class CallToastViewController: UIViewController, CallObserver {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        CallNotificationCenter.sharedInstance.addObserver(self)
+        CallNotificationCenter.sharedInstance.add(observer: self)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        CallNotificationCenter.sharedInstance.removeObserver(self)
+        CallNotificationCenter.sharedInstance.remove(observer: self)
     }
     
     // MARK: - Call answer/reject

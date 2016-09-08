@@ -68,12 +68,12 @@ class VideoCallViewController: UIViewController, CallObserver {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         updateUIStatus()
-        CallNotificationCenter.sharedInstance.addObserver(self)
+        CallNotificationCenter.sharedInstance.add(observer: self)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        CallNotificationCenter.sharedInstance.removeObserver(self)
+        CallNotificationCenter.sharedInstance.remove(observer: self)
     }
     
     override func viewDidLayoutSubviews() {
@@ -435,6 +435,6 @@ extension VideoCallViewController : UICollectionViewDelegate {
         
         let dialButton = cell!.viewWithTag(105) as! UILabel
         let dtmfEvent = dialButton.text
-        call.sendDTMF(dtmfEvent!, completionHandler: nil)
+		call.send(dtmf: dtmfEvent!, completionHandler: nil)
     }
 }

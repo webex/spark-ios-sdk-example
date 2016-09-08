@@ -49,7 +49,7 @@ class CallFeedbackViewController: UIViewController, UITextFieldDelegate {
     // MARK: - Call sendFeedback
     
     @IBAction func sendFeedback(_ sender: AnyObject) {
-        call.sendFeedback(Int(callRateView.rating), comments: userCommentsTextField.text!, includeLogs: includeLogSwitch.isOn)
+		call.sendFeedbackWith(rating: Int(callRateView.rating), comments: userCommentsTextField.text!, includeLogs: includeLogSwitch.isOn)
         dismiss(animated: true, completion: nil)
     }
     
