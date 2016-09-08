@@ -37,7 +37,7 @@ class Utils {
         return (displayName: name, avatarUrl: avatar)
     }
     
-    static func getDataFromUrl(_ urlString:String, completion: ((_ data: Data?, _ response: URLResponse?, _ error: Error? ) -> Void)) {
+    static func getDataFromUrl(_ urlString:String, completion: @escaping ((_ data: Data?, _ response: URLResponse?, _ error: Error? ) -> Void)) {
         let url = URL(string: urlString)
 		
 		

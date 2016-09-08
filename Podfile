@@ -5,8 +5,8 @@ use_frameworks!
 
 target 'KitchenSink' do
 	pod 'SparkSDK', :git => 'https://github.com/ciscospark/spark-ios-sdk.git', :branch => 'swift3'
-	pod 'Alamofire', :git => 'https://github.com/Alamofire/Alamofire.git', :commit => 'a78137ab4559'
-	pod 'ObjectMapper', :git => 'https://github.com/Hearst-DD/ObjectMapper.git', :branch => 'swift-3', :commit => 'c4affdd9'
+	pod 'Alamofire', :git => 'https://github.com/Alamofire/Alamofire.git', :branch => 'swift3'
+	pod 'ObjectMapper', :git => 'https://github.com/Hearst-DD/ObjectMapper.git', :branch => 'swift-3'
 	pod 'AlamofireObjectMapper', :git => 'https://github.com/tristanhimmelman/AlamofireObjectMapper.git', :branch => 'swift-3'
 	pod 'SwiftyJSON', :git => 'https://github.com/asynchrony/SwiftyJSON.git', :branch => 'swift3'
 	pod 'Starscream', :git => 'https://github.com/daltoniam/Starscream.git', :branch => 'swift3'

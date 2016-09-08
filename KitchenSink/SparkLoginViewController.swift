@@ -50,7 +50,7 @@ class SparkLoginViewController: UIViewController {
             return
         }
         
-        //view.makeToastActivity(.Center)
+        view.makeToastActivity(.center)
         passAuth()
         view.hideToastActivity()
     }
