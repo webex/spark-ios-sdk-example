@@ -405,6 +405,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 64CD6C6BBEEF5EBA5E4702E7 /* Pods-KitchenSink.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = G7375E99F9;
 				INFOPLIST_FILE = KitchenSink/Info.plist;
@@ -419,6 +420,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D10621478BD9E68749DD77A3 /* Pods-KitchenSink.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = G7375E99F9;
 				INFOPLIST_FILE = KitchenSink/Info.plist;
