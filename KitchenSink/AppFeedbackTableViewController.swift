@@ -49,10 +49,10 @@ class AppFeedbackTableViewController: UITableViewController, MFMailComposeViewCo
     // MARK: - UI views
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if (indexPath as NSIndexPath).section == 0 && (indexPath as NSIndexPath).row == 1 {
+        if indexPath.section == 0 && indexPath.row == 1 {
             showActionSheet()
         }
-        if (indexPath as NSIndexPath).section == 0 && (indexPath as NSIndexPath).row == 4 {
+        if indexPath.section == 0 && indexPath.row == 4 {
             attachSnapshot()
         }
     }

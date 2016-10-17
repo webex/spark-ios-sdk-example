@@ -417,7 +417,7 @@ extension VideoCallViewController : UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "dialpadCell", for: indexPath)
         
         let dialButton = cell.viewWithTag(105) as! UILabel
-        dialButton.text = DTMFKeys[(indexPath as NSIndexPath).item]
+        dialButton.text = DTMFKeys[indexPath.item]
         dialButton.layer.borderColor = UIColor.gray.cgColor;
         return cell
     }
