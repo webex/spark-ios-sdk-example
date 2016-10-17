@@ -39,13 +39,10 @@ class Utils {
     
     static func getDataFromUrl(_ urlString:String, completion: @escaping ((_ data: Data?, _ response: URLResponse?, _ error: Error? ) -> Void)) {
         let url = URL(string: urlString)
-		
-		
-		let task = URLSession.shared.dataTask(with: url!) {(data, response, error) in		
-			completion(data, response, error)
-		}
-		
-		task.resume()
+        let task = URLSession.shared.dataTask(with: url!) {(data, response, error) in
+            completion(data, response, error)
+        }
+        task.resume()
     }
     
     static func downloadAvatarImage(_ url: String?, completionHandler: @escaping (_ image : UIImage) -> Void) {
@@ -63,7 +60,7 @@ class Utils {
             let image = UIImage(contentsOfFile: imagePath)
             completionHandler(image!)
         } else {
-            getDataFromUrl(url!) { (data, response, error)  in
+            getDataFromUrl(url!) { (data, response, error) in
                 guard let data = data , error == nil else { return }
                 print("Download Finished")
                 do {
