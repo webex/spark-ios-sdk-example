@@ -48,7 +48,7 @@ class AppFeedbackTableViewController: UITableViewController, MFMailComposeViewCo
     
     // MARK: - UI views
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 && indexPath.row == 1 {
             showActionSheet()
         }
@@ -58,24 +58,24 @@ class AppFeedbackTableViewController: UITableViewController, MFMailComposeViewCo
     }
     
     func showActionSheet() {
-        let optionMenu = UIAlertController(title: nil, message: "Choose Topic", preferredStyle: .ActionSheet)
+        let optionMenu = UIAlertController(title: nil, message: "Choose Topic", preferredStyle: .actionSheet)
         
-        let uiAction = UIAlertAction(title: "UI", style: .Default, handler: {
+        let uiAction = UIAlertAction(title: "UI", style: .default, handler: {
             (alert: UIAlertAction!) -> Void in
             self.topicLabel.text = "UI"
         })
         
-        let sdkAction = UIAlertAction(title: "SDK", style: .Default, handler: {
+        let sdkAction = UIAlertAction(title: "SDK", style: .default, handler: {
             (alert: UIAlertAction!) -> Void in
             self.topicLabel.text = "SDK"
         })
         
-        let devicesAction = UIAlertAction(title: "Supported devices", style: .Default, handler: {
+        let devicesAction = UIAlertAction(title: "Supported devices", style: .default, handler: {
             (alert: UIAlertAction!) -> Void in
             self.topicLabel.text = "Supported devices"
         })
         
-        let featureAction = UIAlertAction(title: "Feature request", style: .Default, handler: {
+        let featureAction = UIAlertAction(title: "Feature request", style: .default, handler: {
             (alert: UIAlertAction!) -> Void in
             self.topicLabel.text = "Feature request"
         })
@@ -85,24 +85,24 @@ class AppFeedbackTableViewController: UITableViewController, MFMailComposeViewCo
         optionMenu.addAction(devicesAction)
         optionMenu.addAction(featureAction)
         
-        presentViewController(optionMenu, animated: true, completion: nil)
+        present(optionMenu, animated: true, completion: nil)
     }
     
     func attachSnapshot() {
-        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.PhotoLibrary) {
+        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary) {
             
             imagePicker.delegate = self
-            imagePicker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary;
+            imagePicker.sourceType = UIImagePickerControllerSourceType.photoLibrary;
             imagePicker.allowsEditing = false
             
-            presentViewController(imagePicker, animated: true, completion: nil)
+            present(imagePicker, animated: true, completion: nil)
         }
     }
     
-    @IBAction func sendMail(sender: AnyObject) {
+    @IBAction func sendMail(_ sender: AnyObject) {
         let mailComposeViewController = configuredMailComposeViewController()
         if MFMailComposeViewController.canSendMail() {
-            presentViewController(mailComposeViewController, animated: true, completion: nil)
+            present(mailComposeViewController, animated: true, completion: nil)
         } else {
             showSendMailErrorAlert()
         }
@@ -117,7 +117,7 @@ class AppFeedbackTableViewController: UITableViewController, MFMailComposeViewCo
         mailComposerVC.setMessageBody(userCommentsText.text, isHTML: false)
         
         if (snapshotImage != nil) {
-            let myData: NSData = UIImagePNGRepresentation(snapshotImage)!
+            let myData: Data = UIImagePNGRepresentation(snapshotImage)!
             mailComposerVC.addAttachmentData(myData, mimeType: "image/png", fileName: snapshotFileName)
         }
         
@@ -131,13 +131,13 @@ class AppFeedbackTableViewController: UITableViewController, MFMailComposeViewCo
     
     // MARK: Delegates
     
-    func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
-        controller.dismissViewControllerAnimated(true, completion: nil)
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        controller.dismiss(animated: true, completion: nil)
         
     }
     
-    func imagePickerController(picker: UIImagePickerController!, didFinishPickingImage image: UIImage!, editingInfo: NSDictionary!) {
-        self.dismissViewControllerAnimated(true, completion: { () -> Void in
+    func imagePickerController(_ picker: UIImagePickerController!, didFinishPickingImage image: UIImage!, editingInfo: NSDictionary!) {
+        self.dismiss(animated: true, completion: { () -> Void in
             self.snapshotImage = image
             self.snapshotLabel.text = self.snapshotFileName
         })

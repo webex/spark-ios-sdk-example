@@ -23,33 +23,33 @@ import SparkSDK
 
 class IncomingCallViewController: UIViewController, PhoneObserver, IncomingCallDelegate {
     
-    private var callToastViewController: CallToastViewController!
-    private var videoCallViewController: VideoCallViewController!
-    private var call: Call!
+    fileprivate var callToastViewController: CallToastViewController!
+    fileprivate var videoCallViewController: VideoCallViewController!
+    fileprivate var call: Call!
     
-    private var localVideoView: MediaRenderView {
+    fileprivate var localVideoView: MediaRenderView {
         return videoCallViewController.selfView
     }
     
-    private var remoteVideoView: MediaRenderView {
+    fileprivate var remoteVideoView: MediaRenderView {
         return videoCallViewController.remoteView
     }
     
     // MARK: - Life cycle
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        PhoneNotificationCenter.sharedInstance.addObserver(self)
+        PhoneNotificationCenter.sharedInstance.add(observer: self)
     }
     
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        PhoneNotificationCenter.sharedInstance.removeObserver(self)
+        PhoneNotificationCenter.sharedInstance.remove(observer: self)
     }
     
     // MARK: - PhoneObserver
     
-    func callIncoming(call: Call) {
+    func callIncoming(_ call: Call) {
         self.call = call
         presentCallToastView(call)
     }
@@ -61,7 +61,7 @@ class IncomingCallViewController: UIViewController, PhoneObserver, IncomingCallD
     // MARK: - IncomingCallDelegate
     
     func didAnswerIncomingCall() {
-        Spark.phone.requestMediaAccess(Phone.MediaAccessType.AudioVideo) { granted in
+        Spark.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
             if granted {
                 var remoteAddr = ""
                 if let remote = self.call.from {
@@ -69,9 +69,9 @@ class IncomingCallViewController: UIViewController, PhoneObserver, IncomingCallD
                 }
                 self.presentVideoCallView(remoteAddr)
                 
-                var mediaOption = MediaOption.AudioOnly
+                var mediaOption = MediaOption.audioOnly
                 if VideoAudioSetup.sharedInstance.isVideoEnabled() {
-                    mediaOption = MediaOption.AudioVideo(local: self.localVideoView, remote: self.remoteVideoView)
+                    mediaOption = MediaOption.audioVideo(local: self.localVideoView, remote: self.remoteVideoView)
                 }
                 self.call.answer(option: mediaOption) { success in
                     if !success {
@@ -92,34 +92,34 @@ class IncomingCallViewController: UIViewController, PhoneObserver, IncomingCallD
     
     // MARK: - UI views
     
-    private func presentCallToastView(call: Call) {
-        callToastViewController = storyboard?.instantiateViewControllerWithIdentifier("CallToastViewController") as! CallToastViewController
+    fileprivate func presentCallToastView(_ call: Call) {
+        callToastViewController = storyboard?.instantiateViewController(withIdentifier: "CallToastViewController") as! CallToastViewController
         
         callToastViewController.call = call
         callToastViewController.incomingCallDelegate = self
-        callToastViewController.modalPresentationStyle = .FullScreen
-        presentViewController(callToastViewController, animated: true, completion: nil)
+        callToastViewController.modalPresentationStyle = .fullScreen
+        present(callToastViewController, animated: true, completion: nil)
         if let popoverController = callToastViewController.popoverPresentationController {
             popoverController.sourceView = view
-            popoverController.permittedArrowDirections = .Any
+            popoverController.permittedArrowDirections = .any
         }
     }
     
-    private func presentVideoCallView(remoteAddr: String) {
-        videoCallViewController = storyboard?.instantiateViewControllerWithIdentifier("VideoCallViewController") as? VideoCallViewController!
+    fileprivate func presentVideoCallView(_ remoteAddr: String) {
+        videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController!
         
         videoCallViewController.remoteAddr = remoteAddr
         videoCallViewController.call = self.call
-        videoCallViewController.modalPresentationStyle = .FullScreen
-        self.presentViewController(videoCallViewController, animated: true, completion: nil)
+        videoCallViewController.modalPresentationStyle = .fullScreen
+        self.present(videoCallViewController, animated: true, completion: nil)
         if let popoverController = videoCallViewController.popoverPresentationController {
             popoverController.sourceView = self.view
             popoverController.sourceRect = self.view.bounds
-            popoverController.permittedArrowDirections = .Any
+            popoverController.permittedArrowDirections = .any
         }
     }
     
-    private func dismissVideoCallView() {
-        videoCallViewController.dismissViewControllerAnimated(false, completion: nil)
+    fileprivate func dismissVideoCallView() {
+        videoCallViewController.dismiss(animated: false, completion: nil)
     }
 }

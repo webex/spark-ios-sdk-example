@@ -26,16 +26,16 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
     @IBOutlet weak var dialAddressTextField: UITextField!
     @IBOutlet weak var tableView: UITableView!
     
-    private var videoCallViewController: VideoCallViewController!
-    private let searchController = UISearchController(searchResultsController: nil)
-    private var searchResult: [Person]?
-    private var dialEmail: String?
+    fileprivate var videoCallViewController: VideoCallViewController!
+    fileprivate let searchController = UISearchController(searchResultsController: nil)
+    fileprivate var searchResult: [Person]?
+    fileprivate var dialEmail: String?
     
-    private var localVideoView: MediaRenderView {
+    fileprivate var localVideoView: MediaRenderView {
         return videoCallViewController.selfView
     }
     
-    private var remoteVideoView: MediaRenderView {
+    fileprivate var remoteVideoView: MediaRenderView {
         return videoCallViewController.remoteView
     }
     
@@ -49,18 +49,18 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
     
     // MARK: - Dial call
     
-    func dial(address: String) {
+    func dial(_ address: String) {
         if address.isEmpty {
             return
         }
         
-        Spark.phone.requestMediaAccess(Phone.MediaAccessType.AudioVideo) { granted in
+        Spark.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
             if granted {
                 self.presentVideoCallView(address)
                 
-                var mediaOption = MediaOption.AudioOnly
+                var mediaOption = MediaOption.audioOnly
                 if VideoAudioSetup.sharedInstance.isVideoEnabled() {
-                    mediaOption = MediaOption.AudioVideo(local: self.localVideoView, remote: self.remoteVideoView)
+                    mediaOption = MediaOption.audioVideo(local: self.localVideoView, remote: self.remoteVideoView)
                 }
                 let call = Spark.phone.dial(address, option: mediaOption) { success in
                     if !success {
@@ -75,11 +75,11 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
         }
     }
     
-    @IBAction func dialAddress(sender: AnyObject) {
+    @IBAction func dialAddress(_ sender: AnyObject) {
         dial(dialAddressTextField.text!)
     }
     
-    @IBAction func switchDialWay(sender: AnyObject) {
+    @IBAction func switchDialWay(_ sender: AnyObject) {
         switch sender.selectedSegmentIndex
         {
         case 0:
@@ -95,7 +95,7 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
     
     // MARK: - people search
     
-    func updateSearchResultsForSearchController(searchController: UISearchController) {
+    func updateSearchResults(for searchController: UISearchController) {
         let searchString = searchController.searchBar.text!
         
         if searchString.characters.count < 3 {
@@ -109,9 +109,9 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
                 (response: ServiceResponse<[Person]>) in
                 
                 switch response.result {
-                case .Success(let value):
+                case .success(let value):
                     self.searchResult = value
-                case .Failure:
+                case .failure:
                     self.searchResult = nil
                 }
                 if searchString == searchController.searchBar.text! {
@@ -123,9 +123,9 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
                 (response: ServiceResponse<[Person]>) in
                 
                 switch response.result {
-                case .Success(let value):
+                case .success(let value):
                     self.searchResult = value
-                case .Failure:
+                case .failure:
                     self.searchResult = nil
                 }
                 if searchString == searchController.searchBar.text! {
@@ -137,7 +137,7 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
     
     // MARK: - UITableViewDataSource
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if searchResult != nil  {
             return searchResult!.count
         } else {
@@ -145,8 +145,8 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
         }
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("PersonCell", forIndexPath: indexPath) as! PersonTableViewCell
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "PersonCell", for: indexPath) as! PersonTableViewCell
         let person = searchResult?[indexPath.row]
         let email = person?.emails?.first
         cell.address = email?.toString()
@@ -161,7 +161,7 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
     
     // MARK: - UI views
     
-    private func setupView() {
+    fileprivate func setupView() {
         tableView.dataSource = self
         tableView.delegate = self
         
@@ -173,29 +173,29 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
         tableView.tableHeaderView = searchController.searchBar
     }
     
-    private func presentVideoCallView(remoteAddr: String) {
-        videoCallViewController = storyboard?.instantiateViewControllerWithIdentifier("VideoCallViewController") as? VideoCallViewController!
+    fileprivate func presentVideoCallView(_ remoteAddr: String) {
+        videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController!
         
         videoCallViewController.remoteAddr = remoteAddr
-        videoCallViewController.modalPresentationStyle = .FullScreen
-        presentViewController(videoCallViewController, animated: true, completion: nil)
+        videoCallViewController.modalPresentationStyle = .fullScreen
+        present(videoCallViewController, animated: true, completion: nil)
         if let popoverController = videoCallViewController.popoverPresentationController {
             popoverController.sourceView = view
             popoverController.sourceRect = view.bounds
-            popoverController.permittedArrowDirections = .Any
+            popoverController.permittedArrowDirections = .any
         }
     }
     
-    private func dismissVideoCallView() {
-        videoCallViewController.dismissViewControllerAnimated(false, completion: nil)
+    fileprivate func dismissVideoCallView() {
+        videoCallViewController.dismiss(animated: false, completion: nil)
     }
     
-    private func hideSearchView(hidden: Bool) {
-        searchController.active = false
-        tableView.hidden = hidden
+    fileprivate func hideSearchView(_ hidden: Bool) {
+        searchController.isActive = false
+        tableView.isHidden = hidden
     }
     
-    private func hideDialAddressView(hidden: Bool) {
-        dialAddressTextField.hidden = hidden
+    fileprivate func hideDialAddressView(_ hidden: Bool) {
+        dialAddressTextField.isHidden = hidden
     }
 }

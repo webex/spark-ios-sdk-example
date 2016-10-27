@@ -25,7 +25,7 @@ class HomeTableTableViewController: UITableViewController {
     
     @IBOutlet weak var statusLabel: UILabel!
     
-    private var registerState = "connecting"
+    fileprivate var registerState = "connecting"
     
     // MARK: - Life cycle
     
@@ -38,7 +38,7 @@ class HomeTableTableViewController: UITableViewController {
     // MARK: - Phone register
     
     func registerPhone() {
-        Spark.phone.requestMediaAccess(Phone.MediaAccessType.AudioVideo) { granted in
+        Spark.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
             if !granted {
                 Utils.showCameraMicrophoneAccessDeniedAlert(self)
             }
@@ -56,26 +56,26 @@ class HomeTableTableViewController: UITableViewController {
     
     // MARK: - UITableViewController
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
         
         if indexPath.section == 1 && indexPath.row == 4 {
             Spark.deauthorize()
-            dismissViewControllerAnimated(true, completion: nil)
+            dismiss(animated: true, completion: nil)
         }
     }
     
     // MARK: - UI views
     
-    private func updateStatusLabel() {
+    fileprivate func updateStatusLabel() {
         statusLabel.text = "Powered by SDK v" + Spark.version
         statusLabel.text = statusLabel.text! + "\nRegistration to Cisco cloud : " + registerState
     }
     
-    private func showPhoneRegisterFailAlert() {
-        let alert = UIAlertController(title: "Alert", message: "Phone register fail", preferredStyle: .Alert)
+    fileprivate func showPhoneRegisterFailAlert() {
+        let alert = UIAlertController(title: "Alert", message: "Phone register fail", preferredStyle: .alert)
         
-        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
-        presentViewController(alert, animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
 }

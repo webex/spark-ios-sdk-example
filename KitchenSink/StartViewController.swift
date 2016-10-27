@@ -41,27 +41,27 @@ class StartViewController: UIViewController {
     }
     
     func setupHelpLabels() {
-        demoAppHelpLabel.hidden = true
-        sparkIdHelpLabel.hidden = true
-        appIdHelpLabel.hidden = true
+        demoAppHelpLabel.isHidden = true
+        sparkIdHelpLabel.isHidden = true
+        appIdHelpLabel.isHidden = true
     }
     
-    @IBAction func showDemoAppHelpLabel(sender: AnyObject) {
-        demoAppHelpLabel.hidden = !demoAppHelpLabel.hidden
-        sparkIdHelpLabel.hidden = true
-        appIdHelpLabel.hidden = true
+    @IBAction func showDemoAppHelpLabel(_ sender: AnyObject) {
+        demoAppHelpLabel.isHidden = !demoAppHelpLabel.isHidden
+        sparkIdHelpLabel.isHidden = true
+        appIdHelpLabel.isHidden = true
     }
     
-    @IBAction func showSparkIdHelpLabel(sender: AnyObject) {
-        demoAppHelpLabel.hidden = true
-        sparkIdHelpLabel.hidden = !sparkIdHelpLabel.hidden
-        appIdHelpLabel.hidden = true
+    @IBAction func showSparkIdHelpLabel(_ sender: AnyObject) {
+        demoAppHelpLabel.isHidden = true
+        sparkIdHelpLabel.isHidden = !sparkIdHelpLabel.isHidden
+        appIdHelpLabel.isHidden = true
     }
     
-    @IBAction func showAppIdHelpLabel(sender: AnyObject) {
-        demoAppHelpLabel.hidden = true
-        sparkIdHelpLabel.hidden = true
-        appIdHelpLabel.hidden = !appIdHelpLabel.hidden
+    @IBAction func showAppIdHelpLabel(_ sender: AnyObject) {
+        demoAppHelpLabel.isHidden = true
+        sparkIdHelpLabel.isHidden = true
+        appIdHelpLabel.isHidden = !appIdHelpLabel.isHidden
     }
 }
 

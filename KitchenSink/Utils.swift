@@ -16,12 +16,12 @@ import UIKit
 import SparkSDK
 
 class Utils {
-    static func fetchUserProfile(email: String) -> (displayName: String, avatarUrl: String) {
+    static func fetchUserProfile(_ email: String) -> (displayName: String, avatarUrl: String) {
         var name = ""
         var avatar = ""
         if let email = EmailAddress.fromString(email) {
             // Person list is empty with SIP email address
-            if let persons = try? Spark.people.list(email: email, max: 1) where !persons.isEmpty {
+            if let persons = try? Spark.people.list(email: email, max: 1) , !persons.isEmpty {
                 let person = persons[0]
                 if let displayName = person.displayName {
                     name = displayName
@@ -37,51 +37,52 @@ class Utils {
         return (displayName: name, avatarUrl: avatar)
     }
     
-    static func getDataFromUrl(urlString:String, completion: ((data: NSData?, response: NSURLResponse?, error: NSError? ) -> Void)) {
-        let url = NSURL(string: urlString)
-        NSURLSession.sharedSession().dataTaskWithURL(url!) { (data, response, error) in
-            completion(data: data, response: response, error: error)
-            }.resume()
+    static func getDataFromUrl(_ urlString:String, completion: @escaping ((_ data: Data?, _ response: URLResponse?, _ error: Error? ) -> Void)) {
+        let url = URL(string: urlString)
+        let task = URLSession.shared.dataTask(with: url!) {(data, response, error) in
+            completion(data, response, error)
+        }
+        task.resume()
     }
     
-    static func downloadAvatarImage(url: String?, completionHandler: (image : UIImage) -> Void) {
+    static func downloadAvatarImage(_ url: String?, completionHandler: @escaping (_ image : UIImage) -> Void) {
         if url == nil || url!.isEmpty {
             let image = UIImage(named: "DefaultAvatar")
-            completionHandler(image: image!)
+            completionHandler(image!)
             return
         }
 
-        let fileName = NSURL(fileURLWithPath: url!).lastPathComponent! + ".jpg"
-        let documentsURL = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!
-        let imagePath = documentsURL.URLByAppendingPathComponent(fileName).path!
+        let fileName = URL(fileURLWithPath: url!).lastPathComponent + ".jpg"
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let imagePath = documentsURL.appendingPathComponent(fileName).path
         
-        if NSFileManager.defaultManager().fileExistsAtPath(imagePath) {
+        if FileManager.default.fileExists(atPath: imagePath) {
             let image = UIImage(contentsOfFile: imagePath)
-            completionHandler(image: image!)
+            completionHandler(image!)
         } else {
-            getDataFromUrl(url!) { (data, response, error)  in
-                guard let data = data where error == nil else { return }
+            getDataFromUrl(url!) { (data, response, error) in
+                guard let data = data , error == nil else { return }
                 print("Download Finished")
                 do {
-                    try data.writeToFile(imagePath, options: .AtomicWrite)
+                    try data.write(to: URL(fileURLWithPath: imagePath), options: .atomicWrite)
                 } catch {
                     print(error)
                 }
-                dispatch_async(dispatch_get_main_queue()) { () -> Void in
+                DispatchQueue.main.async { () -> Void in
                     let image = UIImage(data: data)
-                    completionHandler(image: image!)
+                    completionHandler(image!)
                 }
             }
         }
     }
     
-    static func showCameraMicrophoneAccessDeniedAlert(parentView: UIViewController) {
+    static func showCameraMicrophoneAccessDeniedAlert(_ parentView: UIViewController) {
         let AlertTitle = "Access Denied"
         let AlertMessage = "Calling requires access to the camera and microphone. To fix this, go to Settings|Privacy|Camera and Settings|Privacy|Microphone, find this app and grant access."
         
-        let alert = UIAlertController(title: AlertTitle, message: AlertMessage, preferredStyle: .Alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+        let alert = UIAlertController(title: AlertTitle, message: AlertMessage, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         
-        parentView.presentViewController(alert, animated: true, completion: nil)
+        parentView.present(alert, animated: true, completion: nil)
     }
 }
