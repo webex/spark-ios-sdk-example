@@ -311,7 +311,7 @@
         <!--App Id registration-->
         <scene sceneID="Bmk-tw-rN5">
             <objects>
-                <viewController id="qQy-xq-8hj" userLabel="App Id registration" sceneMemberID="viewController">
+                <viewController id="qQy-xq-8hj" userLabel="App Id registration" customClass="JWTLoginViewController" customModule="KitchenSink" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="unf-ZM-Va8"/>
                         <viewControllerLayoutGuide type="bottom" id="suP-Im-Wq6"/>
@@ -353,6 +353,9 @@
                                         <exclude reference="Biw-sZ-mv4"/>
                                     </mask>
                                 </variation>
+                                <connections>
+                                    <action selector="loginWithSpark:" destination="qQy-xq-8hj" eventType="touchUpInside" id="RKa-FT-oRD"/>
+                                </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="powered by SDK v0.9.1" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uBv-vA-C2b">
                                 <rect key="frame" x="100" y="616" width="175" height="21"/>
@@ -390,6 +393,9 @@
                     </view>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="fr5-3O-TQL"/>
+                    <connections>
+                        <outlet property="statusLabel" destination="uBv-vA-C2b" id="Iu8-6r-KN7"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZGF-ry-OCm" sceneMemberID="firstResponder"/>
             </objects>

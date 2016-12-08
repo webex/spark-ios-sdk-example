@@ -22,10 +22,6 @@ import UIKit
 import SparkSDK
 import Toast_Swift
 
-import UIKit
-import SparkSDK
-import Toast_Swift
-
 class SparkLoginViewController: UIViewController {
     
     @IBOutlet weak var statusLabel: UILabel!
