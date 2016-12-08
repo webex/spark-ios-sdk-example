@@ -21,11 +21,12 @@
 import UIKit
 import SparkSDK
 
-class IncomingCallViewController: UIViewController, PhoneObserver, IncomingCallDelegate {
+class IncomingCallViewController: UIViewController, CallObserver, IncomingCallDelegate {
     
     fileprivate var callToastViewController: CallToastViewController!
     fileprivate var videoCallViewController: VideoCallViewController!
     fileprivate var call: Call!
+    private var spark: Spark!
     
     fileprivate var localVideoView: MediaRenderView {
         return videoCallViewController.selfView
@@ -37,14 +38,18 @@ class IncomingCallViewController: UIViewController, PhoneObserver, IncomingCallD
     
     // MARK: - Life cycle
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.spark = AppDelegate.spark
+    }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        PhoneNotificationCenter.sharedInstance.add(observer: self)
+        spark.callNotificationCenter.add(observer: self)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        PhoneNotificationCenter.sharedInstance.remove(observer: self)
+        spark.callNotificationCenter.remove(observer: self)
     }
     
     // MARK: - PhoneObserver
@@ -61,7 +66,7 @@ class IncomingCallViewController: UIViewController, PhoneObserver, IncomingCallD
     // MARK: - IncomingCallDelegate
     
     func didAnswerIncomingCall() {
-        Spark.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
+        spark.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
             if granted {
                 var remoteAddr = ""
                 if let remote = self.call.from {

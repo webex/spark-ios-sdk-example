@@ -57,23 +57,25 @@ class VideoCallViewController: UIViewController, CallObserver {
     fileprivate var avatarImageView = UIImageView()
     fileprivate var remoteDisplayNameLabel = UILabel()
     fileprivate let DTMFKeys = ["1", "2", "3", "A", "4", "5", "6", "B", "7", "8", "9", "C", "*", "0", "#", "D"]
+    private var spark: Spark!
     
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.spark = AppDelegate.spark
         setupAvata()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         updateUIStatus()
-        CallNotificationCenter.sharedInstance.add(observer: self)
+        spark.callNotificationCenter.add(observer: self)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        CallNotificationCenter.sharedInstance.remove(observer: self)
+        spark.callNotificationCenter.remove(observer: self)
     }
     
     override func viewDidLayoutSubviews() {

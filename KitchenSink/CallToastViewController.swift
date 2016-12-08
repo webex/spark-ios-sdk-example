@@ -32,22 +32,24 @@ class CallToastViewController: UIViewController, CallObserver {
     fileprivate var name = ""
     fileprivate var avatar = ""
     
+    private var spark: Spark!
     
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.spark = AppDelegate.spark
         setupView()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        CallNotificationCenter.sharedInstance.add(observer: self)
+        spark.callNotificationCenter.add(observer: self)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        CallNotificationCenter.sharedInstance.remove(observer: self)
+        spark.callNotificationCenter.remove(observer: self)
     }
     
     // MARK: - Call answer/reject
@@ -93,7 +95,7 @@ class CallToastViewController: UIViewController, CallObserver {
     // MARK: - People API
     
     fileprivate func fetchUserProfile() {
-        if Spark.authorized() {
+        if spark.authenticationStrategy.authorized {
             if let email = call.from {
                 let profile = Utils.fetchUserProfile(email)
                 name = profile.displayName

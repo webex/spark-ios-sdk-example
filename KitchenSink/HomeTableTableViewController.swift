@@ -26,11 +26,13 @@ class HomeTableTableViewController: UITableViewController {
     @IBOutlet weak var statusLabel: UILabel!
     
     fileprivate var registerState = "connecting"
+    private var spark: Spark!
     
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.spark = AppDelegate.spark
         registerPhone()
         updateStatusLabel()
     }
@@ -38,12 +40,12 @@ class HomeTableTableViewController: UITableViewController {
     // MARK: - Phone register
     
     func registerPhone() {
-        Spark.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
+        spark.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
             if !granted {
                 Utils.showCameraMicrophoneAccessDeniedAlert(self)
             }
         }
-        Spark.phone.register() { success in
+        spark.phone.register() { success in
             if success {
                 self.registerState = "ok"
                 self.updateStatusLabel()
@@ -60,7 +62,7 @@ class HomeTableTableViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
         
         if indexPath.section == 1 && indexPath.row == 4 {
-            Spark.deauthorize()
+            spark.authenticationStrategy.deauthorize()
             dismiss(animated: true, completion: nil)
         }
     }

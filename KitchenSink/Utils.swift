@@ -21,7 +21,7 @@ class Utils {
         var avatar = ""
         if let email = EmailAddress.fromString(email) {
             // Person list is empty with SIP email address
-            if let persons = try? Spark.people.list(email: email, max: 1) , !persons.isEmpty {
+            if let persons = try? AppDelegate.spark.people.list(email: email, max: 1) , !persons.isEmpty {
                 let person = persons[0]
                 if let displayName = person.displayName {
                     name = displayName
