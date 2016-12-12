@@ -35,30 +35,34 @@ class JWTLoginViewController: UIViewController {
         jwtAuthStrategy = JWTAuthStrategy()
         jwtAuthStrategy.authorizedWith(jwt: "")
         statusLabel.text = "Powered by SDK v" + Spark.version
-        AppDelegate.spark = Spark(authenticationStrategy: jwtAuthStrategy)        
-        
-        if jwtAuthStrategy.authorized {
-            showApplicationHome()
-        }
+        AppDelegate.spark = Spark(authenticationStrategy: jwtAuthStrategy)
     }
     
     // MARK: - Login/Auth handling
     
     @IBAction func loginWithSpark(_ sender: UIButton) {
-        jwtAuthStrategy.accessToken() { [unowned self] success in
-            if success != nil {
-                self.showApplicationHome()
-            } else {
-                let sendMailErrorAlert = UIAlertController(title: "Could Not Login", message: "Unable to Login: Please make sure your JWT is correct.", preferredStyle: .alert)
-                let okAction = UIAlertAction(title: "OK", style: .cancel)
-                sendMailErrorAlert.addAction(okAction)
-                self.present(sendMailErrorAlert, animated: true)
+        if jwtAuthStrategy.authorized {
+            jwtAuthStrategy.accessToken() { [unowned self] success in
+                if success != nil {
+                    self.showApplicationHome()
+                } else {
+                   self.showLoginError()
+                }
             }
+        } else {
+            showLoginError()
         }
     }
     
     private func showApplicationHome() {
         let viewController = storyboard?.instantiateViewController(withIdentifier: "HomeTableTableViewController") as! HomeTableTableViewController
         navigationController?.pushViewController(viewController, animated: false)
+    }
+    
+    private func showLoginError() {
+        let sendMailErrorAlert = UIAlertController(title: "Could Not Login", message: "Unable to Login: Please make sure your JWT is correct.", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .cancel)
+        sendMailErrorAlert.addAction(okAction)
+        self.present(sendMailErrorAlert, animated: true)
     }
 }
