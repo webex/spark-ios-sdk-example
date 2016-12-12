@@ -327,7 +327,7 @@ class VideoCallViewController: UIViewController, CallObserver {
         if presentingViewController!.isKind(of: UINavigationController.self) {
             let navigationController = presentingViewController as! UINavigationController
             dismiss(animated: true, completion: nil)
-            navigationController.popToRootViewController(animated: true)
+            navigationController.popViewController(animated: true)
         }
     }
     
