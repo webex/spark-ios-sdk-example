@@ -87,3 +87,15 @@ Below is code snippets of the SDK calling in the demo.
     call.answer(option: MediaOption.AudioVideo(local: videoCallViewController.selfView, remote: videoCallViewController.remoteView), completionHandler: nil)
     call.reject(nil)
     ```
+
+
+## Note
+
+1. Strip unsupported achitecture before submitting to App store:  
+
+   Wme framework of media engine in SDK contains a build for both the simulator (x86_64) and the actual devices (ARM).  
+   Of course, you aren't allowed to submit to the App Store a binary for an unsupported achitecture, so the solution is to "manually" remove the unneeded architectures from the final binary, before submitting it.  
+   Daniel Kennett came up with a nice solution and provides this script to add to the build phase.  
+   http://stackoverflow.com/questions/30547283/submit-to-app-store-issues
+   
+   Note this script only work in Release scheme and use for achive binary.
