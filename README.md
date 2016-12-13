@@ -33,6 +33,7 @@ Below is code snippets of the SDK calling in the demo.
         return true
     }
    ```
+   
 1. Setup SDK with app infomation, and authorize access to Spark service
    ```swift
    class LoginViewController: UIViewController {
