@@ -63,7 +63,7 @@ class HomeTableTableViewController: UITableViewController {
         
         if indexPath.section == 1 && indexPath.row == 4 {
             spark.authenticationStrategy.deauthorize()
-            dismiss(animated: true, completion: nil)
+            _ = navigationController?.popToRootViewController(animated: true)
         }
     }
     
