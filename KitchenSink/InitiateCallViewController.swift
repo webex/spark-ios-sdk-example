@@ -33,11 +33,11 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
     private var spark: Spark!
     
     fileprivate var localVideoView: MediaRenderView {
-        return videoCallViewController.selfView
+        return videoCallViewController.localVideoView
     }
     
     fileprivate var remoteVideoView: MediaRenderView {
-        return videoCallViewController.remoteView
+        return videoCallViewController.remoteVideoView
     }
     
     

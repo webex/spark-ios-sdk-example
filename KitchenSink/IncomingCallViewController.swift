@@ -29,11 +29,11 @@ class IncomingCallViewController: UIViewController, CallObserver, IncomingCallDe
     private var spark: Spark!
     
     fileprivate var localVideoView: MediaRenderView {
-        return videoCallViewController.selfView
+        return videoCallViewController.localVideoView
     }
     
     fileprivate var remoteVideoView: MediaRenderView {
-        return videoCallViewController.remoteView
+        return videoCallViewController.remoteVideoView
     }
     
     // MARK: - Life cycle
@@ -116,7 +116,7 @@ class IncomingCallViewController: UIViewController, CallObserver, IncomingCallDe
         videoCallViewController.remoteAddr = remoteAddr
         videoCallViewController.call = self.call
         videoCallViewController.modalPresentationStyle = .fullScreen
-        self.present(videoCallViewController, animated: true, completion: nil)
+        present(videoCallViewController, animated: true, completion: nil)
         if let popoverController = videoCallViewController.popoverPresentationController {
             popoverController.sourceView = self.view
             popoverController.sourceRect = self.view.bounds
