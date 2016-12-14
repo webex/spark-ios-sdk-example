@@ -52,14 +52,12 @@ class JWTLoginViewController: UIViewController {
                 case .success(let person):
                     let emailAddress = (person.emails ?? []).first
                     let emailString = emailAddress == nil ? "NONE" : emailAddress!.toString()
-                    let alert = UIAlertController(title: "Logged in", message: "Logged in as \(person.displayName) with id \n\(emailString)", preferredStyle: .alert)
+                    let alert = UIAlertController(title: "Logged in", message: "Logged in as \(person.displayName ?? "NONE") with id \n\(emailString)", preferredStyle: .alert)
                     let okAction = UIAlertAction(title: "OK", style: .cancel) { action in
                         self.showApplicationHome()
                     }
                     alert.addAction(okAction)
                     self.present(alert, animated: true)
-                    
-                    break
                 case .failure(let error):
                     let alert = UIAlertController(title: "Could Not Get Personal Info", message: "Unable to retrieve information about the user logged in using the JWT: Please make sure your JWT is correct. \(error)", preferredStyle: .alert)
                     let okAction = UIAlertAction(title: "OK", style: .cancel)
