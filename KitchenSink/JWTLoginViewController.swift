@@ -27,26 +27,44 @@ class JWTLoginViewController: UIViewController {
     
     @IBOutlet weak var statusLabel: UILabel!
     private var jwtAuthStrategy: JWTAuthStrategy!
+    private var spark: Spark!
     
     // MARK: - Life cycle
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         jwtAuthStrategy = JWTAuthStrategy()
-        jwtAuthStrategy.authorizedWith(jwt: "")
         statusLabel.text = "Powered by SDK v" + Spark.version
-        AppDelegate.spark = Spark(authenticationStrategy: jwtAuthStrategy)
+        spark = Spark(authenticationStrategy: jwtAuthStrategy)
+        AppDelegate.spark = spark
     }
     
     // MARK: - Login/Auth handling
     
     @IBAction func loginWithSpark(_ sender: UIButton) {
-        if jwtAuthStrategy.authorized {
-            jwtAuthStrategy.accessToken() { [unowned self] success in
-                if success != nil {
-                    self.showApplicationHome()
-                } else {
-                   self.showLoginError()
+        if !jwtAuthStrategy.authorized {
+            jwtAuthStrategy.authorizedWith(jwt: "PLACE_JWT_HERE")
+        }
+
+        if spark.authenticationStrategy.authorized {
+            spark.people.getMe() { response in
+                switch response.result {
+                case .success(let person):
+                    let emailAddress = (person.emails ?? []).first
+                    let emailString = emailAddress == nil ? "NONE" : emailAddress!.toString()
+                    let alert = UIAlertController(title: "Logged in", message: "Logged in as \(person.displayName) with id \n\(emailString)", preferredStyle: .alert)
+                    let okAction = UIAlertAction(title: "OK", style: .cancel) { action in
+                        self.showApplicationHome()
+                    }
+                    alert.addAction(okAction)
+                    self.present(alert, animated: true)
+                    
+                    break
+                case .failure(let error):
+                    let alert = UIAlertController(title: "Could Not Get Personal Info", message: "Unable to retrieve information about the user logged in using the JWT: Please make sure your JWT is correct. \(error)", preferredStyle: .alert)
+                    let okAction = UIAlertAction(title: "OK", style: .cancel)
+                    alert.addAction(okAction)
+                    self.present(alert, animated: true)
                 }
             }
         } else {
@@ -60,9 +78,9 @@ class JWTLoginViewController: UIViewController {
     }
     
     private func showLoginError() {
-        let sendMailErrorAlert = UIAlertController(title: "Could Not Login", message: "Unable to Login: Please make sure your JWT is correct.", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Could Not Login", message: "Unable to Login: Please make sure your JWT is correct.", preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .cancel)
-        sendMailErrorAlert.addAction(okAction)
-        self.present(sendMailErrorAlert, animated: true)
+        alert.addAction(okAction)
+        self.present(alert, animated: true)
     }
 }
