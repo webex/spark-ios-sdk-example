@@ -32,6 +32,7 @@ class HomeTableTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.navigationItem.setHidesBackButton(true, animated: false)
         self.spark = AppDelegate.spark
         registerPhone()
         updateStatusLabel()
