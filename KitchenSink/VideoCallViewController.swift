@@ -73,7 +73,7 @@ class VideoCallViewController: UIViewController, CallObserver {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.spark = AppDelegate.spark
-        setupAvata()
+        setupAvatar()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -236,15 +236,16 @@ class VideoCallViewController: UIViewController, CallObserver {
     
     // MARK: - UI views
     
-    private func setupAvata() {
+    private func setupAvatar() {
         avatarContainerView.addSubview(avatarImageView)
         avatarContainerView.addSubview(remoteDisplayNameLabel)
         
-        let profile = Utils.fetchUserProfile(remoteAddr)
-        remoteDisplayName = profile.displayName
-        remoteAvatarUrl = profile.avatarUrl
-        
-        fetchAvataImage()
+        Utils.fetchUserProfile(remoteAddr) { [unowned self] (displayName: String, avatarUrl: String) in
+            self.remoteDisplayName = displayName
+            self.remoteAvatarUrl = avatarUrl
+            
+            self.fetchAvatarImage()
+        }
     }
     
     private func updateUIStatus() {
@@ -326,7 +327,7 @@ class VideoCallViewController: UIViewController, CallObserver {
         showSelfView(call.sendingVideo)
     }
     
-    private func fetchAvataImage() {
+    private func fetchAvatarImage() {
         Utils.downloadAvatarImage(remoteAvatarUrl, completionHandler: {
             self.avatarImageView.image = $0
         })

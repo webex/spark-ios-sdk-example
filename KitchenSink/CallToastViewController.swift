@@ -39,7 +39,7 @@ class CallToastViewController: UIViewController, CallObserver {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.spark = AppDelegate.spark
-        setupView()
+        fetchUserProfile()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -72,20 +72,10 @@ class CallToastViewController: UIViewController, CallObserver {
     
     // MARK: - UI views
     
-    fileprivate func setupView() {
-        fetchUserProfile()
-        fetchAvataImage()
-        updateDisplayName()
-    }
-    
-    fileprivate func fetchAvataImage() {
+    fileprivate func fetchAvatarImage() {
         Utils.downloadAvatarImage(avatar, completionHandler: {
             self.avatarImage.image = $0
         })
-    }
-    
-    fileprivate func updateDisplayName() {
-        nameLabel.text = name
     }
     
     fileprivate func dismissView() {
@@ -97,9 +87,12 @@ class CallToastViewController: UIViewController, CallObserver {
     fileprivate func fetchUserProfile() {
         if spark.authenticationStrategy.authorized {
             if let email = call.from {
-                let profile = Utils.fetchUserProfile(email)
-                name = profile.displayName
-                avatar = profile.avatarUrl
+                Utils.fetchUserProfile(email) { [unowned self] (displayName: String, avatarUrl: String) in
+                    self.name = displayName
+                    self.avatar = avatarUrl
+                    self.fetchAvatarImage()
+                    self.nameLabel.text = displayName
+                }
             }
         }
     }

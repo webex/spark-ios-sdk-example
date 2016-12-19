@@ -16,25 +16,38 @@ import UIKit
 import SparkSDK
 
 class Utils {
-    static func fetchUserProfile(_ email: String) -> (displayName: String, avatarUrl: String) {
+    static func fetchUserProfile(_ email: String, completionHandler: @escaping (String, String) -> Void) {
         var name = ""
         var avatar = ""
         if let email = EmailAddress.fromString(email) {
             // Person list is empty with SIP email address
-            if let persons = try? AppDelegate.spark.people.list(email: email, max: 1) , !persons.isEmpty {
-                let person = persons[0]
-                if let displayName = person.displayName {
-                    name = displayName
-                } else {
-                    // Fallback to raw dial string
-                    name = email.toString()
+            AppDelegate.spark.people.list(email: email, max: 1) { response in
+                var persons: [Person]
+                
+                switch response.result {
+                case .success(let value):
+                    persons = value
+                case .failure(let error):
+                    print("ERROR: \(error)")
+                    completionHandler(name, avatar)
+                    return
                 }
-                if let avatarUrl = person.avatar {
-                    avatar = avatarUrl
+                
+                if(!persons.isEmpty) {
+                    let person = persons[0]
+                    if let displayName = person.displayName {
+                        name = displayName
+                    } else {
+                        // Fallback to raw dial string
+                        name = email.toString()
+                    }
+                    if let avatarUrl = person.avatar {
+                        avatar = avatarUrl
+                    }
                 }
+                completionHandler(name, avatar)
             }
         }
-        return (displayName: name, avatarUrl: avatar)
     }
     
     static func getDataFromUrl(_ urlString:String, completion: @escaping ((_ data: Data?, _ response: URLResponse?, _ error: Error? ) -> Void)) {
