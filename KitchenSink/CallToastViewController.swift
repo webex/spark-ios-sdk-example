@@ -23,14 +23,11 @@ import SparkSDK
 
 class CallToastViewController: UIViewController, CallObserver {
     
-    @IBOutlet weak var avatarImage: UIImageView!
-    @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet private weak var avatarImage: UIImageView!
+    @IBOutlet private weak var nameLabel: UILabel!
     
     var call: Call!
-    var incomingCallDelegate: IncomingCallDelegate!
-    
-    fileprivate var name = ""
-    fileprivate var avatar = ""
+    weak var incomingCallDelegate: IncomingCallDelegate?
     
     private var spark: Spark!
     
@@ -38,7 +35,9 @@ class CallToastViewController: UIViewController, CallObserver {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.spark = AppDelegate.spark
+        spark = AppDelegate.spark
+        avatarImage.image = UIImage(named: "DefaultAvatar")
+        nameLabel.text = call.from
         fetchUserProfile()
     }
     
@@ -54,13 +53,13 @@ class CallToastViewController: UIViewController, CallObserver {
     
     // MARK: - Call answer/reject
     
-    @IBAction func answerButtonPressed(_ sender: AnyObject) {
-        incomingCallDelegate.didAnswerIncomingCall()
+    @IBAction private func answerButtonPressed(_ sender: AnyObject) {
+        incomingCallDelegate?.didAnswerIncomingCall()
         dismissView()
     }
     
-    @IBAction func declineButtonPressed(_ sender: AnyObject) {
-        incomingCallDelegate.didDeclineIncomingCall()
+    @IBAction private func declineButtonPressed(_ sender: AnyObject) {
+        incomingCallDelegate?.didDeclineIncomingCall()
         dismissView()
     }
     
@@ -72,26 +71,24 @@ class CallToastViewController: UIViewController, CallObserver {
     
     // MARK: - UI views
     
-    fileprivate func fetchAvatarImage() {
-        Utils.downloadAvatarImage(avatar, completionHandler: {
+    private func fetchAvatarImage(_ avatarUrl: String) {
+        Utils.downloadAvatarImage(avatarUrl, completionHandler: {
             self.avatarImage.image = $0
         })
     }
     
-    fileprivate func dismissView() {
+    private func dismissView() {
         dismiss(animated: false, completion: nil)
     }
 
     // MARK: - People API
     
-    fileprivate func fetchUserProfile() {
-        if spark.authenticationStrategy.authorized {
-            if let email = call.from {
-                Utils.fetchUserProfile(email) { [unowned self] (displayName: String, avatarUrl: String) in
-                    self.name = displayName
-                    self.avatar = avatarUrl
-                    self.fetchAvatarImage()
-                    self.nameLabel.text = displayName
+    private func fetchUserProfile() {
+        if spark.authenticationStrategy.authorized, let email = call.from {
+            Utils.fetchUserProfile(email) { [weak self] (displayName: String, avatarUrl: String) in
+                if let strongSelf = self {
+                    strongSelf.fetchAvatarImage(avatarUrl)
+                    strongSelf.nameLabel.text = displayName
                 }
             }
         }

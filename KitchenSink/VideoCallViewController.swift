@@ -49,30 +49,30 @@ class VideoCallViewController: UIViewController, CallObserver {
     @IBOutlet private weak var selfViewWidth: NSLayoutConstraint!
     @IBOutlet private weak var selfViewHeight: NSLayoutConstraint!
     
-	var localVideoView: MediaRenderView {
-		_ = view
-		return selfView
-	}
+    var localVideoView: MediaRenderView {
+        _ = view
+        return selfView
+    }
 	
-	var remoteVideoView: MediaRenderView {
-		_ = view
-		return remoteView
-	}
+    var remoteVideoView: MediaRenderView {
+        _ = view
+        return remoteView
+    }
 	
     var call: Call!
     var remoteAddr = ""
     
-    private var remoteDisplayName = ""
-    private var remoteAvatarUrl = ""
-    private var avatarImageView = UIImageView()
-    private var remoteDisplayNameLabel = UILabel()
+    private let avatarImageView = UIImageView()
+    private let remoteDisplayNameLabel = UILabel()
     private var spark: Spark!
     
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.spark = AppDelegate.spark
+        spark = AppDelegate.spark
+        remoteDisplayNameLabel.text = remoteAddr
+        avatarImageView.image = UIImage(named: "DefaultAvatar")
         setupAvatar()
     }
     
@@ -240,11 +240,11 @@ class VideoCallViewController: UIViewController, CallObserver {
         avatarContainerView.addSubview(avatarImageView)
         avatarContainerView.addSubview(remoteDisplayNameLabel)
         
-        Utils.fetchUserProfile(remoteAddr) { [unowned self] (displayName: String, avatarUrl: String) in
-            self.remoteDisplayName = displayName
-            self.remoteAvatarUrl = avatarUrl
-            
-            self.fetchAvatarImage()
+        Utils.fetchUserProfile(remoteAddr) { [weak self] (displayName: String, avatarUrl: String) in
+            if let strongSelf = self {
+                strongSelf.remoteDisplayNameLabel.text = displayName
+                strongSelf.fetchAvatarImage(avatarUrl)
+            }
         }
     }
     
@@ -306,7 +306,6 @@ class VideoCallViewController: UIViewController, CallObserver {
         let x_name = CGFloat(0)
         let y_name = avatarContainerView.frame.height - h_name
         remoteDisplayNameLabel.frame = CGRect(x: x_name, y: y_name, width: w_name, height: h_name)
-        remoteDisplayNameLabel.text = remoteDisplayName
         remoteDisplayNameLabel.textAlignment = NSTextAlignment.center
     }
     
@@ -327,10 +326,10 @@ class VideoCallViewController: UIViewController, CallObserver {
         showSelfView(call.sendingVideo)
     }
     
-    private func fetchAvatarImage() {
-        Utils.downloadAvatarImage(remoteAvatarUrl, completionHandler: {
-            self.avatarImageView.image = $0
-        })
+    private func fetchAvatarImage(_ avatarUrl: String) {
+        Utils.downloadAvatarImage(avatarUrl) { image in
+            self.avatarImageView.image = image
+        }
     }
     
     private func dismissCallView() {

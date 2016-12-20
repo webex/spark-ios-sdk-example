@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import Foundation
-protocol IncomingCallDelegate {
+protocol IncomingCallDelegate: class {
     func didAnswerIncomingCall()
     func didDeclineIncomingCall()
 }
