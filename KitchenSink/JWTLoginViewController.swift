@@ -25,7 +25,9 @@ import Toast_Swift
 class JWTLoginViewController: UIViewController {
     
     
+    @IBOutlet weak var jwtTextField: UITextField!
     @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var jwtLoginButton: UIButton!
     private var jwtAuthStrategy: JWTAuthStrategy!
     private var spark: Spark!
     
@@ -38,12 +40,29 @@ class JWTLoginViewController: UIViewController {
         spark = Spark(authenticationStrategy: jwtAuthStrategy)
         AppDelegate.spark = spark
     }
-    
+
+    // MARK: - JWT Text Field & Button Enable/Disable
+    @IBAction func jwtTextFieldChanged(_ sender: UITextField) {
+        jwtLoginButton.isEnabled = !(jwtTextField.text == "" || jwtTextField.text == nil)
+        jwtLoginButton.alpha = (jwtLoginButton.isEnabled) ? 1.0 : 0.5
+    }
+
+    @IBAction func jwtTextFieldDidBeginEditing(_ sender: UITextField) {
+        jwtTextField.placeholder = ""
+    }
+
+    @IBAction func jwtTextFieldDidEndEditing(_ sender: UITextField) {
+        jwtTextField.placeholder = "Enter JWT"
+    }
     // MARK: - Login/Auth handling
     
     @IBAction func loginWithSpark(_ sender: UIButton) {
+        guard let jwt = jwtTextField.text else {
+            return
+        }
+
         if !jwtAuthStrategy.authorized {
-            jwtAuthStrategy.authorizedWith(jwt: "PLACE_JWT_HERE")
+            jwtAuthStrategy.authorizedWith(jwt: jwt)
         }
 
         if spark.authenticationStrategy.authorized {
@@ -80,5 +99,10 @@ class JWTLoginViewController: UIViewController {
         let okAction = UIAlertAction(title: "OK", style: .cancel)
         alert.addAction(okAction)
         self.present(alert, animated: true)
+    }
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        view.endEditing(true)
+        super.touchesBegan(touches, with: event)
     }
 }
