@@ -16,25 +16,35 @@ import UIKit
 import SparkSDK
 
 class Utils {
-    static func fetchUserProfile(_ email: String) -> (displayName: String, avatarUrl: String) {
-        var name = ""
-        var avatar = ""
-        if let email = EmailAddress.fromString(email) {
+    static func fetchUserProfile(_ emailString: String, completionHandler: @escaping (String, String) -> Void) {
+        if let emailAddress = EmailAddress.fromString(emailString) {
             // Person list is empty with SIP email address
-            if let persons = try? Spark.people.list(email: email, max: 1) , !persons.isEmpty {
-                let person = persons[0]
-                if let displayName = person.displayName {
-                    name = displayName
-                } else {
-                    // Fallback to raw dial string
-                    name = email.toString()
+            AppDelegate.spark.people.list(email: emailAddress, max: 1) { response in
+                var name = emailString
+                var avatarUrlString = ""
+                var persons: [Person] = []
+                
+                switch response.result {
+                case .success(let value):
+                    persons = value
+                case .failure(let error):
+                    print("ERROR: \(error)")
                 }
-                if let avatarUrl = person.avatar {
-                    avatar = avatarUrl
+                
+                if let person = persons.first {
+                    if let displayName = person.displayName {
+                        name = displayName
+                    }
+                    if let avatarUrl = person.avatar {
+                        avatarUrlString = avatarUrl
+                    }
                 }
+                completionHandler(name, avatarUrlString)
             }
+        } else {
+            print("could not parse email address \(emailString) for retrieving user profile")
+            completionHandler(emailString, "")
         }
-        return (displayName: name, avatarUrl: avatar)
     }
     
     static func getDataFromUrl(_ urlString:String, completion: @escaping ((_ data: Data?, _ response: URLResponse?, _ error: Error? ) -> Void)) {

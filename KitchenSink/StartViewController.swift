@@ -26,7 +26,7 @@ class StartViewController: UIViewController {
     @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var demoAppHelpLabel: UILabel!
     @IBOutlet weak var sparkIdHelpLabel: UILabel!
-    @IBOutlet weak var appIdHelpLabel: UILabel!
+    @IBOutlet weak var jwtHelpLabel: UILabel!
     
     // MARK: - Life cycle
     
@@ -43,25 +43,25 @@ class StartViewController: UIViewController {
     func setupHelpLabels() {
         demoAppHelpLabel.isHidden = true
         sparkIdHelpLabel.isHidden = true
-        appIdHelpLabel.isHidden = true
+        jwtHelpLabel.isHidden = true
     }
     
     @IBAction func showDemoAppHelpLabel(_ sender: AnyObject) {
         demoAppHelpLabel.isHidden = !demoAppHelpLabel.isHidden
         sparkIdHelpLabel.isHidden = true
-        appIdHelpLabel.isHidden = true
+        jwtHelpLabel.isHidden = true
     }
     
     @IBAction func showSparkIdHelpLabel(_ sender: AnyObject) {
         demoAppHelpLabel.isHidden = true
         sparkIdHelpLabel.isHidden = !sparkIdHelpLabel.isHidden
-        appIdHelpLabel.isHidden = true
+        jwtHelpLabel.isHidden = true
     }
     
-    @IBAction func showAppIdHelpLabel(_ sender: AnyObject) {
+    @IBAction func showJWTHelpLabel(_ sender: AnyObject) {
         demoAppHelpLabel.isHidden = true
         sparkIdHelpLabel.isHidden = true
-        appIdHelpLabel.isHidden = !appIdHelpLabel.isHidden
+        jwtHelpLabel.isHidden = !jwtHelpLabel.isHidden
     }
 }
 

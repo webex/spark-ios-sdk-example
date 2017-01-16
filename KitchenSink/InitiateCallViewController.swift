@@ -30,13 +30,14 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
     fileprivate let searchController = UISearchController(searchResultsController: nil)
     fileprivate var searchResult: [Person]?
     fileprivate var dialEmail: String?
+    private var spark: Spark!
     
     fileprivate var localVideoView: MediaRenderView {
-        return videoCallViewController.selfView
+        return videoCallViewController.localVideoView
     }
     
     fileprivate var remoteVideoView: MediaRenderView {
-        return videoCallViewController.remoteView
+        return videoCallViewController.remoteVideoView
     }
     
     
@@ -44,6 +45,7 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.spark = AppDelegate.spark
         setupView()
     }
     
@@ -54,7 +56,7 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
             return
         }
         
-        Spark.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
+        spark.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
             if granted {
                 self.presentVideoCallView(address)
                 
@@ -62,7 +64,7 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
                 if VideoAudioSetup.sharedInstance.isVideoEnabled() {
                     mediaOption = MediaOption.audioVideo(local: self.localVideoView, remote: self.remoteVideoView)
                 }
-                let call = Spark.phone.dial(address, option: mediaOption) { success in
+                let call = self.spark.phone.dial(address, option: mediaOption) { success in
                     if !success {
                         self.dismissVideoCallView()
                         print("Failed to dial call.")
@@ -105,7 +107,7 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
         }
         
         if let email = EmailAddress.fromString(searchString) {
-            Spark.people.list(email: email, max: 10) {
+            spark.people.list(email: email, max: 10) {
                 (response: ServiceResponse<[Person]>) in
                 
                 switch response.result {
@@ -119,7 +121,7 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
                 }
             }
         } else {
-            Spark.people.list(displayName: searchString, max: 10) {
+            spark.people.list(displayName: searchString, max: 10) {
                 (response: ServiceResponse<[Person]>) in
                 
                 switch response.result {

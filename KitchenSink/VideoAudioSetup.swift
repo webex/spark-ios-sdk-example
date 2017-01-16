@@ -21,19 +21,20 @@ class VideoAudioSetup {
     fileprivate var videoEnabled = true
     
     func setFacingMode(_ mode: Call.FacingMode) {
-        Spark.phone.defaultFacingMode = mode
+        //VideoAudioSetup.spark.
+        PhoneSettings.defaultFacingMode = mode
     }
     
     func getFacingMode() -> Call.FacingMode {
-        return Spark.phone.defaultFacingMode
+        return PhoneSettings.defaultFacingMode
     }
     
     func setLoudSpeaker(_ enable: Bool) {
-        Spark.phone.defaultLoudSpeaker = enable
+        PhoneSettings.defaultLoudSpeaker = enable
     }
     
     func isLoudSpeaker() -> Bool {
-        return Spark.phone.defaultLoudSpeaker
+        return PhoneSettings.defaultLoudSpeaker
     }
     
     func setVideoEnabled(_ enable: Bool) {
