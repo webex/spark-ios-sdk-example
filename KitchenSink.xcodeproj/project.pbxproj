@@ -172,6 +172,7 @@
 				TargetAttributes = {
 					04AE18211CDAD3D800A8F078 = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = 3K8M2E3L9T;
 						LastSwiftMigration = 0800;
 					};
 				};
@@ -410,10 +411,10 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 3K8M2E3L9T;
 				INFOPLIST_FILE = KitchenSink/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.KitchenSinkDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.SparkSDK.KitchenSinkDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
@@ -425,10 +426,10 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 3K8M2E3L9T;
 				INFOPLIST_FILE = KitchenSink/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.KitchenSinkDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.SparkSDK.KitchenSinkDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
