@@ -19,7 +19,7 @@ class Utils {
     static func fetchUserProfile(_ emailString: String, completionHandler: @escaping (String, String) -> Void) {
         if let emailAddress = EmailAddress.fromString(emailString) {
             // Person list is empty with SIP email address
-            AppDelegate.spark.people.list(email: emailAddress, max: 1) { response in
+            SparkContext.sharedInstance.spark?.people.list(email: emailAddress, max: 1) { response in
                 var name = emailString
                 var avatarUrlString = ""
                 var persons: [Person] = []

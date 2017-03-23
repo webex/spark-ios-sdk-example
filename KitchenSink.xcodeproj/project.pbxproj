@@ -27,6 +27,8 @@
 		3D8194C41D1A73B200D4D4E3 /* IncomingCallDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8194C31D1A73B200D4D4E3 /* IncomingCallDelegate.swift */; };
 		5A82441E1DF9E5F900481A55 /* JWTLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A82441D1DF9E5F900481A55 /* JWTLoginViewController.swift */; };
 		5D40D3631D17A48C00558921 /* VideoAudioSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D40D3621D17A48C00558921 /* VideoAudioSetup.swift */; };
+		C79C450C1E79014A004EF22F /* SparkContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C450B1E79014A004EF22F /* SparkContext.swift */; };
+		C79C450E1E80CE20004EF22F /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C450D1E80CE20004EF22F /* BaseViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +58,8 @@
 		657C43FB45F7E9767BC98E93 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		87B55BD44833FEC88DC1F273 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A779AB3A31B809D134C73D0C /* Pods_KitchenSink.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C79C450B1E79014A004EF22F /* SparkContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SparkContext.swift; sourceTree = "<group>"; };
+		C79C450D1E80CE20004EF22F /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		D10621478BD9E68749DD77A3 /* Pods-KitchenSink.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink.release.xcconfig"; path = "Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -92,6 +96,7 @@
 		04AE18241CDAD3D800A8F078 /* KitchenSink */ = {
 			isa = PBXGroup;
 			children = (
+				C79C450B1E79014A004EF22F /* SparkContext.swift */,
 				04AE182C1CDAD3D800A8F078 /* Assets.xcassets */,
 				04AE18311CDAD3D800A8F078 /* Info.plist */,
 				04AE182E1CDAD3D800A8F078 /* LaunchScreen.storyboard */,
@@ -112,6 +117,7 @@
 				5D40D3621D17A48C00558921 /* VideoAudioSetup.swift */,
 				048969341CDB34AB008966FA /* VideoAudioSetupViewController.swift */,
 				0471A2591CDC5ECD00C6647E /* VideoCallViewController.swift */,
+				C79C450D1E80CE20004EF22F /* BaseViewController.swift */,
 			);
 			path = KitchenSink;
 			sourceTree = "<group>";
@@ -173,7 +179,7 @@
 					04AE18211CDAD3D800A8F078 = {
 						CreatedOnToolsVersion = 7.3;
 						DevelopmentTeam = 3K8M2E3L9T;
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 0820;
 					};
 				};
 			};
@@ -285,9 +291,11 @@
 				0471A2561CDB429B00C6647E /* HomeTableTableViewController.swift in Sources */,
 				3D8194C41D1A73B200D4D4E3 /* IncomingCallDelegate.swift in Sources */,
 				04AE18261CDAD3D800A8F078 /* AppDelegate.swift in Sources */,
+				C79C450C1E79014A004EF22F /* SparkContext.swift in Sources */,
 				048969351CDB34AB008966FA /* VideoAudioSetupViewController.swift in Sources */,
 				5D40D3631D17A48C00558921 /* VideoAudioSetup.swift in Sources */,
 				0471A25E1CDC6BF600C6647E /* CallToastViewController.swift in Sources */,
+				C79C450E1E80CE20004EF22F /* BaseViewController.swift in Sources */,
 				0471A2581CDC438300C6647E /* SparkLoginViewController.swift in Sources */,
 				042A4A711D114DC8002697D3 /* Utils.swift in Sources */,
 			);
@@ -411,11 +419,14 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = 3K8M2E3L9T;
 				INFOPLIST_FILE = KitchenSink/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.SparkSDK.KitchenSinkDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -426,11 +437,13 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = 3K8M2E3L9T;
 				INFOPLIST_FILE = KitchenSink/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.SparkSDK.KitchenSinkDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;

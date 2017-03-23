@@ -21,7 +21,7 @@
 import UIKit
 import SparkSDK
 
-class StartViewController: UIViewController {
+class StartViewController: BaseViewController {
     
     @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var demoAppHelpLabel: UILabel!

@@ -21,33 +21,27 @@
 import UIKit
 import SparkSDK
 
-class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UITableViewDelegate, UITableViewDataSource {
+class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, UITableViewDelegate, UITableViewDataSource {
     
+    @IBOutlet weak var indicatorView: UIActivityIndicatorView!
     @IBOutlet weak var dialAddressTextField: UITextField!
     @IBOutlet weak var tableView: UITableView!
     
-    fileprivate var videoCallViewController: VideoCallViewController!
     fileprivate let searchController = UISearchController(searchResultsController: nil)
     fileprivate var searchResult: [Person]?
     fileprivate var dialEmail: String?
-    private var spark: Spark!
-    
-    fileprivate var localVideoView: MediaRenderView {
-        return videoCallViewController.localVideoView
-    }
-    
-    fileprivate var remoteVideoView: MediaRenderView {
-        return videoCallViewController.remoteVideoView
-    }
-    
     
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.spark = AppDelegate.spark
         setupView()
     }
+    
+    deinit {
+        searchController.view.removeFromSuperview()
+    }
+    
     
     // MARK: - Dial call
     
@@ -55,30 +49,12 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
         if address.isEmpty {
             return
         }
-        
-        spark.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
-            if granted {
-                self.presentVideoCallView(address)
-                
-                var mediaOption = MediaOption.audioOnly
-                if VideoAudioSetup.sharedInstance.isVideoEnabled() {
-                    mediaOption = MediaOption.audioVideo(local: self.localVideoView, remote: self.remoteVideoView)
-                }
-                let call = self.spark.phone.dial(address, option: mediaOption) { success in
-                    if !success {
-                        self.dismissVideoCallView()
-                        print("Failed to dial call.")
-                    }
-                }
-                self.videoCallViewController.call = call
-            } else {
-                Utils.showCameraMicrophoneAccessDeniedAlert(self)
-            }
-        }
+        self.presentVideoCallView(address)
     }
     
     @IBAction func dialAddress(_ sender: AnyObject) {
-        dial(dialAddressTextField.text!)
+//        dial(dialAddressTextField.text!)
+        dial("c07e355a-de93-473c-91cf-d16443824ff4")
     }
     
     @IBAction func switchDialWay(_ sender: AnyObject) {
@@ -106,10 +82,12 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
             return
         }
         
+        indicatorView.startAnimating()
         if let email = EmailAddress.fromString(searchString) {
-            spark.people.list(email: email, max: 10) {
+            SparkContext.sharedInstance.spark?.people.list(email: email, max: 10) {
                 (response: ServiceResponse<[Person]>) in
                 
+                self.indicatorView.stopAnimating()
                 switch response.result {
                 case .success(let value):
                     self.searchResult = value
@@ -121,9 +99,9 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
                 }
             }
         } else {
-            spark.people.list(displayName: searchString, max: 10) {
+            SparkContext.sharedInstance.spark?.people.list(displayName: searchString, max: 10) {
                 (response: ServiceResponse<[Person]>) in
-                
+                self.indicatorView.stopAnimating()
                 switch response.result {
                 case .success(let value):
                     self.searchResult = value
@@ -173,23 +151,16 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
         searchController.searchBar.placeholder = "Email or user name"
         definesPresentationContext = true
         tableView.tableHeaderView = searchController.searchBar
+        view.bringSubview(toFront: indicatorView)
+        dialAddressTextField.layer.borderColor = UIColor.gray.cgColor
     }
     
     fileprivate func presentVideoCallView(_ remoteAddr: String) {
-        videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController!
-        
-        videoCallViewController.remoteAddr = remoteAddr
-        videoCallViewController.modalPresentationStyle = .fullScreen
-        present(videoCallViewController, animated: true, completion: nil)
-        if let popoverController = videoCallViewController.popoverPresentationController {
-            popoverController.sourceView = view
-            popoverController.sourceRect = view.bounds
-            popoverController.permittedArrowDirections = .any
+        if let videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController! {
+            
+            videoCallViewController.videoCallRole = .Caller(remoteAddr)
+            navigationController?.pushViewController(videoCallViewController, animated: true)
         }
-    }
-    
-    fileprivate func dismissVideoCallView() {
-        videoCallViewController.dismiss(animated: false, completion: nil)
     }
     
     fileprivate func hideSearchView(_ hidden: Bool) {

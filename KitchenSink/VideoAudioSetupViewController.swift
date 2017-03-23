@@ -21,7 +21,7 @@
 import UIKit
 import SparkSDK
 
-class VideoAudioSetupViewController: UIViewController {
+class VideoAudioSetupViewController: BaseViewController {
     
     @IBOutlet weak var defaultAudioSpeakerSwitch: UISwitch!
     @IBOutlet weak var defaultVideoSwitch: UISwitch!

@@ -21,19 +21,18 @@
 import UIKit
 import SparkSDK
 
-class HomeTableTableViewController: UITableViewController {
+class HomeTableTableViewController: BaseTableViewController {
     
     @IBOutlet weak var statusLabel: UILabel!
     
     fileprivate var registerState = "connecting"
-    private var spark: Spark!
+    
     
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationItem.setHidesBackButton(true, animated: false)
-        self.spark = AppDelegate.spark
         registerPhone()
         updateStatusLabel()
     }
@@ -41,12 +40,12 @@ class HomeTableTableViewController: UITableViewController {
     // MARK: - Phone register
     
     func registerPhone() {
-        spark.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
+        SparkContext.sharedInstance.spark?.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
             if !granted {
                 Utils.showCameraMicrophoneAccessDeniedAlert(self)
             }
         }
-        spark.phone.register() { success in
+        SparkContext.sharedInstance.spark?.phone.register() { success in
             if success {
                 self.registerState = "ok"
                 self.updateStatusLabel()
@@ -63,7 +62,7 @@ class HomeTableTableViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
         
         if indexPath.section == 1 && indexPath.row == 4 {
-            spark.authenticationStrategy.deauthorize()
+            SparkContext.sharedInstance.deinitSpark()
             _ = navigationController?.popToRootViewController(animated: true)
         }
     }

@@ -22,25 +22,35 @@ import UIKit
 import SparkSDK
 import Toast_Swift
 
-class JWTLoginViewController: UIViewController {
+class JWTLoginViewController: BaseViewController {
     
     
     @IBOutlet weak var jwtTextField: UITextField!
     @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var jwtLoginButton: UIButton!
     private var jwtAuthStrategy: JWTAuthStrategy!
-    private var spark: Spark!
+    @IBOutlet weak var waitingView: UIActivityIndicatorView!
     
     // MARK: - Life cycle
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        initView()
+    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        jwtAuthStrategy = JWTAuthStrategy()
-        statusLabel.text = "Powered by SDK v" + Spark.version
-        spark = Spark(authenticationStrategy: jwtAuthStrategy)
-        AppDelegate.spark = spark
+        SparkContext.initSparkForJWTLogin()
+        jwtAuthStrategy = SparkContext.sharedInstance.spark?.authenticationStrategy as! JWTAuthStrategy!
+        Spark.toggleConsoleLogger(true)
+        jwtTextField.text = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwYW56aGFuZyIsIm5hbWUiOiJwYW56aGFuZyIsImlzcyI6ImNkNWM5YWY3LThlZDMtNGUxNS05NzA1LTAyNWVmMzBiMWI2YSJ9.UTYEVcXpjLjDkMj--SmXZpeMcj-UDH7T4CEWZgeqMd8"
+        hideWaitingView()
     }
-
+    // MARK: - View style and context init
+    private func initView()
+    {
+        statusLabel.text = "Powered by SDK v" + Spark.version
+    }
+    
     // MARK: - JWT Text Field & Button Enable/Disable
     @IBAction func jwtTextFieldChanged(_ sender: UITextField) {
         jwtLoginButton.isEnabled = !(jwtTextField.text == "" || jwtTextField.text == nil)
@@ -55,18 +65,21 @@ class JWTLoginViewController: UIViewController {
         jwtTextField.placeholder = "Enter JWT"
     }
     // MARK: - Login/Auth handling
-    
     @IBAction func loginWithSpark(_ sender: UIButton) {
         guard let jwt = jwtTextField.text else {
             return
         }
+        
+        showWaitingView()
 
         if !jwtAuthStrategy.authorized {
             jwtAuthStrategy.authorizedWith(jwt: jwt)
         }
 
-        if spark.authenticationStrategy.authorized {
-            spark.people.getMe() { response in
+        if SparkContext.sharedInstance.spark?.authenticationStrategy.authorized == true {
+            SparkContext.sharedInstance.spark?.people.getMe() { response in
+                self.hideWaitingView()
+                
                 switch response.result {
                 case .success(let person):
                     let emailAddress = (person.emails ?? []).first
@@ -85,18 +98,22 @@ class JWTLoginViewController: UIViewController {
                 }
             }
         } else {
+            hideWaitingView()
             showLoginError()
         }
     }
     
     private func showApplicationHome() {
         let viewController = storyboard?.instantiateViewController(withIdentifier: "HomeTableTableViewController") as! HomeTableTableViewController
-        navigationController?.pushViewController(viewController, animated: false)
+        navigationController?.pushViewController(viewController, animated: true)
     }
     
     private func showLoginError() {
         let alert = UIAlertController(title: "Could Not Login", message: "Unable to Login: Please make sure your JWT is correct.", preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "OK", style: .cancel)
+        let okAction = UIAlertAction(title: "OK", style: .cancel) {
+            action in
+            
+        }
         alert.addAction(okAction)
         self.present(alert, animated: true)
     }
@@ -104,5 +121,19 @@ class JWTLoginViewController: UIViewController {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         view.endEditing(true)
         super.touchesBegan(touches, with: event)
+    }
+    
+    func showWaitingView() {
+        waitingView.startAnimating()
+        jwtLoginButton.setTitleColor(UIColor.clear, for: UIControlState.disabled)
+        jwtLoginButton.isEnabled = false
+        jwtLoginButton.alpha = 0.5
+    }
+    
+    func hideWaitingView() {
+        waitingView.stopAnimating()
+        jwtLoginButton.setTitleColor(UIColor.white, for: UIControlState.disabled)
+        jwtTextFieldChanged(jwtTextField)
+        jwtLoginButton.alpha = 1
     }
 }

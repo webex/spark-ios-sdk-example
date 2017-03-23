@@ -22,33 +22,26 @@ import UIKit
 import SparkSDK
 import Toast_Swift
 
-class SparkLoginViewController: UIViewController {
+class SparkLoginViewController: BaseViewController {
     
     @IBOutlet weak var statusLabel: UILabel!
     private var oauthStrategy: OAuthStrategy!
     
     // MARK: - Life cycle
-    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        statusLabel.text = "Powered by SDK v" + Spark.version
+    }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        let clientId = "Cb3f891d2044fec65bfe36a8d1b3d69b3098448e9e0335c58bab42f5b94ad06c9"
-        let clientSecret = "f2660da9c8b90a9cdfe713f7c115473b76da531bb7ec9c66fdb8ec1481585879"
-        let scope = "spark:people_read spark:rooms_read spark:rooms_write spark:memberships_read spark:memberships_write spark:messages_read spark:messages_write"
-        let redirectUri = "KitchenSink://response"
-
-        oauthStrategy = OAuthStrategy(clientId: clientId, clientSecret: clientSecret, scope: scope, redirectUri: redirectUri)
-        
-        AppDelegate.spark = Spark(authenticationStrategy: oauthStrategy)
-        
-        statusLabel.text = "Powered by SDK v" + Spark.version
-        
+        SparkContext.initSparkForSparkIdLogin()
+        oauthStrategy = SparkContext.sharedInstance.spark?.authenticationStrategy as! OAuthStrategy
         if oauthStrategy.authorized {
             showApplicationHome()
         }
     }
     
     // MARK: - Login/Auth handling
-    
     @IBAction func loginWithSpark(_ sender: AnyObject) {
         oauthStrategy.authorize(parentViewController: self) { success in
             if success {
@@ -59,6 +52,6 @@ class SparkLoginViewController: UIViewController {
     
     private func showApplicationHome() {
         let viewController = storyboard?.instantiateViewController(withIdentifier: "HomeTableTableViewController") as! HomeTableTableViewController
-        navigationController?.pushViewController(viewController, animated: false)
+        navigationController?.pushViewController(viewController, animated: true)
     }
 }

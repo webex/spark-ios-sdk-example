@@ -21,7 +21,6 @@ class VideoAudioSetup {
     fileprivate var videoEnabled = true
     
     func setFacingMode(_ mode: Call.FacingMode) {
-        //VideoAudioSetup.spark.
         PhoneSettings.defaultFacingMode = mode
     }
     

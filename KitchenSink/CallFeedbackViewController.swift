@@ -22,14 +22,14 @@ import UIKit
 import SparkSDK
 import Cosmos
 
-class CallFeedbackViewController: UIViewController, UITextFieldDelegate {
+class CallFeedbackViewController: BaseViewController, UITextFieldDelegate {
 
     @IBOutlet weak var userCommentsTextField: UITextField!
     @IBOutlet weak var includeLogSwitch: UISwitch!
     @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var callRateView: CosmosView!
     
-    var call: Call!
+    var dissmissBlock: (()->())? = nil
     
     // MARK: - Life cycle
     
@@ -39,9 +39,10 @@ class CallFeedbackViewController: UIViewController, UITextFieldDelegate {
     }
     
     func setupView() {
+        
         userCommentsTextField.delegate = self
-        callRateView.didFinishTouchingCosmos = { rating in
-            self.updateStatusLabel()
+        callRateView.didFinishTouchingCosmos = { [weak self] rating in
+            self?.updateStatusLabel()
         }
         updateStatusLabel()
     }
@@ -49,14 +50,21 @@ class CallFeedbackViewController: UIViewController, UITextFieldDelegate {
     // MARK: - Call sendFeedback
     
     @IBAction func sendFeedback(_ sender: AnyObject) {
-		call.sendFeedbackWith(rating: Int(callRateView.rating), comments: userCommentsTextField.text!, includeLogs: includeLogSwitch.isOn)
-        dismiss(animated: true, completion: nil)
+        SparkContext.sharedInstance.call?.sendFeedbackWith(rating: Int(callRateView.rating), comments: userCommentsTextField.text!, includeLogs: includeLogSwitch.isOn)
+        
+        dismiss(animated: true)
+        {
+            self.dissmissBlock?()
+        }
     }
     
     // MARK: - UI views
     
     @IBAction func cancel(_ sender: AnyObject) {
-        dismiss(animated: true, completion: nil)
+        dismiss(animated: true)
+        {
+            self.dissmissBlock?()
+        }
     }
     
     @IBAction func IncludeLogs(_ sender: AnyObject) {
