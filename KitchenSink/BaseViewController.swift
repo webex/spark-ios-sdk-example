@@ -45,6 +45,22 @@ class BaseViewController: UIViewController {
     override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
         return .portrait
     }
+    
+    // MARK: - life cycle
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: true)
+    }
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        initView()
+    }
+    func initView() {
+        
+    }
+    func dissmissKeyboard() {
+        self.view.endEditing(true)
+    }
 }
 
 class BaseTableViewController: UITableViewController {
@@ -60,5 +76,20 @@ class BaseTableViewController: UITableViewController {
     
     override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
         return .portrait
+    }
+    // MARK: - life cycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        initView()
+    }
+    func initView() {
+        
+    }
+    func dissmissKeyboard() {
+        self.view.endEditing(true)
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: true)
     }
 }

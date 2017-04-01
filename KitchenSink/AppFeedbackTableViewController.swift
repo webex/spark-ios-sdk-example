@@ -27,6 +27,11 @@ class AppFeedbackTableViewController: BaseTableViewController, MFMailComposeView
     @IBOutlet weak var userCommentsText: UITextView!
     @IBOutlet weak var mailAddressLabel: UILabel!
     @IBOutlet weak var snapshotLabel: UILabel!
+    @IBOutlet weak var sendButton: UIButton!
+    @IBOutlet weak var buttonHeight: NSLayoutConstraint!
+    @IBOutlet var labelFontScaleCollection: [UILabel]!
+    @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
+    @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
     
     let mailAddress = "devsupport@ciscospark.com"
     var imagePicker = UIImagePickerController()
@@ -45,18 +50,51 @@ class AppFeedbackTableViewController: BaseTableViewController, MFMailComposeView
         snapshotLabel.text = " "
         mailAddressLabel.text = mailAddress
     }
+    override func initView() {
+        for label in labelFontScaleCollection {
+            label.font = UIFont.systemFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+        }
+        
+        sendButton.titleLabel?.font = UIFont.systemFont(ofSize: (sendButton.titleLabel?.font.pointSize)! * Utils.HEIGHT_SCALE)
+        
+        for heightConstraint in heightScaleCollection {
+            heightConstraint.constant *= Utils.HEIGHT_SCALE
+        }
+        for widthConstraint in widthScaleCollection {
+            widthConstraint.constant *= Utils.WIDTH_SCALE
+        }
+        
+        sendButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueNormal(), background: nil), for: .normal)
+        sendButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueHightlight(), background: nil), for: .highlighted)
+        sendButton.layer.cornerRadius = buttonHeight.constant/2
+    }
     
     // MARK: - UI views
-    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.row == 6 {
+            return 66 * Utils.HEIGHT_SCALE
+        }
+        return super.tableView(tableView, heightForRowAt: indexPath)
+    }
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        if indexPath.section == 0 && indexPath.row == 2 {
+            if !userCommentsText.isFirstResponder {
+                userCommentsText.becomeFirstResponder()
+            }
+            return
+        }
+        
+        dissmissKeyboard()
         if indexPath.section == 0 && indexPath.row == 1 {
             showActionSheet()
         }
+        
         if indexPath.section == 0 && indexPath.row == 4 {
             attachSnapshot()
         }
     }
-    
+
     func showActionSheet() {
         let optionMenu = UIAlertController(title: nil, message: "Choose Topic", preferredStyle: .actionSheet)
         

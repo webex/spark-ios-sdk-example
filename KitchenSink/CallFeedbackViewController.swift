@@ -22,35 +22,79 @@ import UIKit
 import SparkSDK
 import Cosmos
 
-class CallFeedbackViewController: BaseViewController, UITextFieldDelegate {
-
-    @IBOutlet weak var userCommentsTextField: UITextField!
+class CallFeedbackViewController: BaseViewController, UITextViewDelegate {
+    
+    @IBOutlet weak var userCommentsTextView: UITextView!
     @IBOutlet weak var includeLogSwitch: UISwitch!
     @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var callRateView: CosmosView!
+    @IBOutlet weak var placeholderLabel: UILabel!
     
+    @IBOutlet var labelFontScaleCollection: [UILabel]!
+    @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
+    @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
+    @IBOutlet var buttonFontScaleCollection: [UIButton]!
+    @IBOutlet weak var sendFeedBackButton: UIButton!
+    @IBOutlet weak var cancelButton: UIButton!
+    @IBOutlet weak var buttonHeight: NSLayoutConstraint!
+    
+    @IBOutlet weak var titleTopToSuperViewConstraint: NSLayoutConstraint!
+    private var topToSuperView: CGFloat = 0
     var dissmissBlock: (()->())? = nil
     
     // MARK: - Life cycle
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupView()
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(dissmissKeyboard))
+        view.addGestureRecognizer(tap)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(CallFeedbackViewController.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(CallFeedbackViewController.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        topToSuperView = titleTopToSuperViewConstraint.constant
+        
     }
     
-    func setupView() {
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
         
-        userCommentsTextField.delegate = self
-        callRateView.didFinishTouchingCosmos = { [weak self] rating in
-            self?.updateStatusLabel()
+    override func initView() {
+        
+        for label in labelFontScaleCollection {
+            label.font = UIFont.systemFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
         }
-        updateStatusLabel()
+        for button in buttonFontScaleCollection {
+            button.titleLabel?.font = UIFont.systemFont(ofSize: (button.titleLabel?.font.pointSize)! * Utils.HEIGHT_SCALE)
+        }
+        for heightConstraint in heightScaleCollection {
+            heightConstraint.constant *= Utils.HEIGHT_SCALE
+        }
+        for widthConstraint in widthScaleCollection {
+            widthConstraint.constant *= Utils.WIDTH_SCALE
+        }
+        userCommentsTextView.font = UIFont.systemFont(ofSize: (userCommentsTextView.font?.pointSize)! * Utils.HEIGHT_SCALE)
+        
+        
+        
+        userCommentsTextView.layer.borderColor = UIColor.gray.cgColor
+        userCommentsTextView.layer.borderWidth = 1.0
+        userCommentsTextView.layer.cornerRadius = 8
+        userCommentsTextView.delegate = self
+        
+        cancelButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueNormal(), background: nil), for: .normal)
+        cancelButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueHightlight(), background: nil), for: .highlighted)
+        cancelButton.layer.cornerRadius = buttonHeight.constant/2
+        
+        sendFeedBackButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueNormal(), background: nil), for: .normal)
+        sendFeedBackButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueHightlight(), background: nil), for: .highlighted)
+        sendFeedBackButton.layer.cornerRadius = buttonHeight.constant/2
+        
     }
     
     // MARK: - Call sendFeedback
     
     @IBAction func sendFeedback(_ sender: AnyObject) {
-        SparkContext.sharedInstance.call?.sendFeedbackWith(rating: Int(callRateView.rating), comments: userCommentsTextField.text!, includeLogs: includeLogSwitch.isOn)
+        SparkContext.sharedInstance.call?.sendFeedbackWith(rating: Int(callRateView.rating), comments: userCommentsTextView.text!, includeLogs: includeLogSwitch.isOn)
         
         dismiss(animated: true)
         {
@@ -58,8 +102,17 @@ class CallFeedbackViewController: BaseViewController, UITextFieldDelegate {
         }
     }
     
-    // MARK: - UI views
+    // MARK: - UITextViewDelegate
+    func textViewDidChange(_ textView: UITextView) {
+        if !textView.text.isEmpty {
+            placeholderLabel.isHidden = true
+        }
+        else {
+            placeholderLabel.isHidden = false
+        }
+    }
     
+    // MARK: - UI views
     @IBAction func cancel(_ sender: AnyObject) {
         dismiss(animated: true)
         {
@@ -71,19 +124,50 @@ class CallFeedbackViewController: BaseViewController, UITextFieldDelegate {
         updateStatusLabel()
     }
     
-    @IBAction func userCommentsChanged(_ sender: AnyObject) {
-        updateStatusLabel()
-    }
-
     func updateStatusLabel() {
         statusLabel.text = "User rating: " + String(Int(callRateView.rating))
-        statusLabel.text = statusLabel.text! + "\nUser comments : " + userCommentsTextField.text!
+        statusLabel.text = statusLabel.text! + "\nUser comments : " + userCommentsTextView.text!
         statusLabel.text = statusLabel.text! + "\nInclude logs : " + includeLogSwitch.isOn.description
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         self.view.endEditing(true)
-        updateStatusLabel()
         return false
+    }
+    
+    // MARK: - Keyboard show/hide
+    func keyboardWillShow(notification:NSNotification) {
+        guard titleTopToSuperViewConstraint.constant != 0 else {
+            return
+        }
+        
+        if let keyboardSize = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
+            guard keyboardSize.size.height > 0 else {
+                return
+            }
+
+            let textViewButtom = userCommentsTextView.frame.origin.y + userCommentsTextView.frame.size.height
+            let keyboardY = UIScreen.main.bounds.height - keyboardSize.size.height
+            //print("textViewButtom:\(textViewButtom) , keyboardY :\(keyboardY)")
+            if keyboardY < textViewButtom {
+                UIView.animate(withDuration: 0.5) { [weak self] in
+                    if let strongSelf = self {
+                        strongSelf.titleTopToSuperViewConstraint.constant = 0
+                        strongSelf.view.layoutIfNeeded()
+                    }
+                }
+            }
+        }
+    }
+    
+    func keyboardWillHide(notification:NSNotification) {
+        if titleTopToSuperViewConstraint.constant != topToSuperView {
+            UIView.animate(withDuration: 0.5) { [weak self] in
+                if let strongSelf = self {
+                    strongSelf.titleTopToSuperViewConstraint.constant = strongSelf.topToSuperView
+                    strongSelf.view.layoutIfNeeded()
+                }
+            }
+        }
     }
 }

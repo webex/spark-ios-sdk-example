@@ -22,31 +22,29 @@ import UIKit
 import SparkSDK
 
 class IncomingCallViewController: BaseViewController, CallObserver, IncomingCallDelegate {
+    @IBOutlet var labelFontScaleCollection: [UILabel]!
+    @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
     
     // MARK: - Life cycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         SparkContext.sharedInstance.spark?.callNotificationCenter.add(observer: self)
     }
-    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         SparkContext.sharedInstance.spark?.callNotificationCenter.remove(observer: self)
     }
     
     // MARK: - PhoneObserver
-    
     func callIncoming(_ call: Call) {
         SparkContext.sharedInstance.call = call
         presentCallToastView(call)
     }
     
-    func refreshAccessTokenFailed() {
-        // TODO: need to implement it?
-    }
-    
     // MARK: - IncomingCallDelegate
-    
     func didAnswerIncomingCall() {
         
         self.presentVideoCallView(SparkContext.sharedInstance.call?.from ?? "")
@@ -58,6 +56,14 @@ class IncomingCallViewController: BaseViewController, CallObserver, IncomingCall
     }
     
     // MARK: - UI views
+    override func initView() {
+        for label in labelFontScaleCollection {
+            label.font = UIFont.systemFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+        }
+        for heightConstraint in heightScaleCollection {
+            heightConstraint.constant *= Utils.HEIGHT_SCALE
+        }
+    }
     
     fileprivate func presentCallToastView(_ call: Call) {
         if let callToastViewController = storyboard?.instantiateViewController(withIdentifier: "CallToastViewController") as? CallToastViewController {
@@ -76,5 +82,4 @@ class IncomingCallViewController: BaseViewController, CallObserver, IncomingCall
             navigationController?.pushViewController(videoCallViewController, animated: true)
         }
     }
-    
 }

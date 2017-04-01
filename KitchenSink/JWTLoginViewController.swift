@@ -31,39 +31,52 @@ class JWTLoginViewController: BaseViewController {
     private var jwtAuthStrategy: JWTAuthStrategy!
     @IBOutlet weak var waitingView: UIActivityIndicatorView!
     
-    // MARK: - Life cycle
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        initView()
-    }
+    @IBOutlet var textFieldFontScaleCollection: [UITextField]!
+    @IBOutlet var labelFontScaleCollection: [UILabel]!
+    @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
+    @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
+    @IBOutlet var buttonFontScaleCollection: [UIButton]!
+
     
+    @IBOutlet weak var buttonHeightConstraint: NSLayoutConstraint!
+    // MARK: - Life cycle
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         SparkContext.initSparkForJWTLogin()
         jwtAuthStrategy = SparkContext.sharedInstance.spark?.authenticationStrategy as! JWTAuthStrategy!
         Spark.toggleConsoleLogger(true)
-        jwtTextField.text = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwYW56aGFuZyIsIm5hbWUiOiJwYW56aGFuZyIsImlzcyI6ImNkNWM5YWY3LThlZDMtNGUxNS05NzA1LTAyNWVmMzBiMWI2YSJ9.UTYEVcXpjLjDkMj--SmXZpeMcj-UDH7T4CEWZgeqMd8"
         hideWaitingView()
     }
     // MARK: - View style and context init
-    private func initView()
+    override func initView()
     {
+        for label in labelFontScaleCollection {
+            label.font = UIFont.systemFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+        }
+        for button in buttonFontScaleCollection {
+            button.titleLabel?.font = UIFont.systemFont(ofSize: (button.titleLabel?.font.pointSize)! * Utils.HEIGHT_SCALE)
+        }
+        for heightConstraint in heightScaleCollection {
+            heightConstraint.constant *= Utils.HEIGHT_SCALE
+        }
+        for widthConstraint in widthScaleCollection {
+            widthConstraint.constant *= Utils.WIDTH_SCALE
+        }
+        for textField in textFieldFontScaleCollection {
+            textField.font = UIFont.systemFont(ofSize: (textField.font?.pointSize)! * Utils.HEIGHT_SCALE)
+        }
         statusLabel.text = "Powered by SDK v" + Spark.version
+        jwtLoginButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueNormal(), background: nil), for: .normal)
+        jwtLoginButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueHightlight(), background: nil), for: .highlighted)
+        jwtLoginButton.layer.cornerRadius = buttonHeightConstraint.constant/2
     }
     
     // MARK: - JWT Text Field & Button Enable/Disable
     @IBAction func jwtTextFieldChanged(_ sender: UITextField) {
-        jwtLoginButton.isEnabled = !(jwtTextField.text == "" || jwtTextField.text == nil)
+        jwtLoginButton.isEnabled = !((jwtTextField.text?.isEmpty) ?? false)
         jwtLoginButton.alpha = (jwtLoginButton.isEnabled) ? 1.0 : 0.5
     }
 
-    @IBAction func jwtTextFieldDidBeginEditing(_ sender: UITextField) {
-        jwtTextField.placeholder = ""
-    }
-
-    @IBAction func jwtTextFieldDidEndEditing(_ sender: UITextField) {
-        jwtTextField.placeholder = "Enter JWT"
-    }
     // MARK: - Login/Auth handling
     @IBAction func loginWithSpark(_ sender: UIButton) {
         guard let jwt = jwtTextField.text else {
@@ -133,7 +146,7 @@ class JWTLoginViewController: BaseViewController {
     func hideWaitingView() {
         waitingView.stopAnimating()
         jwtLoginButton.setTitleColor(UIColor.white, for: UIControlState.disabled)
-        jwtTextFieldChanged(jwtTextField)
         jwtLoginButton.alpha = 1
+        jwtTextFieldChanged(jwtTextField)
     }
 }

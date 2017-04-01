@@ -21,6 +21,13 @@ class PersonTableViewCell: UITableViewCell {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var dialButton: UIButton!
     
+    @IBOutlet weak var avatarImageHeight: NSLayoutConstraint!
+    @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
+    
+    @IBOutlet var labelFontScaleCollection: [UILabel]!
+    
+    @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
+    
     var address: String?
     var initiateCallViewController: InitiateCallViewController!
     
@@ -28,6 +35,19 @@ class PersonTableViewCell: UITableViewCell {
         super.awakeFromNib()
         let selector = #selector(PersonTableViewCell.dial)
         dialButton.addTarget(self, action: selector, for: UIControlEvents.touchUpInside)
+        
+        
+        for label in labelFontScaleCollection {
+            label.font = UIFont.systemFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+        }
+        for heightConstraint in heightScaleCollection {
+            heightConstraint.constant *= Utils.HEIGHT_SCALE
+        }
+        for widthConstraint in widthScaleCollection {
+            widthConstraint.constant *= Utils.WIDTH_SCALE
+        }
+        
+        avatarImageView.layer.cornerRadius = avatarImageHeight.constant/2
     }
     
     func dial(_ sender: UIButton) {

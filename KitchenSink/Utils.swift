@@ -16,6 +16,8 @@ import UIKit
 import SparkSDK
 
 class Utils {
+    static let HEIGHT_SCALE: CGFloat = UIScreen.main.bounds.height / 568.0
+    static let WIDTH_SCALE: CGFloat = UIScreen.main.bounds.width / 320.0
     static func fetchUserProfile(_ emailString: String, completionHandler: @escaping (String, String) -> Void) {
         if let emailAddress = EmailAddress.fromString(emailString) {
             // Person list is empty with SIP email address

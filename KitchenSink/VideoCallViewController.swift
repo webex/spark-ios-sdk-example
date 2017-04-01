@@ -37,7 +37,6 @@ class VideoCallViewController: BaseViewController, CallObserver {
     @IBOutlet private weak var disconnectionTypeLabel: UILabel!
     
     @IBOutlet private weak var hangupButton: UIButton!
-    @IBOutlet private weak var homeButton: UIButton!
     @IBOutlet private weak var dialpadButton: UIButton!
     @IBOutlet private weak var dialpadView: UICollectionView!
     
@@ -58,6 +57,14 @@ class VideoCallViewController: BaseViewController, CallObserver {
     @IBOutlet private weak var selfViewWidth: NSLayoutConstraint!
     @IBOutlet private weak var selfViewHeight: NSLayoutConstraint!
     
+    
+    @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
+    
+    @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
+    @IBOutlet var labelFontScaleCollection: [UILabel]!
+    
+    
+    
     var videoCallRole :VideoCallRole = .Callee("")
     
     private var isFullScreen: Bool = false
@@ -69,6 +76,9 @@ class VideoCallViewController: BaseViewController, CallObserver {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        let newBackButton = UIBarButtonItem.init(title: "Back", style: .plain, target:self, action: #selector(gotoHome))
+        navigationItem.leftBarButtonItem = newBackButton
+        
         var remoteAddr = ""
         switch videoCallRole {
         case .Callee(let remoteAddress):
@@ -77,7 +87,6 @@ class VideoCallViewController: BaseViewController, CallObserver {
         case .Caller(let remoteAddress):
             remoteAddr = remoteAddress
             dial(remoteAddress)
-            
         }
         setupAvatarView(remoteAddr)
     }
@@ -94,6 +103,7 @@ class VideoCallViewController: BaseViewController, CallObserver {
             navigationController?.isNavigationBarHidden = false
         }
         SparkContext.sharedInstance.spark?.callNotificationCenter.remove(observer: self)
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
     
     override func viewDidLayoutSubviews() {
@@ -101,13 +111,8 @@ class VideoCallViewController: BaseViewController, CallObserver {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
     
     deinit {
@@ -264,7 +269,7 @@ class VideoCallViewController: BaseViewController, CallObserver {
         }
     }
     
-    @IBAction private func gotoHome(_ sender: AnyObject) {
+    @objc private func gotoHome() {
         if isCallDisconnected() {
             _ = navigationController?.popViewController(animated: true)
         } else {
@@ -277,13 +282,25 @@ class VideoCallViewController: BaseViewController, CallObserver {
     }
     
     // MARK: - UI views
-    
+    override func initView() {
+        for label in labelFontScaleCollection {
+            label.font = UIFont.systemFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+        }
+        for heightConstraint in heightScaleCollection {
+            heightConstraint.constant *= Utils.HEIGHT_SCALE
+        }
+        for widthConstraint in widthScaleCollection {
+            widthConstraint.constant *= Utils.WIDTH_SCALE
+        }
+    }
     private func setupAvatarView(_ remoteAddr: String) {
         avatarImageView.image = UIImage(named: "DefaultAvatar")
         avatarImageView.layer.masksToBounds = true
         avatarImageView.translatesAutoresizingMaskIntoConstraints = false
         
         remoteDisplayNameLabel.text = remoteAddr
+        remoteDisplayNameLabel.font = UIFont.systemFont(ofSize: 17 * Utils.HEIGHT_SCALE)
+        remoteDisplayNameLabel.textColor = UIColor.white
         remoteDisplayNameLabel.textAlignment = NSTextAlignment.center
         remoteDisplayNameLabel.translatesAutoresizingMaskIntoConstraints = false
         
@@ -292,15 +309,15 @@ class VideoCallViewController: BaseViewController, CallObserver {
         
         
         let avatarImageViewCenterXConstraint = NSLayoutConstraint.init(item: avatarImageView, attribute: .centerX, relatedBy: .equal, toItem: avatarContainerView, attribute: .centerX, multiplier: 1, constant: 0)
-        let avatarImageViewCenterYConstraint = NSLayoutConstraint.init(item: avatarImageView, attribute: .centerY, relatedBy: .equal, toItem: avatarContainerView, attribute: .centerY, multiplier: 1, constant: 0)
+        let avatarImageViewCenterYConstraint = NSLayoutConstraint.init(item: avatarImageView, attribute: .centerY, relatedBy: .equal, toItem: avatarContainerView, attribute: .centerY, multiplier: 1, constant: -(remoteViewHeight.constant/3/4))
         
         avatarImageViewHeightConstraint = NSLayoutConstraint.init(item: avatarImageView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1, constant: remoteViewHeight.constant/3)
         let avatarImageViewWidthConstraint = NSLayoutConstraint.init(item: avatarImageView, attribute: .width, relatedBy: .equal, toItem: avatarImageView, attribute: .height, multiplier: 1, constant: 0)
         
         let remoteDisplayNameLabelLeadingConstraint = NSLayoutConstraint.init(item: remoteDisplayNameLabel, attribute: .leading, relatedBy: .equal, toItem: avatarContainerView, attribute: .leading, multiplier: 1, constant: 0)
         let remoteDisplayNameLabelTrailingConstraint = NSLayoutConstraint.init(item: remoteDisplayNameLabel, attribute: .trailing, relatedBy: .equal, toItem: avatarContainerView, attribute: .trailing, multiplier: 1, constant: 0)
-        let remoteDisplayNameLabelHeightConstraint = NSLayoutConstraint.init(item: remoteDisplayNameLabel, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1, constant: 21)
-        let remoteDisplayNameLabelTopConstraint = NSLayoutConstraint.init(item: remoteDisplayNameLabel, attribute: .top, relatedBy: .equal, toItem: avatarImageView, attribute: .bottom, multiplier: 1, constant: 20)
+        let remoteDisplayNameLabelHeightConstraint = NSLayoutConstraint.init(item: remoteDisplayNameLabel, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1, constant: 21 * Utils.HEIGHT_SCALE)
+        let remoteDisplayNameLabelTopConstraint = NSLayoutConstraint.init(item: remoteDisplayNameLabel, attribute: .top, relatedBy: .equal, toItem: avatarImageView, attribute: .bottom, multiplier: 1, constant: 15 * Utils.HEIGHT_SCALE)
         
         remoteDisplayNameLabel.addConstraint(remoteDisplayNameLabelHeightConstraint)
         
@@ -331,9 +348,21 @@ class VideoCallViewController: BaseViewController, CallObserver {
     }
 
     private func fetchAvatarImage(_ avatarUrl: String) {
-        Utils.downloadAvatarImage(avatarUrl) { [weak self] image in
+        Utils.downloadAvatarImage(avatarUrl) { [weak self] avatarImage in
             if let strongSelf = self {
-                strongSelf.avatarImageView.image = image
+                UIView.animate(withDuration: 0.25, delay: 0, options: .curveEaseIn, animations: {
+                    strongSelf.avatarImageView.alpha = 1
+                    strongSelf.avatarImageView.alpha = 0.1
+                    strongSelf.view.layoutIfNeeded()
+                }, completion: { [weak self] finished in
+                    if let strongSelf = self {
+                        UIView.animate(withDuration: 0.25, delay: 0, options: .curveEaseOut, animations: {
+                            strongSelf.avatarImageView.image = avatarImage
+                            strongSelf.avatarImageView.alpha = 1
+                            strongSelf.view.layoutIfNeeded()
+                        }, completion: nil)
+                    }
+                })
             }
         }
     }
@@ -474,35 +503,32 @@ class VideoCallViewController: BaseViewController, CallObserver {
     private func fullScreenLandscape(_ height:CGFloat) {
         remoteViewTop.constant = 0
         remoteViewHeight.constant = height
-        print("remoteView set to screen bounds:\(UIScreen.main.bounds)")
-        selfViewWidth.constant = 100
-        selfViewHeight.constant = 70
+        selfViewWidth.constant = 100 * Utils.HEIGHT_SCALE
+        selfViewHeight.constant = 70 * Utils.WIDTH_SCALE
         hideControlView(true)
         fullScreenButton.isHidden = true
     }
     private func fullScreenPortrait(_ height:CGFloat) {
         remoteViewTop.constant = 0
         remoteViewHeight.constant = height
-        print("remoteView set to screen bounds:\(UIScreen.main.bounds)")
-        selfViewWidth.constant = 70
-        selfViewHeight.constant = 100
+        selfViewWidth.constant = 70 * Utils.WIDTH_SCALE
+        selfViewHeight.constant = 100 * Utils.HEIGHT_SCALE
         hideControlView(true)
         fullScreenButton.isHidden = false
-        fullScreenButton.setBackgroundImage(UIImage.init(named: "normalScreen"), for: UIControlState.normal)
+        fullScreenButton.setBackgroundImage(UIImage.init(named: "NormalScreen"), for: UIControlState.normal)
         
     }
     private func normalSizePortrait() {
-        remoteViewTop.constant = 40
-        remoteViewHeight.constant = 180
-        selfViewWidth.constant = 70
-        selfViewHeight.constant = 100
+        remoteViewTop.constant = 40 * Utils.HEIGHT_SCALE
+        remoteViewHeight.constant = 180 * Utils.HEIGHT_SCALE
+        selfViewWidth.constant = 70 * Utils.WIDTH_SCALE
+        selfViewHeight.constant = 100 * Utils.HEIGHT_SCALE
         hideControlView(false)
         fullScreenButton.isHidden = false
-        fullScreenButton.setBackgroundImage(UIImage.init(named: "fullScreen"), for: UIControlState.normal)
+        fullScreenButton.setBackgroundImage(UIImage.init(named: "FullScreen"), for: UIControlState.normal)
     }
     private func hideControlView(_ isHidden: Bool) {
         fullScreenButton.isHidden = UIDevice.current.orientation.isLandscape
-        homeButton.isHidden = isHidden
         disconnectionTypeLabel.isHidden = (isHidden == false ? !isCallDisconnected():isHidden)
         showCallControllView(!isHidden)
         navigationController?.isNavigationBarHidden = isHidden

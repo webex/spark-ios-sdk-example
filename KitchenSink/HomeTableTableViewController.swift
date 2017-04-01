@@ -24,17 +24,25 @@ import SparkSDK
 class HomeTableTableViewController: BaseTableViewController {
     
     @IBOutlet weak var statusLabel: UILabel!
-    
     fileprivate var registerState = "connecting"
+    @IBOutlet weak var buttonHeight: NSLayoutConstraint!
+    @IBOutlet weak var footerView: UIView!
     
-    
+    @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
+    @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
+    @IBOutlet var labelFontScaleCollection: [UILabel]!
+    @IBOutlet var buttonFontScaleCollection: [UIButton]!
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.setHidesBackButton(true, animated: false)
         registerPhone()
         updateStatusLabel()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
     }
     
     // MARK: - Phone register
@@ -57,17 +65,49 @@ class HomeTableTableViewController: BaseTableViewController {
     }
     
     // MARK: - UITableViewController
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.section == 0 && indexPath.row == 1 {
+            return 80 * Utils.HEIGHT_SCALE
+        }
+        
+        return super.tableView(tableView, heightForRowAt: indexPath) * Utils.HEIGHT_SCALE
+    }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
         if indexPath.section == 1 && indexPath.row == 4 {
-            SparkContext.sharedInstance.deinitSpark()
-            _ = navigationController?.popToRootViewController(animated: true)
+            logout()
         }
     }
     
     // MARK: - UI views
+    
+    override func initView() {
+        for label in labelFontScaleCollection {
+            label.font = UIFont.systemFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+        }
+        for heightConstraint in heightScaleCollection {
+            heightConstraint.constant *= Utils.HEIGHT_SCALE
+        }
+        for widthConstraint in widthScaleCollection {
+            widthConstraint.constant *= Utils.WIDTH_SCALE
+        }
+        
+        
+        for button in buttonFontScaleCollection {
+            button.titleLabel?.font = UIFont.systemFont(ofSize: (button.titleLabel?.font.pointSize)! * Utils.HEIGHT_SCALE)
+            button.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueNormal(), background: nil), for: .normal)
+            button.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueHightlight(), background: nil), for: .highlighted)
+            button.clipsToBounds = true
+            button.layer.cornerRadius = buttonHeight.constant/2
+        }
+        
+        var frame = footerView.frame
+        frame.size.height *= Utils.HEIGHT_SCALE
+        footerView.frame = frame
+        
+    }
     
     fileprivate func updateStatusLabel() {
         statusLabel.text = "Powered by SDK v" + Spark.version
@@ -80,4 +120,16 @@ class HomeTableTableViewController: BaseTableViewController {
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }
+    
+    
+    @IBAction func logoutButtonTouchUpinside(_ sender: Any) {
+        logout()
+    }
+    
+    private func logout() {
+        SparkContext.sharedInstance.deinitSpark()
+        _ = navigationController?.popToRootViewController(animated: true)
+
+    }
+    
 }

@@ -27,6 +27,7 @@
 		3D8194C41D1A73B200D4D4E3 /* IncomingCallDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8194C31D1A73B200D4D4E3 /* IncomingCallDelegate.swift */; };
 		5A82441E1DF9E5F900481A55 /* JWTLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A82441D1DF9E5F900481A55 /* JWTLoginViewController.swift */; };
 		5D40D3631D17A48C00558921 /* VideoAudioSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D40D3621D17A48C00558921 /* VideoAudioSetup.swift */; };
+		C718557E1E8A4AED00ABF181 /* UIKitExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C718557D1E8A4AED00ABF181 /* UIKitExtension.swift */; };
 		C79C450C1E79014A004EF22F /* SparkContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C450B1E79014A004EF22F /* SparkContext.swift */; };
 		C79C450E1E80CE20004EF22F /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79C450D1E80CE20004EF22F /* BaseViewController.swift */; };
 /* End PBXBuildFile section */
@@ -58,6 +59,7 @@
 		657C43FB45F7E9767BC98E93 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		87B55BD44833FEC88DC1F273 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A779AB3A31B809D134C73D0C /* Pods_KitchenSink.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C718557D1E8A4AED00ABF181 /* UIKitExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIKitExtension.swift; sourceTree = "<group>"; };
 		C79C450B1E79014A004EF22F /* SparkContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SparkContext.swift; sourceTree = "<group>"; };
 		C79C450D1E80CE20004EF22F /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		D10621478BD9E68749DD77A3 /* Pods-KitchenSink.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink.release.xcconfig"; path = "Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink.release.xcconfig"; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 				048969341CDB34AB008966FA /* VideoAudioSetupViewController.swift */,
 				0471A2591CDC5ECD00C6647E /* VideoCallViewController.swift */,
 				C79C450D1E80CE20004EF22F /* BaseViewController.swift */,
+				C718557D1E8A4AED00ABF181 /* UIKitExtension.swift */,
 			);
 			path = KitchenSink;
 			sourceTree = "<group>";
@@ -282,6 +285,7 @@
 			files = (
 				0476F5651CEEB69400889801 /* AppFeedbackTableViewController.swift in Sources */,
 				042A4A751D12532E002697D3 /* PersonTableViewCell.swift in Sources */,
+				C718557E1E8A4AED00ABF181 /* UIKitExtension.swift in Sources */,
 				04D9882A1CEDAEBF00C18422 /* CallFeedbackViewController.swift in Sources */,
 				04AE18281CDAD3D800A8F078 /* StartViewController.swift in Sources */,
 				5A82441E1DF9E5F900481A55 /* JWTLoginViewController.swift in Sources */,

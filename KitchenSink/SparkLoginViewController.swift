@@ -24,9 +24,17 @@ import Toast_Swift
 
 class SparkLoginViewController: BaseViewController {
     
+    @IBOutlet weak var loginButton: UIButton!
     @IBOutlet weak var statusLabel: UILabel!
     private var oauthStrategy: OAuthStrategy!
     
+    @IBOutlet var labelFontScaleCollection: [UILabel]!
+    
+    @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
+    
+    @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
+    @IBOutlet var buttonFontScaleCollection: [UIButton]!
+    @IBOutlet weak var loginButtonHeight: NSLayoutConstraint!
     // MARK: - Life cycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -40,7 +48,26 @@ class SparkLoginViewController: BaseViewController {
             showApplicationHome()
         }
     }
-    
+    // MARK: - UIView 
+    override func initView() {
+        for label in labelFontScaleCollection {
+            label.font = UIFont.systemFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+        }
+        for button in buttonFontScaleCollection {
+            button.titleLabel?.font = UIFont.systemFont(ofSize: (button.titleLabel?.font.pointSize)! * Utils.HEIGHT_SCALE)
+        }
+        for heightConstraint in heightScaleCollection {
+            heightConstraint.constant *= Utils.HEIGHT_SCALE
+        }
+        for widthConstraint in widthScaleCollection {
+            widthConstraint.constant *= Utils.WIDTH_SCALE
+        }
+        
+        
+        loginButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueNormal(), background: nil), for: .normal)
+        loginButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueHightlight(), background: nil), for: .highlighted)
+        loginButton.layer.cornerRadius = loginButtonHeight.constant/2
+    }
     // MARK: - Login/Auth handling
     @IBAction func loginWithSpark(_ sender: AnyObject) {
         oauthStrategy.authorize(parentViewController: self) { success in

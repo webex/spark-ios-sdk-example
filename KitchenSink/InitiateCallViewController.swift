@@ -27,6 +27,12 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     @IBOutlet weak var dialAddressTextField: UITextField!
     @IBOutlet weak var tableView: UITableView!
     
+    
+    @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
+    @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
+    @IBOutlet var textFieldScaleCollection: [UITextField]!
+    @IBOutlet weak var segmentedControl: UISegmentedControl!
+    
     fileprivate let searchController = UISearchController(searchResultsController: nil)
     fileprivate var searchResult: [Person]?
     fileprivate var dialEmail: String?
@@ -35,6 +41,9 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(dissmissKeyboard))
+        view.addGestureRecognizer(tap)
+        
         setupView()
     }
     
@@ -47,17 +56,18 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     
     func dial(_ address: String) {
         if address.isEmpty {
+            showNoticeAlert("Address is empty")
             return
         }
         self.presentVideoCallView(address)
     }
     
     @IBAction func dialAddress(_ sender: AnyObject) {
-//        dial(dialAddressTextField.text!)
-        dial("c07e355a-de93-473c-91cf-d16443824ff4")
+        dial(dialAddressTextField.text!)
     }
     
     @IBAction func switchDialWay(_ sender: AnyObject) {
+        dissmissKeyboard()
         switch sender.selectedSegmentIndex
         {
         case 0:
@@ -116,7 +126,9 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     }
     
     // MARK: - UITableViewDataSource
-    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60 * Utils.HEIGHT_SCALE
+    }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if searchResult != nil  {
             return searchResult!.count
@@ -140,11 +152,22 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     }
     
     // MARK: - UI views
-    
+    override func initView() {
+        for textfield in textFieldScaleCollection {
+            textfield.font = UIFont.systemFont(ofSize: (textfield.font?.pointSize)! * Utils.HEIGHT_SCALE)
+        }
+        for heightConstraint in heightScaleCollection {
+            heightConstraint.constant *= Utils.HEIGHT_SCALE
+        }
+        for widthConstraint in widthScaleCollection {
+            widthConstraint.constant *= Utils.WIDTH_SCALE
+        }
+        segmentedControl.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFont(ofSize: 20*Utils.HEIGHT_SCALE)], for: .normal)
+        segmentedControl.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFont(ofSize: 20*Utils.HEIGHT_SCALE)], for: .selected)
+    }
     fileprivate func setupView() {
         tableView.dataSource = self
         tableView.delegate = self
-        
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
         searchController.hidesNavigationBarDuringPresentation = false
@@ -171,4 +194,18 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     fileprivate func hideDialAddressView(_ hidden: Bool) {
         dialAddressTextField.isHidden = hidden
     }
+    
+    override func dissmissKeyboard() {
+        super.dissmissKeyboard()
+        searchController.searchBar.endEditing(true)
+    }
+    
+    fileprivate func showNoticeAlert(_ notice:String) {
+        let alert = UIAlertController(title: "Alert", message: notice, preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
+
+    
 }

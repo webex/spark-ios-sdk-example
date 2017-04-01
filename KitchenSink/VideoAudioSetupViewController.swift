@@ -28,22 +28,37 @@ class VideoAudioSetupViewController: BaseViewController {
     @IBOutlet weak var defaultCameraSwitch: UISwitch!
     @IBOutlet weak var statusLabel: UILabel!
     
+    @IBOutlet var labelFontCollection: [UILabel]!
+    
+    @IBOutlet var widthScaleConstraintCollection: [NSLayoutConstraint]!
+    @IBOutlet var heightScaleConstraintCollection: [NSLayoutConstraint]!
+    
     let setup = VideoAudioSetup.sharedInstance
     
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupView()
     }
     
-    func setupView() {
+    override func initView() {
+        for label in labelFontCollection {
+            label.font = UIFont.systemFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+        }
+        
+        for heightConstraint in heightScaleConstraintCollection {
+            heightConstraint.constant *= Utils.HEIGHT_SCALE
+        }
+        for widthConstraint in widthScaleConstraintCollection {
+            widthConstraint.constant *= Utils.WIDTH_SCALE
+        }
+        
+        
         defaultAudioSpeakerSwitch.setOn(setup.isLoudSpeaker(), animated: true)
         defaultVideoSwitch.setOn(setup.isVideoEnabled(), animated: true)
         defaultCameraSwitch.setOn(setup.getFacingMode() == Call.FacingMode.User, animated: true)
         updateStatusLabel()
     }
-    
     // MARK: - Speaker switch
     
     @IBAction func toggleLoudSpeaker(_ sender: AnyObject) {
