@@ -43,23 +43,43 @@ class HomeTableTableViewController: BaseTableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: true)
+        getUserInfo()
     }
     
     // MARK: - Phone register
     
     func registerPhone() {
-        SparkContext.sharedInstance.spark?.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
+        SparkContext.sharedInstance.spark?.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { [weak self] granted in
             if !granted {
-                Utils.showCameraMicrophoneAccessDeniedAlert(self)
+                if let strongSelf = self {
+                    Utils.showCameraMicrophoneAccessDeniedAlert(strongSelf)
+                }
             }
         }
-        SparkContext.sharedInstance.spark?.phone.register() { success in
-            if success {
-                self.registerState = "ok"
-                self.updateStatusLabel()
-            } else {
-                self.registerState = "fail"
-                self.showPhoneRegisterFailAlert()
+        SparkContext.sharedInstance.spark?.phone.register() { [weak self] success in
+            if let strongSelf = self {
+                if success {
+                    strongSelf.registerState = "ok"
+                    strongSelf.updateStatusLabel()
+                } else {
+                    strongSelf.registerState = "fail"
+                    strongSelf.showPhoneRegisterFailAlert()
+                }
+            }
+        }
+    }
+    
+    func getUserInfo() {
+        SparkContext.sharedInstance.spark?.people.getMe() {[weak self] response in
+            if let strongSelf = self {
+                switch response.result {
+                case .success(let person):
+                    SparkContext.sharedInstance.selfInfo = person
+                    strongSelf.updateStatusLabel()
+                case .failure:
+                    SparkContext.sharedInstance.selfInfo = nil
+                    strongSelf.updateStatusLabel()
+                }
             }
         }
     }
@@ -69,7 +89,12 @@ class HomeTableTableViewController: BaseTableViewController {
         if indexPath.section == 0 && indexPath.row == 1 {
             return 80 * Utils.HEIGHT_SCALE
         }
-        
+        else if indexPath.section == 0 && indexPath.row == 0 {
+            return 80 * Utils.HEIGHT_SCALE
+        }
+        else if indexPath.section == 1 {
+            return 75 * Utils.HEIGHT_SCALE
+        }
         return super.tableView(tableView, heightForRowAt: indexPath) * Utils.HEIGHT_SCALE
     }
     
@@ -85,7 +110,7 @@ class HomeTableTableViewController: BaseTableViewController {
     
     override func initView() {
         for label in labelFontScaleCollection {
-            label.font = UIFont.systemFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+            label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
         }
         for heightConstraint in heightScaleCollection {
             heightConstraint.constant *= Utils.HEIGHT_SCALE
@@ -96,7 +121,7 @@ class HomeTableTableViewController: BaseTableViewController {
         
         
         for button in buttonFontScaleCollection {
-            button.titleLabel?.font = UIFont.systemFont(ofSize: (button.titleLabel?.font.pointSize)! * Utils.HEIGHT_SCALE)
+            button.titleLabel?.font = UIFont.buttonLightFont(ofSize: (button.titleLabel?.font.pointSize)! * Utils.HEIGHT_SCALE)
             button.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueNormal(), background: nil), for: .normal)
             button.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueHightlight(), background: nil), for: .highlighted)
             button.clipsToBounds = true
@@ -109,14 +134,15 @@ class HomeTableTableViewController: BaseTableViewController {
         
     }
     
+    
+    
     fileprivate func updateStatusLabel() {
-        statusLabel.text = "Powered by SDK v" + Spark.version
+        statusLabel.text = "login as \(SparkContext.sharedInstance.selfInfo?.displayName ?? "NONE")"
         statusLabel.text = statusLabel.text! + "\nRegistration to Cisco cloud : " + registerState
     }
     
     fileprivate func showPhoneRegisterFailAlert() {
         let alert = UIAlertController(title: "Alert", message: "Phone register fail", preferredStyle: .alert)
-        
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }
@@ -129,7 +155,7 @@ class HomeTableTableViewController: BaseTableViewController {
     private func logout() {
         SparkContext.sharedInstance.deinitSpark()
         _ = navigationController?.popToRootViewController(animated: true)
-
+        
     }
     
 }

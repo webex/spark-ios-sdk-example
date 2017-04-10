@@ -38,7 +38,7 @@ class SparkLoginViewController: BaseViewController {
     // MARK: - Life cycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        statusLabel.text = "Powered by SDK v" + Spark.version
+        statusLabel.text = "Powered by SparkSDK v" + Spark.version
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -51,10 +51,10 @@ class SparkLoginViewController: BaseViewController {
     // MARK: - UIView 
     override func initView() {
         for label in labelFontScaleCollection {
-            label.font = UIFont.systemFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+            label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
         }
         for button in buttonFontScaleCollection {
-            button.titleLabel?.font = UIFont.systemFont(ofSize: (button.titleLabel?.font.pointSize)! * Utils.HEIGHT_SCALE)
+            button.titleLabel?.font = UIFont.buttonLightFont(ofSize: (button.titleLabel?.font.pointSize)! * Utils.HEIGHT_SCALE)
         }
         for heightConstraint in heightScaleCollection {
             heightConstraint.constant *= Utils.HEIGHT_SCALE

@@ -82,7 +82,7 @@ class CallToastViewController: BaseViewController, CallObserver {
     // MARK: - UI views
     override func initView() {
         for label in labelFontScaleCollection {
-            label.font = UIFont.systemFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+            label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
         }
         for heightConstraint in heightScaleCollection {
             heightConstraint.constant *= Utils.HEIGHT_SCALE
@@ -122,11 +122,19 @@ class CallToastViewController: BaseViewController, CallObserver {
     
     private func fetchUserProfile() {
         if SparkContext.sharedInstance.spark?.authenticationStrategy.authorized == true, let email = SparkContext.sharedInstance.call?.from {
-            Utils.fetchUserProfile(email) { [weak self] (displayName: String, avatarUrl: String) in
-                if let strongSelf = self {
-                    strongSelf.fetchAvatarImage(avatarUrl)
-                    strongSelf.nameLabel.text = displayName
+            Utils.fetchUserProfile(email) { [weak self] (person:Person?) in
+                if person != nil {
+                    if let strongSelf = self{
+                        strongSelf.nameLabel.text = email
+                        if let displayName = person!.displayName {
+                            strongSelf.nameLabel.text = displayName
+                        }
+                        if let avatarUrl = person!.avatar {
+                            strongSelf.fetchAvatarImage(avatarUrl)
+                        }
+                    }
                 }
+
             }
         }
     }

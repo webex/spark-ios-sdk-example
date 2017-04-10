@@ -27,16 +27,18 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     @IBOutlet weak var dialAddressTextField: UITextField!
     @IBOutlet weak var tableView: UITableView!
     
+    @IBOutlet weak var historyTableView: UITableView!
     
     @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var textFieldScaleCollection: [UITextField]!
-    @IBOutlet weak var segmentedControl: UISegmentedControl!
+    
     
     fileprivate let searchController = UISearchController(searchResultsController: nil)
     fileprivate var searchResult: [Person]?
+    fileprivate var historyResult: [Person]?
     fileprivate var dialEmail: String?
-    
+    fileprivate var segmentedControl: UISegmentedControl?
     // MARK: - Life cycle
     
     override func viewDidLoad() {
@@ -45,6 +47,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         view.addGestureRecognizer(tap)
         
         setupView()
+        
     }
     
     deinit {
@@ -59,6 +62,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
             showNoticeAlert("Address is empty")
             return
         }
+        
         self.presentVideoCallView(address)
     }
     
@@ -71,9 +75,15 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         switch sender.selectedSegmentIndex
         {
         case 0:
+            hideHistoryView(false)
+            hideDialAddressView(true)
+            hideSearchView(true)
+        case 1:
             hideDialAddressView(true)
             hideSearchView(false)
-        case 1:
+            hideHistoryView(true)
+        case 2:
+            hideHistoryView(true)
             hideSearchView(true)
             hideDialAddressView(false)
         default:
@@ -127,19 +137,32 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     
     // MARK: - UITableViewDataSource
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 60 * Utils.HEIGHT_SCALE
+        return 100 * Utils.HEIGHT_SCALE
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if searchResult != nil  {
+        
+        if tableView == self.tableView && searchResult != nil  {
             return searchResult!.count
-        } else {
+        } else if tableView == self.historyTableView {
+            return historyResult?.count ?? 0
+        }
+        else {
             return 0
         }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PersonCell", for: indexPath) as! PersonTableViewCell
-        let person = searchResult?[indexPath.row]
+        let dataSource: [Person]?
+        
+        if tableView == self.tableView {
+            dataSource = searchResult
+        }
+        else {
+            dataSource = historyResult
+        }
+        
+        let person = dataSource?[indexPath.row]
         let email = person?.emails?.first
         cell.address = email?.toString()
         cell.initiateCallViewController = self
@@ -148,13 +171,14 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
             cell.avatarImageView.image = $0
         })
         cell.nameLabel.text = person?.displayName
+        
         return cell
     }
     
     // MARK: - UI views
     override func initView() {
         for textfield in textFieldScaleCollection {
-            textfield.font = UIFont.systemFont(ofSize: (textfield.font?.pointSize)! * Utils.HEIGHT_SCALE)
+            textfield.font = UIFont.textViewLightFont(ofSize: (textfield.font?.pointSize)! * Utils.HEIGHT_SCALE)
         }
         for heightConstraint in heightScaleCollection {
             heightConstraint.constant *= Utils.HEIGHT_SCALE
@@ -162,10 +186,10 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         for widthConstraint in widthScaleCollection {
             widthConstraint.constant *= Utils.WIDTH_SCALE
         }
-        segmentedControl.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFont(ofSize: 20*Utils.HEIGHT_SCALE)], for: .normal)
-        segmentedControl.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFont(ofSize: 20*Utils.HEIGHT_SCALE)], for: .selected)
     }
     fileprivate func setupView() {
+        historyTableView.dataSource = self
+        historyTableView.delegate = self
         tableView.dataSource = self
         tableView.delegate = self
         searchController.searchResultsUpdater = self
@@ -176,6 +200,20 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         tableView.tableHeaderView = searchController.searchBar
         view.bringSubview(toFront: indicatorView)
         dialAddressTextField.layer.borderColor = UIColor.gray.cgColor
+        
+        let itemArray = [UIImage.fontAwesomeIcon(name: .history, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .search, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .phone, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29))]
+        segmentedControl = UISegmentedControl.init(items: itemArray)
+        segmentedControl?.frame = CGRect.init(x: 0, y: 0, width: 150, height: 29)
+        segmentedControl?.tintColor = UIColor.titleGreyColor()
+        segmentedControl?.selectedSegmentIndex = 0
+        segmentedControl?.addTarget(self, action: #selector(switchDialWay(_:)),for:.valueChanged)
+        navigationItem.titleView = segmentedControl
+        
+        //init history tableView data
+        historyResult = UserDefaultsUtil.callPersonHistory
+        historyTableView.reloadData()
+        
+        
     }
     
     fileprivate func presentVideoCallView(_ remoteAddr: String) {
@@ -189,10 +227,25 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     fileprivate func hideSearchView(_ hidden: Bool) {
         searchController.isActive = false
         tableView.isHidden = hidden
+        if !hidden {
+            searchController.searchBar.becomeFirstResponder()
+        }
+    }
+    
+    fileprivate func hideHistoryView(_ hidden: Bool) {
+        historyTableView.isHidden = hidden
+        
+        if !hidden {
+            historyResult = UserDefaultsUtil.callPersonHistory
+            historyTableView.reloadData()
+        }
     }
     
     fileprivate func hideDialAddressView(_ hidden: Bool) {
         dialAddressTextField.isHidden = hidden
+        if !hidden {
+            dialAddressTextField.becomeFirstResponder()
+        }
     }
     
     override func dissmissKeyboard() {

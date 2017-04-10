@@ -37,6 +37,11 @@ class StartViewController: BaseViewController {
     
     @IBOutlet weak var imageTopToSuperView: NSLayoutConstraint!
     
+    @IBOutlet weak var sparkIDButton: UIButton!
+    @IBOutlet weak var JWTButton: UIButton!
+    
+    @IBOutlet weak var buttonHeight: NSLayoutConstraint!
+    
     // MARK: - Life cycle
     
     override func viewDidLoad() {
@@ -69,10 +74,10 @@ class StartViewController: BaseViewController {
     // MARK: - UIView
     override func initView() {
         for label in labelFrontScaleCollection {
-            label.font = UIFont.systemFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+            label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
         }
         for button in buttonFrontScaleCollection {
-            button.titleLabel?.font = UIFont.systemFont(ofSize: (button.titleLabel?.font.pointSize)! * Utils.HEIGHT_SCALE)
+            button.titleLabel?.font = UIFont.buttonLightFont(ofSize: (button.titleLabel?.font.pointSize)! * Utils.HEIGHT_SCALE)
         }
         for heightConstraint in heightScaleCollection {
             heightConstraint.constant *= Utils.HEIGHT_SCALE
@@ -80,10 +85,19 @@ class StartViewController: BaseViewController {
         for widthConstraint in widthScaleCollection {
             widthConstraint.constant *= Utils.WIDTH_SCALE
         }
+        
+        sparkIDButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueNormal(), background: nil), for: .normal)
+        sparkIDButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueHightlight(), background: nil), for: .highlighted)
+        sparkIDButton.layer.cornerRadius = buttonHeight.constant/2
+        
+        JWTButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueNormal(), background: nil), for: .normal)
+        JWTButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueHightlight(), background: nil), for: .highlighted)
+        JWTButton.layer.cornerRadius = buttonHeight.constant/2
+        
     }
     
     func updateStatusLabel() {
-        statusLabel.text = "Powered by SDK v" + Spark.version
+        statusLabel.text = "Powered by SparkSDK v" + Spark.version
     }
     
     func setupHelpLabels() {

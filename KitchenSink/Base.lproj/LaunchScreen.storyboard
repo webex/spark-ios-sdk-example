@@ -29,15 +29,15 @@
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="AppLunchIcon" translatesAutoresizingMaskIntoConstraints="NO" id="xq2-nt-0at">
-                                <rect key="frame" x="157.5" y="253.5" width="60" height="60"/>
+                                <rect key="frame" x="137.5" y="213.5" width="100" height="100"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="60" id="1qE-Wj-bsF"/>
-                                    <constraint firstAttribute="height" constant="60" id="tKe-9w-qIA"/>
+                                    <constraint firstAttribute="width" constant="100" id="1qE-Wj-bsF"/>
+                                    <constraint firstAttribute="height" constant="100" id="tKe-9w-qIA"/>
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Kitchen Sink" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KJN-Ma-Zu2">
-                                <rect key="frame" x="126.5" y="333.5" width="122" height="26.5"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                <rect key="frame" x="118" y="333.5" width="139" height="28"/>
+                                <fontDescription key="fontDescription" name="ArialMT" family="Arial" pointSize="25"/>
                                 <color key="textColor" red="0.41568627450000001" green="0.41960784309999999" blue="0.42352941179999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -45,7 +45,7 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="9Jw-VS-rMO" secondAttribute="bottom" id="3My-SS-6aP"/>
-                            <constraint firstItem="xq2-nt-0at" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-50" id="6iy-gX-SYk"/>
+                            <constraint firstItem="xq2-nt-0at" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-70" id="6iy-gX-SYk"/>
                             <constraint firstItem="KJN-Ma-Zu2" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="Scn-uB-N2J"/>
                             <constraint firstItem="KJN-Ma-Zu2" firstAttribute="top" secondItem="xq2-nt-0at" secondAttribute="bottom" constant="20" id="YW7-NT-J3b"/>
                             <constraint firstItem="xq2-nt-0at" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="Ykc-Q6-kft"/>

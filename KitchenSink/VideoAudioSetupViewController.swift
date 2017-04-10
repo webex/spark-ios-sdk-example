@@ -23,27 +23,52 @@ import SparkSDK
 
 class VideoAudioSetupViewController: BaseViewController {
     
-    @IBOutlet weak var defaultAudioSpeakerSwitch: UISwitch!
-    @IBOutlet weak var defaultVideoSwitch: UISwitch!
-    @IBOutlet weak var defaultCameraSwitch: UISwitch!
-    @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var noneView: UIView!
+    @IBOutlet weak var noneImage: UIImageView!
+    
+    @IBOutlet weak var audioView: UIView!
+    
+    @IBOutlet weak var audioImage: UIImageView!
+    
+    @IBOutlet weak var videoView: UIView!
+    @IBOutlet weak var videoImage: UIImageView!
+    
+    @IBOutlet weak var audioVideoView: UIView!
+
+    @IBOutlet weak var audioVideoImage: UIImageView!
+    
+    
+    @IBOutlet weak var frontCameraView: UIView!
+    @IBOutlet weak var backCameraView: UIView!
+    @IBOutlet weak var frontImage: UIImageView!
+    @IBOutlet weak var backImage: UIImageView!
     
     @IBOutlet var labelFontCollection: [UILabel]!
-    
     @IBOutlet var widthScaleConstraintCollection: [NSLayoutConstraint]!
     @IBOutlet var heightScaleConstraintCollection: [NSLayoutConstraint]!
+
+    private let uncheckImage = UIImage.fontAwesomeIcon(name: .squareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
+    private let checkImage = UIImage.fontAwesomeIcon(name: .checkSquareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
+
+    
+    
+    
     
     let setup = VideoAudioSetup.sharedInstance
+    override var navigationTitle: String? {
+        get {
+            return "Video/Audio setup"
+        }
+        set(newValue) {
+            title = newValue
+        }
+    }
+        
     
     // MARK: - Life cycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
-    
     override func initView() {
         for label in labelFontCollection {
-            label.font = UIFont.systemFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+            label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
         }
         
         for heightConstraint in heightScaleConstraintCollection {
@@ -53,66 +78,130 @@ class VideoAudioSetupViewController: BaseViewController {
             widthConstraint.constant *= Utils.WIDTH_SCALE
         }
         
+
+        //navigation bar init
+        let nextButton = UIButton.init(frame: CGRect.init(x: 0, y: 0, width: 44, height: 44))
         
-        defaultAudioSpeakerSwitch.setOn(setup.isLoudSpeaker(), animated: true)
-        defaultVideoSwitch.setOn(setup.isVideoEnabled(), animated: true)
-        defaultCameraSwitch.setOn(setup.getFacingMode() == Call.FacingMode.User, animated: true)
-        updateStatusLabel()
-    }
-    // MARK: - Speaker switch
-    
-    @IBAction func toggleLoudSpeaker(_ sender: AnyObject) {
-        setup.setLoudSpeaker(defaultAudioSpeakerSwitch.isOn)
-        updateStatusLabel()
-    }
-    
-    @IBAction func toggleVideoMode(_ sender: AnyObject) {
-        setup.setVideoEnabled(defaultVideoSwitch.isOn)
-        if !setup.isVideoEnabled() {
-            defaultCameraSwitch.isEnabled = false
-        } else {
-            defaultCameraSwitch.isEnabled = true
-        }
-        updateStatusLabel()
-    }
-    
-    @IBAction func toggleFacingMode(_ sender: AnyObject) {
-        if defaultCameraSwitch.isOn {
-            setup.setFacingMode(Call.FacingMode.User)
-        } else {
-            setup.setFacingMode(Call.FacingMode.Environment)
-        }
-        updateStatusLabel()
-    }
-    
-    func updateStatusLabel() {
-        // Speaker
-        let speakerStatus: String
-        if defaultAudioSpeakerSwitch.isOn {
-            speakerStatus = "Speaker"
-        } else {
-            speakerStatus = "Non Speaker"
-        }
-        statusLabel.text = "\nAudio output selected : " + speakerStatus
+        let nextImage = UIImage.fontAwesomeIcon(name: .phone, textColor: UIColor.buttonGreenNormal(), size: CGSize.init(width: 32 * Utils.WIDTH_SCALE , height: 44))
+        let nextLightImage = UIImage.fontAwesomeIcon(name: .phone, textColor: UIColor.buttonGreenHightlight(), size: CGSize.init(width: 32 * Utils.WIDTH_SCALE, height: 44))
+        nextButton.setImage(nextImage, for: .normal)
+        nextButton.setImage(nextLightImage, for: .highlighted)
+        nextButton.addTarget(self, action: #selector(gotoInitiateCallView), for: .touchUpInside)
         
-        // Video mode
-        let mediaOption: String
-        if defaultVideoSwitch.isOn {
-            mediaOption = "Audio + Video"
-        } else {
-            mediaOption = "Audio-Only"
-        }
-        statusLabel.text = statusLabel.text! + "\nMedia option : " + mediaOption
         
-        // Camera
-        let cameraStatus: String
-        if !defaultVideoSwitch.isOn {
-            cameraStatus = "N/A"
-        } else if defaultCameraSwitch.isOn {
-            cameraStatus = "Front camera"
-        } else {
-            cameraStatus = "Back camera"
-        }
-        statusLabel.text = statusLabel.text! + "\nCamera selected : " + cameraStatus
+        let rightView = UIView.init(frame:CGRect.init(x: 0, y: 0, width: 44, height: 44))
+        rightView.addSubview(nextButton)
+        let rightButtonItem = UIBarButtonItem.init(customView: rightView)
+        
+        
+        let fixBarSpacer = UIBarButtonItem.init(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
+        fixBarSpacer.width = -10 * (2 - Utils.WIDTH_SCALE)
+        navigationItem.rightBarButtonItems = [fixBarSpacer,rightButtonItem]
+        
+        
+        //checkbox init 
+        var tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:)))
+        noneView.addGestureRecognizer(tapGesture)
+        
+        tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:)))
+        audioView.addGestureRecognizer(tapGesture)
+        
+        tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:)))
+        videoView.addGestureRecognizer(tapGesture)
+        
+        tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:)))
+        audioVideoView.addGestureRecognizer(tapGesture)
+        updateCheckBoxStatus()
+        
+        
+        tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCameraGestureEvent(sender:)))
+        frontCameraView.addGestureRecognizer(tapGesture)
+        tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCameraGestureEvent(sender:)))
+        backCameraView.addGestureRecognizer(tapGesture)
+        updateCameraStatus()
     }
+    // MARK: - hand checkbox change
+    func handleCapGestureEvent(sender:UITapGestureRecognizer) {
+        if let view = sender.view {
+            if view == noneView {
+                setup.setLoudSpeaker(false)
+                setup.setVideoEnabled(false)
+            }
+            else if view == audioView {
+                setup.setLoudSpeaker(true)
+                setup.setVideoEnabled(false)
+            }
+            else if view == videoView {
+                setup.setLoudSpeaker(false)
+                setup.setVideoEnabled(true)
+            }
+            else {
+                setup.setLoudSpeaker(true)
+                setup.setVideoEnabled(true)
+            }
+            
+            updateCheckBoxStatus()
+        }
+    }
+    
+    func handleCameraGestureEvent(sender:UITapGestureRecognizer) {
+        if let view = sender.view {
+            if view == frontCameraView {
+                setup.setFacingMode(Call.FacingMode.User)
+            }
+            else {
+                setup.setFacingMode(Call.FacingMode.Environment)
+            }
+            
+            updateCameraStatus()
+        }
+    }
+    
+    
+    func updateCheckBoxStatus() {
+
+        
+        if !setup.isLoudSpeaker() && !setup.isVideoEnabled() {
+            noneImage.image = checkImage
+            audioImage.image = uncheckImage
+            videoImage.image = uncheckImage
+            audioVideoImage.image = uncheckImage
+        } else if setup.isLoudSpeaker() && !setup.isVideoEnabled() {
+            noneImage.image = uncheckImage
+            audioImage.image = checkImage
+            videoImage.image = uncheckImage
+            audioVideoImage.image = uncheckImage
+        }
+        else if !setup.isLoudSpeaker() && setup.isVideoEnabled() {
+            noneImage.image = uncheckImage
+            audioImage.image = uncheckImage
+            videoImage.image = checkImage
+            audioVideoImage.image = uncheckImage
+        }
+        else {
+            noneImage.image = uncheckImage
+            audioImage.image = uncheckImage
+            videoImage.image = uncheckImage
+            audioVideoImage.image = checkImage
+        }
+    }
+    
+    func updateCameraStatus() {
+        if setup.getFacingMode() == Call.FacingMode.User {
+            frontImage.image = checkImage
+            backImage.image = uncheckImage
+        }
+        else {
+            frontImage.image = uncheckImage
+            backImage.image = checkImage
+        }
+    }
+
+    func gotoInitiateCallView() {
+        if let initiateCallViewController = storyboard?.instantiateViewController(withIdentifier: "InitiateCallViewController") as? InitiateCallViewController! {
+            navigationController?.pushViewController(initiateCallViewController, animated: true)
+        }
+
+    }
+    
 }

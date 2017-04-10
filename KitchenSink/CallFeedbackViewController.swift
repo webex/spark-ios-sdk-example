@@ -26,7 +26,6 @@ class CallFeedbackViewController: BaseViewController, UITextViewDelegate {
     
     @IBOutlet weak var userCommentsTextView: UITextView!
     @IBOutlet weak var includeLogSwitch: UISwitch!
-    @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var callRateView: CosmosView!
     @IBOutlet weak var placeholderLabel: UILabel!
     
@@ -41,6 +40,7 @@ class CallFeedbackViewController: BaseViewController, UITextViewDelegate {
     @IBOutlet weak var titleTopToSuperViewConstraint: NSLayoutConstraint!
     private var topToSuperView: CGFloat = 0
     var dissmissBlock: (()->())? = nil
+    
     
     // MARK: - Life cycle
     override func viewDidLoad() {
@@ -61,10 +61,10 @@ class CallFeedbackViewController: BaseViewController, UITextViewDelegate {
     override func initView() {
         
         for label in labelFontScaleCollection {
-            label.font = UIFont.systemFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+            label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
         }
         for button in buttonFontScaleCollection {
-            button.titleLabel?.font = UIFont.systemFont(ofSize: (button.titleLabel?.font.pointSize)! * Utils.HEIGHT_SCALE)
+            button.titleLabel?.font = UIFont.buttonLightFont(ofSize: (button.titleLabel?.font.pointSize)! * Utils.HEIGHT_SCALE)
         }
         for heightConstraint in heightScaleCollection {
             heightConstraint.constant *= Utils.HEIGHT_SCALE
@@ -72,7 +72,7 @@ class CallFeedbackViewController: BaseViewController, UITextViewDelegate {
         for widthConstraint in widthScaleCollection {
             widthConstraint.constant *= Utils.WIDTH_SCALE
         }
-        userCommentsTextView.font = UIFont.systemFont(ofSize: (userCommentsTextView.font?.pointSize)! * Utils.HEIGHT_SCALE)
+        userCommentsTextView.font = UIFont.textViewLightFont(ofSize: (userCommentsTextView.font?.pointSize)! * Utils.HEIGHT_SCALE)
         
         
         
@@ -119,17 +119,7 @@ class CallFeedbackViewController: BaseViewController, UITextViewDelegate {
             self.dissmissBlock?()
         }
     }
-    
-    @IBAction func IncludeLogs(_ sender: AnyObject) {
-        updateStatusLabel()
-    }
-    
-    func updateStatusLabel() {
-        statusLabel.text = "User rating: " + String(Int(callRateView.rating))
-        statusLabel.text = statusLabel.text! + "\nUser comments : " + userCommentsTextView.text!
-        statusLabel.text = statusLabel.text! + "\nInclude logs : " + includeLogSwitch.isOn.description
-    }
-    
+
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         self.view.endEditing(true)
         return false

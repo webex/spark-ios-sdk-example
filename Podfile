@@ -7,4 +7,5 @@ target 'KitchenSink' do
 	pod 'SparkSDK', :git => 'https://github.com/ciscospark/spark-ios-sdk.git', :branch => 'master'
 	pod 'Cosmos', '~> 6.0.0'
 	pod 'Toast-Swift', '~> 2.0.0'
+    pod 'FontAwesome.swift'
 end

@@ -25,6 +25,17 @@ class IncomingCallViewController: BaseViewController, CallObserver, IncomingCall
     @IBOutlet var labelFontScaleCollection: [UILabel]!
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
     
+    private var waittingTimer: Timer?
+    @IBOutlet weak var animationLabel: UILabel!
+    
+    override var navigationTitle: String? {
+        get {
+            return SparkContext.sharedInstance.selfInfo?.displayName
+        }
+        set(newValue) {
+            title = newValue
+        }
+    }
     // MARK: - Life cycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -32,10 +43,12 @@ class IncomingCallViewController: BaseViewController, CallObserver, IncomingCall
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        startWaitingAnimation()
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         SparkContext.sharedInstance.spark?.callNotificationCenter.remove(observer: self)
+        stopWaitingAnimation()
     }
     
     // MARK: - PhoneObserver
@@ -58,12 +71,40 @@ class IncomingCallViewController: BaseViewController, CallObserver, IncomingCall
     // MARK: - UI views
     override func initView() {
         for label in labelFontScaleCollection {
-            label.font = UIFont.systemFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+            label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
         }
         for heightConstraint in heightScaleCollection {
             heightConstraint.constant *= Utils.HEIGHT_SCALE
         }
     }
+    
+    func startWaitingAnimation() {
+        stopWaitingAnimation()
+        waittingTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(waitingAnimation), userInfo: nil, repeats: true)
+    }
+    
+    func stopWaitingAnimation() {
+        if let timer = waittingTimer {
+            if timer.isValid {
+                timer.invalidate()
+            }
+            waittingTimer = nil
+        }
+    }
+    
+    func waitingAnimation() {
+        if let labelText = animationLabel.text {
+            if labelText.characters.count > 2 {
+                animationLabel.text = ""
+            }
+            else {
+                animationLabel.text!.append(".")
+            }
+        }
+        
+    }
+    
+    
     
     fileprivate func presentCallToastView(_ call: Call) {
         if let callToastViewController = storyboard?.instantiateViewController(withIdentifier: "CallToastViewController") as? CallToastViewController {

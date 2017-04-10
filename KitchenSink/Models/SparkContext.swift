@@ -20,7 +20,7 @@ class SparkContext: NSObject {
     //    let UI: TestUI
     static let sharedInstance: SparkContext = SparkContext()
     var spark: Spark?
-    
+    var selfInfo :Person?
     var call: Call?
     
     private var userInfo = [String:Any]()
@@ -52,8 +52,14 @@ class SparkContext: NSObject {
         guard spark != nil else {
             return
         }
+        
+        if call != nil {
+            deinitCall()
+        }
+        
         spark!.phone.deregister() { ret in
             self.spark?.authenticationStrategy.deauthorize()
+            self.selfInfo = nil
             self.spark = nil
         }
         
