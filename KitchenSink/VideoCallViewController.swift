@@ -37,7 +37,7 @@ class VideoCallViewController: BaseViewController, CallObserver {
     @IBOutlet private weak var hangupButton: UIButton!
     @IBOutlet private weak var dialpadButton: UIButton!
     @IBOutlet private weak var dialpadView: UICollectionView!
-
+    
     @IBOutlet weak var loudSpeakerSwitch: UISwitch!
     @IBOutlet weak var frontCameraView: UIView!
     
@@ -58,6 +58,10 @@ class VideoCallViewController: BaseViewController, CallObserver {
     @IBOutlet private weak var remoteViewHeight: NSLayoutConstraint!
     @IBOutlet private weak var selfViewWidth: NSLayoutConstraint!
     @IBOutlet private weak var selfViewHeight: NSLayoutConstraint!
+    
+    
+    @IBOutlet var dialpadViewWidth: NSLayoutConstraint!
+    @IBOutlet var dialpadViewHeight: NSLayoutConstraint!
     
     
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
@@ -194,16 +198,20 @@ class VideoCallViewController: BaseViewController, CallObserver {
     
     func localMediaDidChange(_ call: Call, localMediaChangeType: LocalMediaChangeType) {
         print("localMediaDidChange Entering")
-        switch localMediaChangeType {
-        case .localVideoMuted:
-            sendingVideoSwitch.isOn = false
-        case .localVideoUnmuted:
-            sendingVideoSwitch.isOn = true
-        case .localAudioMuted:
-            sendingAudioSwitch.isOn = false
-        case .localAudioUnmuted:
-            sendingAudioSwitch.isOn = true
-        }
+            switch localMediaChangeType {
+            case .localVideoMuted:
+                if self.sendingVideoSwitch.isOn != false {
+                    self.sendingVideoSwitch.isOn = false
+                }
+            case .localVideoUnmuted:
+                if self.sendingVideoSwitch.isOn != true {
+                self.sendingVideoSwitch.isOn = true
+                }
+            case .localAudioMuted:
+                self.sendingAudioSwitch.isOn = false
+            case .localAudioUnmuted:
+                self.sendingAudioSwitch.isOn = true
+            }
         print("localMediaDidChange out")
     }
     
@@ -255,12 +263,12 @@ class VideoCallViewController: BaseViewController, CallObserver {
     
     @IBAction private func toggleLoudSpeaker(_ sender: AnyObject) {
         SparkContext.sharedInstance.call?.toggleLoudSpeaker()
-        loudSpeakerSwitch.isOn = SparkContext.sharedInstance.call?.loudSpeaker ?? true
+        loudSpeakerSwitch.isOn = SparkContext.sharedInstance.call?.loudSpeaker ?? VideoAudioSetup.sharedInstance.isLoudSpeaker()
     }
     
     @IBAction private func toggleSendingVideo(_ sender: AnyObject) {
         SparkContext.sharedInstance.call?.toggleSendingVideo()
-        sendingVideoSwitch.isOn = SparkContext.sharedInstance.call?.sendingVideo ?? true
+        sendingVideoSwitch.isOn = SparkContext.sharedInstance.call?.sendingVideo ?? VideoAudioSetup.sharedInstance.isSelfViewShow
         showSelfView(sendingVideoSwitch.isOn)
     }
     
@@ -293,11 +301,6 @@ class VideoCallViewController: BaseViewController, CallObserver {
         hideDialpadView(!dialpadView.isHidden)
     }
     
-    @IBAction func muteButtonTouchUpinside(_ sender: Any) {
-    }
-    
-    
-    
     // MARK: - UI views
     override func initView() {
         for label in labelFontScaleCollection {
@@ -320,18 +323,33 @@ class VideoCallViewController: BaseViewController, CallObserver {
         tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:)))
         backCameraView.addGestureRecognizer(tapGesture)
         
-
     }
     
     
     func updateCheckBoxStatus() {
-        if SparkContext.sharedInstance.call?.facingMode != .User {
-            backCameraImage.image = checkImage
+        guard VideoAudioSetup.sharedInstance.isVideoEnabled() != false else {
+            backCameraImage.image = uncheckImage
             frontCameraImage.image = uncheckImage
+            return
         }
-        else {
+        
+        if let isFacingMode = SparkContext.sharedInstance.call?.facingMode {
+            if isFacingMode == .User {
+                backCameraImage.image = uncheckImage
+                frontCameraImage.image = checkImage
+            }
+            else {
+                backCameraImage.image = checkImage
+                frontCameraImage.image = uncheckImage
+            }
+        }
+        else if VideoAudioSetup.sharedInstance.getFacingMode() == .User {
             backCameraImage.image = uncheckImage
             frontCameraImage.image = checkImage
+        }
+        else {
+            backCameraImage.image = checkImage
+            frontCameraImage.image = uncheckImage
         }
     }
     
@@ -438,16 +456,19 @@ class VideoCallViewController: BaseViewController, CallObserver {
     
     
     private func updateUIStatus() {
-        updateStatusLabel()
-        updateSwitches()
-        updateAvatarViewVisibility()
-        hideDialpadButton(false)
-        hideDialpadView(true)
-        updateSelfViewVisibility()
-        
-        if isCallDisconnected() {
-            hideCallView()
+        DispatchQueue.main.async {
+            self.updateStatusLabel()
+            self.updateSwitches()
+            self.updateAvatarViewVisibility()
+            self.hideDialpadButton(false)
+            self.hideDialpadView(true)
+            self.updateSelfViewVisibility()
+            
+            if self.isCallDisconnected() {
+                self.hideCallView()
+            }
         }
+        
     }
     
     private func showDisconnectionType(_ type: DisconnectionType) {
@@ -462,8 +483,8 @@ class VideoCallViewController: BaseViewController, CallObserver {
     
     private func updateSwitches() {
         updateCheckBoxStatus()
-        loudSpeakerSwitch.isOn = SparkContext.sharedInstance.call?.loudSpeaker ?? true
-        sendingVideoSwitch.isOn = SparkContext.sharedInstance.call?.sendingVideo ?? true
+        loudSpeakerSwitch.isOn = SparkContext.sharedInstance.call?.loudSpeaker ?? VideoAudioSetup.sharedInstance.isLoudSpeaker()
+        sendingVideoSwitch.isOn = SparkContext.sharedInstance.call?.sendingVideo ?? VideoAudioSetup.sharedInstance.isSelfViewShow
         sendingAudioSwitch.isOn = SparkContext.sharedInstance.call?.sendingAudio ?? true
         receivingVideoSwitch.isOn = SparkContext.sharedInstance.call?.receivingVideo ?? true
         receivingAudioSwitch.isOn = SparkContext.sharedInstance.call?.receivingAudio ?? true
@@ -471,6 +492,8 @@ class VideoCallViewController: BaseViewController, CallObserver {
         if !VideoAudioSetup.sharedInstance.isVideoEnabled() {
             frontCameraView.isUserInteractionEnabled = false
             backCameraView.isUserInteractionEnabled = false
+            sendingVideoSwitch.isOn = false
+            receivingVideoSwitch.isOn = false
             sendingVideoSwitch.isEnabled = false
             receivingVideoSwitch.isEnabled = false
         }
@@ -595,12 +618,22 @@ class VideoCallViewController: BaseViewController, CallObserver {
                 if VideoAudioSetup.sharedInstance.isVideoEnabled() {
                     mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
                 }
-                SparkContext.sharedInstance.call = SparkContext.sharedInstance.spark?.phone.dial(remoteAddr, option: mediaOption) { success in
-                    if !success {
-                        _ = self.navigationController?.popViewController(animated: true)
-                        print("Failed to dial call.")
+                SparkContext.sharedInstance.call = SparkContext.sharedInstance.spark?.phone.dial(remoteAddr, option: mediaOption) { [weak self] success in
+                    if let strongSelf = self {
+                        if !success {
+                            _ = strongSelf.navigationController?.popViewController(animated: true)
+                            print("Failed to dial call.")
+                        }
+                        // self view init
+                        if VideoAudioSetup.sharedInstance.isVideoEnabled() && !VideoAudioSetup.sharedInstance.isSelfViewShow {
+                                strongSelf.toggleSendingVideo(strongSelf.sendingVideoSwitch)
+                        }
                     }
+                    
                 }
+                
+                
+                
             } else {
                 Utils.showCameraMicrophoneAccessDeniedAlert(self)
             }
@@ -608,22 +641,41 @@ class VideoCallViewController: BaseViewController, CallObserver {
     }
     
     func didAnswerIncomingCall() {
-        SparkContext.sharedInstance.spark?.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
-            if granted {
-                
-                var mediaOption = MediaOption.audioOnly
-                if VideoAudioSetup.sharedInstance.isVideoEnabled() {
-                    mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
-                }
-                SparkContext.sharedInstance.call?.answer(option: mediaOption) { success in
-                    if !success {
-                        _ = self.navigationController?.popViewController(animated: true)
-                        SparkContext.sharedInstance.call?.reject(nil)
+        SparkContext.sharedInstance.spark?.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { [weak self] granted in
+            if let strongSelf = self {
+                if granted {
+                    
+                    var mediaOption = MediaOption.audioOnly
+                    if VideoAudioSetup.sharedInstance.isVideoEnabled() {
+                        mediaOption = MediaOption.audioVideo(local: strongSelf.selfView, remote: strongSelf.remoteView)
                     }
+                    
+                    if !VideoAudioSetup.sharedInstance.isSelfViewShow {
+                        strongSelf.sendingVideoSwitch.isOn = false
+                        strongSelf.showSelfView(strongSelf.sendingVideoSwitch.isOn)
+                    }
+                    
+                    if !VideoAudioSetup.sharedInstance.isLoudSpeaker() {
+                        strongSelf.loudSpeakerSwitch.isOn = false
+                    }
+                    
+                    SparkContext.sharedInstance.call?.answer(option: mediaOption) { [weak self] success in
+                        if let strongSelf = self {
+                            if !success {
+                                _ = strongSelf.navigationController?.popViewController(animated: true)
+                                SparkContext.sharedInstance.call?.reject(nil)
+                            }
+                        }
+                        // self view init
+                        if VideoAudioSetup.sharedInstance.isVideoEnabled() && !VideoAudioSetup.sharedInstance.isSelfViewShow {
+                            strongSelf.toggleSendingVideo(strongSelf.sendingVideoSwitch)
+                        }
+                    }
+                    
+                } else {
+                    SparkContext.sharedInstance.call?.reject(nil)
+                    Utils.showCameraMicrophoneAccessDeniedAlert(strongSelf)
                 }
-            } else {
-                SparkContext.sharedInstance.call?.reject(nil)
-                Utils.showCameraMicrophoneAccessDeniedAlert(self)
             }
         }
     }
@@ -664,7 +716,7 @@ class VideoCallViewController: BaseViewController, CallObserver {
 // MARK: - DTMF dialpad view
 
 extension VideoCallViewController : UICollectionViewDataSource {
-    private static let DTMFKeys = ["1", "2", "3", "A", "4", "5", "6", "B", "7", "8", "9", "C", "*", "0", "#", "D"]
+    private static let DTMFKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "0", "#"]
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return VideoCallViewController.DTMFKeys.count
@@ -672,10 +724,9 @@ extension VideoCallViewController : UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "dialpadCell", for: indexPath)
-        
         let dialButton = cell.viewWithTag(105) as! UILabel
         dialButton.text = VideoCallViewController.DTMFKeys[indexPath.item]
-        dialButton.layer.borderColor = UIColor.gray.cgColor;
+        dialButton.layer.borderColor = UIColor.gray.cgColor
         return cell
     }
 }

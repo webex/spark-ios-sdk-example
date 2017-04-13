@@ -13,22 +13,27 @@ import SparkSDK
 public class UserDefaultsUtil {
     private static let CALL_PERSON_HISTORY_KEY = "KSCallPersonHistory"
     private static let CALL_PERSON_HISTORY_ADDRESS_KEY = "KSCallPersonHistoryAddress"
+    private static let CALL_VIDEO_ENABLE_KEY = "KSCallVideoEnable"
+    private static let CALL_SELF_VIEW_ENABLE_KEY = "KSCallSelfViewEnable"
     static let userDefault = UserDefaults.standard
     static var callPersonHistory: [Person] {
         get {
             var resutlArray: [Person] = []
-            if let array = userDefault.array(forKey: CALL_PERSON_HISTORY_KEY) {
-                for onePerson in array {
-                    if let personString = onePerson as? String {
-                        if var p = Person(JSONString: personString) {
-                            p.emails = getPersonAddress(p)
-                            if p.emails != nil {
-                                resutlArray.append(p)
+            if let selfId = SparkContext.sharedInstance.selfInfo?.id {
+                let key = CALL_PERSON_HISTORY_KEY + selfId
+                if let array = userDefault.array(forKey: key) {
+                    for onePerson in array {
+                        if let personString = onePerson as? String {
+                            if var p = Person(JSONString: personString) {
+                                p.emails = getPersonAddress(p)
+                                if p.emails != nil {
+                                    resutlArray.append(p)
+                                }
                             }
                         }
                     }
+                    
                 }
-                
             }
             return resutlArray
             
@@ -44,33 +49,34 @@ public class UserDefaultsUtil {
         guard personString != nil else {
             return
         }
-        var resultArray: [Any]
-        
-        if var array = userDefault.array(forKey: CALL_PERSON_HISTORY_KEY) {
-            
-            for onePerson in array {
-                if let personString = onePerson as? String {
-                    if let p = Person(JSONString: personString) {
-                        if p.id == person.id {
-                            return
+        var resultArray: [Any] = Array.init()
+        if let selfId = SparkContext.sharedInstance.selfInfo?.id {
+            let key = CALL_PERSON_HISTORY_KEY + selfId
+            if var array = userDefault.array(forKey: key) {
+                
+                for onePerson in array {
+                    if let personString = onePerson as? String {
+                        if let p = Person(JSONString: personString) {
+                            if p.id == person.id {
+                                return
+                            }
                         }
                     }
                 }
+                
+                array.append(personString!)
+                if array.count > 10 {
+                    array.removeFirst()
+                }
+                resultArray = array
             }
-            
-            array.append(personString!)
-            if array.count > 10 {
-                array.removeFirst()
+            else
+            {
+                resultArray.append(personString!)
             }
-            resultArray = array
-        }
-        else
-        {
-            resultArray = Array.init()
-            resultArray.append(personString!)
+            userDefault.set(resultArray, forKey: key)
         }
         
-        userDefault.set(resultArray, forKey: CALL_PERSON_HISTORY_KEY)
         
     }
     

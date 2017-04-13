@@ -211,6 +211,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         
         //init history tableView data
         historyResult = UserDefaultsUtil.callPersonHistory
+        historyResult?.reverse()
         historyTableView.reloadData()
         
         
@@ -237,6 +238,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         
         if !hidden {
             historyResult = UserDefaultsUtil.callPersonHistory
+            historyResult?.reverse()
             historyTableView.reloadData()
         }
     }

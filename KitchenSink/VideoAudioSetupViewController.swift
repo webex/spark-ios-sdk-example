@@ -23,38 +23,43 @@ import SparkSDK
 
 class VideoAudioSetupViewController: BaseViewController {
     
-    @IBOutlet weak var noneView: UIView!
-    @IBOutlet weak var noneImage: UIImageView!
-    
     @IBOutlet weak var audioView: UIView!
-    
     @IBOutlet weak var audioImage: UIImageView!
-    
-    @IBOutlet weak var videoView: UIView!
-    @IBOutlet weak var videoImage: UIImageView!
-    
     @IBOutlet weak var audioVideoView: UIView!
-
     @IBOutlet weak var audioVideoImage: UIImageView!
     
-    
+    @IBOutlet weak var loudSpeakerSwitch: UISwitch!
+    @IBOutlet weak var selfViewSwitch: UISwitch!
+    @IBOutlet weak var cameraSetupView: UIView!
+    @IBOutlet weak var videoSetupView: UIView!
     @IBOutlet weak var frontCameraView: UIView!
     @IBOutlet weak var backCameraView: UIView!
     @IBOutlet weak var frontImage: UIImageView!
     @IBOutlet weak var backImage: UIImageView!
+    @IBOutlet weak var selfViewHiddenHelpLabelHeight: NSLayoutConstraint!
     
+    @IBOutlet weak var selfViewHiddenHelpLabel: KSLabel!
+    
+    
+    @IBOutlet weak var videoViewHiddenHelpLabel: KSLabel!
+    @IBOutlet weak var videoViewhiddenHelpLabelHeight: NSLayoutConstraint!
+    
+    
+    @IBOutlet weak var selfViewSetupHeight: NSLayoutConstraint!
+    @IBOutlet weak var videoViewHeight: NSLayoutConstraint!
     @IBOutlet var labelFontCollection: [UILabel]!
     @IBOutlet var widthScaleConstraintCollection: [NSLayoutConstraint]!
     @IBOutlet var heightScaleConstraintCollection: [NSLayoutConstraint]!
 
     private let uncheckImage = UIImage.fontAwesomeIcon(name: .squareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
     private let checkImage = UIImage.fontAwesomeIcon(name: .checkSquareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
-
-    
-    
-    
-    
     let setup = VideoAudioSetup.sharedInstance
+    private let selfViewSetupHeightContant = 320 * Utils.HEIGHT_SCALE
+    private let selfViewSetupHelpLabelHeightContant = 54 * Utils.HEIGHT_SCALE
+    
+    private let videoViewSetupHeightContant = 400 * Utils.HEIGHT_SCALE
+    private let videoViewSetupHelpLabelHeightContant = 54 * Utils.HEIGHT_SCALE
+    
     override var navigationTitle: String? {
         get {
             return "Video/Audio setup"
@@ -101,46 +106,49 @@ class VideoAudioSetupViewController: BaseViewController {
         
         //checkbox init 
         var tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:)))
-        noneView.addGestureRecognizer(tapGesture)
-        
-        tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:)))
         audioView.addGestureRecognizer(tapGesture)
         
         tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:)))
-        videoView.addGestureRecognizer(tapGesture)
-        
-        tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:)))
         audioVideoView.addGestureRecognizer(tapGesture)
-        updateCheckBoxStatus()
-        
+        updateCallCapStatus()
+        videoViewHeight.constant = CGFloat(setup.isVideoEnabled() ? videoViewSetupHeightContant:0)
+        videoViewhiddenHelpLabelHeight.constant = CGFloat(setup.isVideoEnabled() ? 0:videoViewSetupHelpLabelHeightContant)
         
         tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCameraGestureEvent(sender:)))
         frontCameraView.addGestureRecognizer(tapGesture)
         tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCameraGestureEvent(sender:)))
         backCameraView.addGestureRecognizer(tapGesture)
         updateCameraStatus()
+        updateLoudspeakerStatus()
+        updateSelfViewStatus()
+        selfViewSetupHeight.constant = CGFloat(selfViewSwitch.isOn ? selfViewSetupHeightContant:0)
+        selfViewHiddenHelpLabelHeight.constant = CGFloat(selfViewSwitch.isOn ? 0:selfViewSetupHelpLabelHeightContant)
+        
     }
     // MARK: - hand checkbox change
+    
+    @IBAction func loudSpeakerSwitchChange(_ sender: Any) {
+        let speakerSwitch = sender as! UISwitch
+        setup.setLoudSpeaker(speakerSwitch.isOn)
+    }
+    @IBAction func selfViewSwitchChange(_ sender: Any) {
+        let selfViewSwitch = sender as! UISwitch
+        setup.isSelfViewShow = selfViewSwitch.isOn
+        updateSelfSetupView(!selfViewSwitch.isOn)
+    }
+    
     func handleCapGestureEvent(sender:UITapGestureRecognizer) {
         if let view = sender.view {
-            if view == noneView {
-                setup.setLoudSpeaker(false)
+            if view == audioView {
                 setup.setVideoEnabled(false)
+                updateVideoView(true)
             }
-            else if view == audioView {
-                setup.setLoudSpeaker(true)
-                setup.setVideoEnabled(false)
-            }
-            else if view == videoView {
-                setup.setLoudSpeaker(false)
+            else if view == audioVideoView {
                 setup.setVideoEnabled(true)
-            }
-            else {
-                setup.setLoudSpeaker(true)
-                setup.setVideoEnabled(true)
+                updateVideoView(false)
             }
             
-            updateCheckBoxStatus()
+            updateCallCapStatus()
         }
     }
     
@@ -158,30 +166,12 @@ class VideoAudioSetupViewController: BaseViewController {
     }
     
     
-    func updateCheckBoxStatus() {
-
-        
-        if !setup.isLoudSpeaker() && !setup.isVideoEnabled() {
-            noneImage.image = checkImage
-            audioImage.image = uncheckImage
-            videoImage.image = uncheckImage
-            audioVideoImage.image = uncheckImage
-        } else if setup.isLoudSpeaker() && !setup.isVideoEnabled() {
-            noneImage.image = uncheckImage
+    func updateCallCapStatus() {
+        if !setup.isVideoEnabled() {
             audioImage.image = checkImage
-            videoImage.image = uncheckImage
             audioVideoImage.image = uncheckImage
-        }
-        else if !setup.isLoudSpeaker() && setup.isVideoEnabled() {
-            noneImage.image = uncheckImage
+        } else {
             audioImage.image = uncheckImage
-            videoImage.image = checkImage
-            audioVideoImage.image = uncheckImage
-        }
-        else {
-            noneImage.image = uncheckImage
-            audioImage.image = uncheckImage
-            videoImage.image = uncheckImage
             audioVideoImage.image = checkImage
         }
     }
@@ -196,7 +186,97 @@ class VideoAudioSetupViewController: BaseViewController {
             backImage.image = checkImage
         }
     }
+    
+    func updateLoudspeakerStatus() {
+        loudSpeakerSwitch.isOn = setup.isLoudSpeaker()
+    }
 
+    func updateSelfViewStatus() {
+        selfViewSwitch.isOn = setup.isSelfViewShow
+    }
+    
+    func updateVideoView(_ isHidden:Bool) {
+        var firstView:UIView?
+        var firstConstraint:NSLayoutConstraint?
+        var firstConstant:CGFloat?
+        var secondView:UIView?
+        var secondConstraint:NSLayoutConstraint?
+        var secondConstant:CGFloat?
+        
+        if isHidden {
+            firstView = videoSetupView
+            firstConstraint = videoViewHeight
+            firstConstant = 0
+            secondView = videoViewHiddenHelpLabel
+            secondConstraint = videoViewhiddenHelpLabelHeight
+            secondConstant = videoViewSetupHelpLabelHeightContant
+            
+        }
+        else {
+            firstView = videoViewHiddenHelpLabel
+            firstConstraint = videoViewhiddenHelpLabelHeight
+            firstConstant = 0
+            secondView = videoSetupView
+            secondConstraint = videoViewHeight
+            secondConstant = videoViewSetupHeightContant
+        }
+        
+        expandedView(firstConstraint!, constant: firstConstant!,view: firstView!){ [weak self] in
+            if let strongSelf = self {
+                strongSelf.expandedView(secondConstraint!, constant: secondConstant!,view: secondView!)
+            }
+        }
+        
+    }
+
+    func updateSelfSetupView(_ isHidden:Bool) {
+        var firstView:UIView?
+        var firstConstraint:NSLayoutConstraint?
+        var firstConstant:CGFloat?
+        var secondView:UIView?
+        var secondConstraint:NSLayoutConstraint?
+        var secondConstant:CGFloat?
+        
+        if isHidden {
+            firstView = cameraSetupView
+            firstConstraint = selfViewSetupHeight
+            firstConstant = 0
+            secondView = selfViewHiddenHelpLabel
+            secondConstraint = selfViewHiddenHelpLabelHeight
+            secondConstant = selfViewSetupHelpLabelHeightContant
+            
+        }
+        else {
+            firstView = selfViewHiddenHelpLabel
+            firstConstraint = selfViewHiddenHelpLabelHeight
+            firstConstant = 0
+            secondView = cameraSetupView
+            secondConstraint = selfViewSetupHeight
+            secondConstant = selfViewSetupHeightContant
+        }
+        
+        expandedView(firstConstraint!, constant: firstConstant!,view: firstView!){ [weak self] in
+            if let strongSelf = self {
+                strongSelf.expandedView(secondConstraint!, constant: secondConstant!,view: secondView!)
+            }
+        }
+    }
+    
+    private func expandedView(_ viewConstraint:NSLayoutConstraint,constant:CGFloat,view:UIView,completion: (() -> Swift.Void)? = nil) {
+        UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 10.0, options: .curveEaseIn, animations: { [weak self]  in
+            if let strongSelf = self {
+                viewConstraint.constant = constant
+                view.alpha = (constant == 0 ? 0:1)
+                strongSelf.view.layoutIfNeeded()
+            }
+            
+        }, completion: { finished in
+            if let finishedCompletion = completion {
+                finishedCompletion()
+            }
+        })
+    }
+    
     func gotoInitiateCallView() {
         if let initiateCallViewController = storyboard?.instantiateViewController(withIdentifier: "InitiateCallViewController") as? InitiateCallViewController! {
             navigationController?.pushViewController(initiateCallViewController, animated: true)

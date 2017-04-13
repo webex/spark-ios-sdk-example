@@ -19,6 +19,15 @@ class VideoAudioSetup {
     
     static let sharedInstance = VideoAudioSetup()
     fileprivate var videoEnabled = true
+    fileprivate var selfViewShowed = true
+    var isSelfViewShow: Bool{
+        get {
+            return self.selfViewShowed
+        }
+        set(newValue) {
+            self.selfViewShowed = newValue
+        }
+    }
     
     func setFacingMode(_ mode: Call.FacingMode) {
         PhoneSettings.defaultFacingMode = mode
