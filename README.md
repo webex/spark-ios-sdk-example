@@ -40,7 +40,7 @@ Below is code snippets of the SDK calling in the demo.
     static let ClientSecret = ProcessInfo().environment["CLIENTSECRET"] ?? "your secret"
     static let Scope = "spark:people_read spark:rooms_read spark:rooms_write spark:memberships_read spark:memberships_write spark:messages_read spark:messages_write"
     static let RedirectUri = "KitchenSink://response"
-}
+    }
     ```
 
 1. Register device
