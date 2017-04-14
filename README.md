@@ -24,15 +24,6 @@ Here are the steps to setup Xcode project using [CocoaPods](http://cocoapods.org
 The "// MARK: " labels in source code have distinguished the SDK calling and UI views paragraphes.  
 Below is code snippets of the SDK calling in the demo.
 
-1. Setup SDK with Spark access token in Spark
-   ```swift
-   func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        let sparkAccessToken = "Yjc5ZTYyMDEt..."
-        Spark.initWith(accessToken: sparkAccessToken)
-        return true
-    }
-   ```
-   
 1. Setup SDK with app infomation, and authorize access to Spark service in SparkContext.swift
    ```swift
    class SparkEnvirmonment {
