@@ -20,8 +20,6 @@ Here are the steps to setup Xcode project using [CocoaPods](http://cocoapods.org
     ```bash
     pod install
     ```
-## Request your App ID and Secret
-1.Register a new user on the website https://developer.ciscospark.com/ 
 ## Example
 The "// MARK: " labels in source code have distinguished the SDK calling and UI views paragraphes.  
 Below is code snippets of the SDK calling in the demo.
