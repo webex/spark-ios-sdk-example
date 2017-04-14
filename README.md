@@ -1,6 +1,6 @@
 # Kitchen Sink
 
-Kitchen Sink Demo App is a developer friendly sample implementation of Spark client SDK and showcases all SDK features.
+Kitchen Sink is a developer friendly sample implementation of Spark client SDK and showcases all SDK features.
 
 ## Setup
 Here are the steps to setup Xcode project using [CocoaPods](http://cocoapods.org):
@@ -20,12 +20,13 @@ Here are the steps to setup Xcode project using [CocoaPods](http://cocoapods.org
     ```bash
     pod install
     ```
-
+## Request your App ID and Secret
+1.Register a new user on the website https://developer.ciscospark.com/ 
 ## Example
 The "// MARK: " labels in source code have distinguished the SDK calling and UI views paragraphes.  
 Below is code snippets of the SDK calling in the demo.
 
-1. Setup SDK with Spark access token 
+1. Setup SDK with Spark access token in Spark
    ```swift
    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         let sparkAccessToken = "Yjc5ZTYyMDEt..."
@@ -34,27 +35,25 @@ Below is code snippets of the SDK calling in the demo.
     }
    ```
    
-1. Setup SDK with app infomation, and authorize access to Spark service
+1. Setup SDK with app infomation, and authorize access to Spark service in SparkContext.swift
    ```swift
-   class LoginViewController: UIViewController {
-        @IBAction func loginWithSpark(sender: AnyObject) {
-            let clientId = "C90f769..."
-            let clientSecret = "64e252..."
-            let scope = "spark:people_read spark:rooms_read spark:rooms_write spark:memberships_read spark:memberships_write spark:messages_read spark:messages_write"
-            let redirectUri = "KitchenSink://response"
-            
-            Spark.initWith(clientId: clientId, clientSecret: clientSecret, scope: scope, redirectUri: redirectUri, controller: self)
-        }
-    }
+   class SparkEnvirmonment {
+    static let ClientId = "your client ID"
+    static let ClientSecret = ProcessInfo().environment["CLIENTSECRET"] ?? "your secret"
+    static let Scope = "spark:people_read spark:rooms_read spark:rooms_write spark:memberships_read spark:memberships_write spark:messages_read spark:messages_write"
+    static let RedirectUri = "KitchenSink://response"
+}
     ```
 
 1. Register device
     ```swift
-    Spark.phone.register() { success in
-        if !success {
-            print("Failed to register device.")
+    SparkContext.sharedInstance.spark?.phone.register() { [weak self] success in
+            if let strongSelf = self {
+                if success {
+                    .....
+                }
+            }
         }
-    }
     ```
             
 1. Spark calling API
@@ -65,19 +64,28 @@ Below is code snippets of the SDK calling in the demo.
     @IBOutlet weak var remoteView: MediaRenderView!
     
     // Make a call
-    let call = Spark.phone.dial(email, option: MediaOption.AudioVideo(local: videoCallViewController.selfView, remote: videoCallViewController.remoteView)) { success in
-        if !success {
-            print("Failed to dial call.")
+    SparkContext.sharedInstance.spark?.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
+            if granted {
+                  mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
+                  SparkContext.sharedInstance.call = SparkContext.sharedInstance.spark?.phone.dial(remoteAddr, option: mediaOption) { [weak self] success in
+                    if let strongSelf = self {
+                        if !success {
+                            ....
+                        }
+                    }
+              }  
+            } else {
+                Utils.showCameraMicrophoneAccessDeniedAlert(self)
+            }
         }
-    }
     
     // Recive a call
     class IncomingCallViewController: UIViewController, PhoneObserver {
     override func viewWillAppear(...) {
-        PhoneNotificationCenter.sharedInstance.addObserver(self)
+        SparkContext.sharedInstance.spark?.callNotificationCenter.add(observer: self)
     }
     override func viewWillDisappear(...) {
-        PhoneNotificationCenter.sharedInstance.removeObserver(self)
+        SparkContext.sharedInstance.spark?.callNotificationCenter.remove(observer: self)
     }
     func callIncoming(call: Call) {
         // Show incoming call toast view
