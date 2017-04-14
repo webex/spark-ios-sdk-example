@@ -32,6 +32,7 @@
 		C785D3281E95EEB900A5A648 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C785D3271E95EEB900A5A648 /* BaseViewController.swift */; };
 		C785D32C1E9684C000A5A648 /* AppFeedbackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C785D32B1E9684C000A5A648 /* AppFeedbackViewController.swift */; };
 		C7D086E81E9B6FAA00FC662B /* KSLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D086E71E9B6FAA00FC662B /* KSLabel.swift */; };
+		C7D086EA1E9DE42000FC662B /* KSLargerHitAreaButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D086E91E9DE42000FC662B /* KSLargerHitAreaButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -66,6 +67,7 @@
 		C785D3271E95EEB900A5A648 /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BaseViewController.swift; path = UIKitExtension/BaseViewController.swift; sourceTree = "<group>"; };
 		C785D32B1E9684C000A5A648 /* AppFeedbackViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppFeedbackViewController.swift; sourceTree = "<group>"; };
 		C7D086E71E9B6FAA00FC662B /* KSLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KSLabel.swift; path = UIKitExtension/KSLabel.swift; sourceTree = "<group>"; };
+		C7D086E91E9DE42000FC662B /* KSLargerHitAreaButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KSLargerHitAreaButton.swift; path = UIKitExtension/KSLargerHitAreaButton.swift; sourceTree = "<group>"; };
 		D10621478BD9E68749DD77A3 /* Pods-KitchenSink.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink.release.xcconfig"; path = "Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -161,6 +163,7 @@
 				C785D3271E95EEB900A5A648 /* BaseViewController.swift */,
 				C785D3141E9494CA00A5A648 /* UIKitExtension.swift */,
 				C7D086E71E9B6FAA00FC662B /* KSLabel.swift */,
+				C7D086E91E9DE42000FC662B /* KSLargerHitAreaButton.swift */,
 			);
 			name = UIKitExtension;
 			sourceTree = "<group>";
@@ -316,6 +319,7 @@
 				042A4A751D12532E002697D3 /* PersonTableViewCell.swift in Sources */,
 				C785D3171E9494CA00A5A648 /* UIKitExtension.swift in Sources */,
 				04D9882A1CEDAEBF00C18422 /* CallFeedbackViewController.swift in Sources */,
+				C7D086EA1E9DE42000FC662B /* KSLargerHitAreaButton.swift in Sources */,
 				C785D3281E95EEB900A5A648 /* BaseViewController.swift in Sources */,
 				C785D32C1E9684C000A5A648 /* AppFeedbackViewController.swift in Sources */,
 				C785D3101E9494A300A5A648 /* Utils.swift in Sources */,
