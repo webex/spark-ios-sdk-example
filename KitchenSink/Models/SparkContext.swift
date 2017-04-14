@@ -9,7 +9,7 @@ import SparkSDK
 
 class SparkEnvirmonment {
     static let ClientId = "Cb3f891d2044fec65bfe36a8d1b3d69b3098448e9e0335c58bab42f5b94ad06c9"
-    static let ClientSecret = ProcessInfo().environment["CLIENTSECRET"] ?? ""
+    static let ClientSecret = ProcessInfo().environment["CLIENTSECRET"] ?? "f2660da9c8b90a9cdfe713f7c115473b76da531bb7ec9c66fdb8ec1481585879"
     static let Scope = "spark:people_read spark:rooms_read spark:rooms_write spark:memberships_read spark:memberships_write spark:messages_read spark:messages_write"
     static let RedirectUri = "KitchenSink://response"
 }
