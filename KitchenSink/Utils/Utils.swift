@@ -16,12 +16,14 @@ import UIKit
 import SparkSDK
 
 class Utils {
-    static func fetchUserProfile(_ emailString: String, completionHandler: @escaping (String, String) -> Void) {
+    static let HEIGHT_SCALE: CGFloat = UIScreen.main.bounds.height / 736.0
+    static let WIDTH_SCALE: CGFloat = UIScreen.main.bounds.width / 414.0
+    static func fetchUserProfile(_ emailString: String, completionHandler: @escaping (Person?) -> Void) {
         if let emailAddress = EmailAddress.fromString(emailString) {
             // Person list is empty with SIP email address
-            AppDelegate.spark.people.list(email: emailAddress, max: 1) { response in
-                var name = emailString
-                var avatarUrlString = ""
+            SparkContext.sharedInstance.spark?.people.list(email: emailAddress, max: 1) { response in
+//                var name = emailString
+//                var avatarUrlString = ""
                 var persons: [Person] = []
                 
                 switch response.result {
@@ -32,18 +34,19 @@ class Utils {
                 }
                 
                 if let person = persons.first {
-                    if let displayName = person.displayName {
-                        name = displayName
-                    }
-                    if let avatarUrl = person.avatar {
-                        avatarUrlString = avatarUrl
-                    }
+//                    if let displayName = person.displayName {
+//                        name = displayName
+//                    }
+//                    if let avatarUrl = person.avatar {
+//                        avatarUrlString = avatarUrl
+//                    }
+                    completionHandler(person)
                 }
-                completionHandler(name, avatarUrlString)
+                
             }
         } else {
             print("could not parse email address \(emailString) for retrieving user profile")
-            completionHandler(emailString, "")
+            completionHandler(nil)
         }
     }
     

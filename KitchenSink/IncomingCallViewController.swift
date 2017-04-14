@@ -21,110 +21,106 @@
 import UIKit
 import SparkSDK
 
-class IncomingCallViewController: UIViewController, CallObserver, IncomingCallDelegate {
+class IncomingCallViewController: BaseViewController, CallObserver, IncomingCallDelegate {
+    @IBOutlet var labelFontScaleCollection: [UILabel]!
+    @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
     
-    fileprivate var callToastViewController: CallToastViewController!
-    fileprivate var videoCallViewController: VideoCallViewController!
-    fileprivate var call: Call!
-    private var spark: Spark!
+    private var waittingTimer: Timer?
+    @IBOutlet weak var animationLabel: UILabel!
     
-    fileprivate var localVideoView: MediaRenderView {
-        return videoCallViewController.localVideoView
+    override var navigationTitle: String? {
+        get {
+            return SparkContext.sharedInstance.selfInfo?.displayName
+        }
+        set(newValue) {
+            title = newValue
+        }
     }
-    
-    fileprivate var remoteVideoView: MediaRenderView {
-        return videoCallViewController.remoteVideoView
-    }
-    
     // MARK: - Life cycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        self.spark = AppDelegate.spark
-    }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        spark.callNotificationCenter.add(observer: self)
+        SparkContext.sharedInstance.spark?.callNotificationCenter.add(observer: self)
     }
-    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        startWaitingAnimation()
+    }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        spark.callNotificationCenter.remove(observer: self)
+        SparkContext.sharedInstance.spark?.callNotificationCenter.remove(observer: self)
+        stopWaitingAnimation()
     }
     
     // MARK: - PhoneObserver
-    
     func callIncoming(_ call: Call) {
-        self.call = call
+        SparkContext.sharedInstance.call = call
         presentCallToastView(call)
     }
     
-    func refreshAccessTokenFailed() {
-        // TODO: need to implement it?
-    }
-    
     // MARK: - IncomingCallDelegate
-    
     func didAnswerIncomingCall() {
-        spark.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
-            if granted {
-                var remoteAddr = ""
-                if let remote = self.call.from {
-                    remoteAddr = remote
-                }
-                self.presentVideoCallView(remoteAddr)
-                
-                var mediaOption = MediaOption.audioOnly
-                if VideoAudioSetup.sharedInstance.isVideoEnabled() {
-                    mediaOption = MediaOption.audioVideo(local: self.localVideoView, remote: self.remoteVideoView)
-                }
-                self.call.answer(option: mediaOption) { success in
-                    if !success {
-                        self.dismissVideoCallView()
-                        self.call.reject(nil)
-                    }
-                }
-            } else {
-                self.call.reject(nil)
-                Utils.showCameraMicrophoneAccessDeniedAlert(self)
-            }
-        }
+        
+        self.presentVideoCallView(SparkContext.sharedInstance.call?.from ?? "")
+        
     }
     
     func didDeclineIncomingCall() {
-        call.reject(nil)
+        SparkContext.sharedInstance.call?.reject(nil)
     }
     
     // MARK: - UI views
+    override func initView() {
+        for label in labelFontScaleCollection {
+            label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+        }
+        for heightConstraint in heightScaleCollection {
+            heightConstraint.constant *= Utils.HEIGHT_SCALE
+        }
+    }
+    
+    func startWaitingAnimation() {
+        stopWaitingAnimation()
+        waittingTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(waitingAnimation), userInfo: nil, repeats: true)
+    }
+    
+    func stopWaitingAnimation() {
+        if let timer = waittingTimer {
+            if timer.isValid {
+                timer.invalidate()
+            }
+            waittingTimer = nil
+        }
+    }
+    
+    func waitingAnimation() {
+        if let labelText = animationLabel.text {
+            if labelText.characters.count > 2 {
+                animationLabel.text = ""
+            }
+            else {
+                animationLabel.text!.append(".")
+            }
+        }
+        
+    }
+    
+    
     
     fileprivate func presentCallToastView(_ call: Call) {
-        callToastViewController = storyboard?.instantiateViewController(withIdentifier: "CallToastViewController") as! CallToastViewController
-        
-        callToastViewController.call = call
-        callToastViewController.incomingCallDelegate = self
-        callToastViewController.modalPresentationStyle = .fullScreen
-        present(callToastViewController, animated: true, completion: nil)
-        if let popoverController = callToastViewController.popoverPresentationController {
-            popoverController.sourceView = view
-            popoverController.permittedArrowDirections = .any
+        if let callToastViewController = storyboard?.instantiateViewController(withIdentifier: "CallToastViewController") as? CallToastViewController {
+            
+            callToastViewController.incomingCallDelegate = self
+            callToastViewController.modalPresentationStyle = .fullScreen
+            callToastViewController.modalTransitionStyle = .coverVertical
+            present(callToastViewController, animated: true, completion: nil)
         }
     }
     
     fileprivate func presentVideoCallView(_ remoteAddr: String) {
-        videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController!
-        
-        videoCallViewController.remoteAddr = remoteAddr
-        videoCallViewController.call = self.call
-        videoCallViewController.modalPresentationStyle = .fullScreen
-        present(videoCallViewController, animated: true, completion: nil)
-        if let popoverController = videoCallViewController.popoverPresentationController {
-            popoverController.sourceView = self.view
-            popoverController.sourceRect = self.view.bounds
-            popoverController.permittedArrowDirections = .any
+        if let videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController! {
+            
+            videoCallViewController.videoCallRole = .Callee(remoteAddr)
+            navigationController?.pushViewController(videoCallViewController, animated: true)
         }
-    }
-    
-    fileprivate func dismissVideoCallView() {
-        videoCallViewController.dismiss(animated: false, completion: nil)
     }
 }

@@ -21,64 +21,141 @@
 import UIKit
 import SparkSDK
 
-class HomeTableTableViewController: UITableViewController {
+class HomeTableTableViewController: BaseTableViewController {
     
     @IBOutlet weak var statusLabel: UILabel!
-    
     fileprivate var registerState = "connecting"
-    private var spark: Spark!
+    @IBOutlet weak var buttonHeight: NSLayoutConstraint!
+    @IBOutlet weak var footerView: UIView!
     
+    @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
+    @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
+    @IBOutlet var labelFontScaleCollection: [UILabel]!
+    @IBOutlet var buttonFontScaleCollection: [UIButton]!
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.setHidesBackButton(true, animated: false)
-        self.spark = AppDelegate.spark
         registerPhone()
         updateStatusLabel()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
+        getUserInfo()
     }
     
     // MARK: - Phone register
     
     func registerPhone() {
-        spark.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
+        SparkContext.sharedInstance.spark?.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { [weak self] granted in
             if !granted {
-                Utils.showCameraMicrophoneAccessDeniedAlert(self)
+                if let strongSelf = self {
+                    Utils.showCameraMicrophoneAccessDeniedAlert(strongSelf)
+                }
             }
         }
-        spark.phone.register() { success in
-            if success {
-                self.registerState = "ok"
-                self.updateStatusLabel()
-            } else {
-                self.registerState = "fail"
-                self.showPhoneRegisterFailAlert()
+        SparkContext.sharedInstance.spark?.phone.register() { [weak self] success in
+            if let strongSelf = self {
+                if success {
+                    strongSelf.registerState = "ok"
+                    strongSelf.updateStatusLabel()
+                } else {
+                    strongSelf.registerState = "fail"
+                    strongSelf.showPhoneRegisterFailAlert()
+                }
+            }
+        }
+    }
+    
+    func getUserInfo() {
+        SparkContext.sharedInstance.spark?.people.getMe() {[weak self] response in
+            if let strongSelf = self {
+                switch response.result {
+                case .success(let person):
+                    SparkContext.sharedInstance.selfInfo = person
+                    strongSelf.updateStatusLabel()
+                case .failure:
+                    SparkContext.sharedInstance.selfInfo = nil
+                    strongSelf.updateStatusLabel()
+                }
             }
         }
     }
     
     // MARK: - UITableViewController
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.section == 0 && indexPath.row == 1 {
+            return 80 * Utils.HEIGHT_SCALE
+        }
+        else if indexPath.section == 0 && indexPath.row == 0 {
+            return 80 * Utils.HEIGHT_SCALE
+        }
+        else if indexPath.section == 1 {
+            return 75 * Utils.HEIGHT_SCALE
+        }
+        return super.tableView(tableView, heightForRowAt: indexPath) * Utils.HEIGHT_SCALE
+    }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
         if indexPath.section == 1 && indexPath.row == 4 {
-            spark.authenticationStrategy.deauthorize()
-            _ = navigationController?.popToRootViewController(animated: true)
+            logout()
         }
     }
     
     // MARK: - UI views
     
+    override func initView() {
+        for label in labelFontScaleCollection {
+            label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
+        }
+        for heightConstraint in heightScaleCollection {
+            heightConstraint.constant *= Utils.HEIGHT_SCALE
+        }
+        for widthConstraint in widthScaleCollection {
+            widthConstraint.constant *= Utils.WIDTH_SCALE
+        }
+        
+        
+        for button in buttonFontScaleCollection {
+            button.titleLabel?.font = UIFont.buttonLightFont(ofSize: (button.titleLabel?.font.pointSize)! * Utils.HEIGHT_SCALE)
+            button.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueNormal(), background: nil), for: .normal)
+            button.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueHightlight(), background: nil), for: .highlighted)
+            button.clipsToBounds = true
+            button.layer.cornerRadius = buttonHeight.constant/2
+        }
+        
+        var frame = footerView.frame
+        frame.size.height *= Utils.HEIGHT_SCALE
+        footerView.frame = frame
+        
+    }
+    
+    
+    
     fileprivate func updateStatusLabel() {
-        statusLabel.text = "Powered by SDK v" + Spark.version
+        statusLabel.text = "login as \(SparkContext.sharedInstance.selfInfo?.displayName ?? "NONE")"
         statusLabel.text = statusLabel.text! + "\nRegistration to Cisco cloud : " + registerState
     }
     
     fileprivate func showPhoneRegisterFailAlert() {
         let alert = UIAlertController(title: "Alert", message: "Phone register fail", preferredStyle: .alert)
-        
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }
+    
+    
+    @IBAction func logoutButtonTouchUpinside(_ sender: Any) {
+        logout()
+    }
+    
+    private func logout() {
+        SparkContext.sharedInstance.deinitSpark()
+        _ = navigationController?.popToRootViewController(animated: true)
+        
+    }
+    
 }

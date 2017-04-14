@@ -21,60 +21,49 @@
 import UIKit
 import SparkSDK
 
-class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UITableViewDelegate, UITableViewDataSource {
+class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, UITableViewDelegate, UITableViewDataSource {
     
+    @IBOutlet weak var indicatorView: UIActivityIndicatorView!
     @IBOutlet weak var dialAddressTextField: UITextField!
     @IBOutlet weak var tableView: UITableView!
     
-    fileprivate var videoCallViewController: VideoCallViewController!
+    @IBOutlet weak var historyTableView: UITableView!
+    
+    @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
+    @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
+    @IBOutlet var textFieldScaleCollection: [UITextField]!
+    
+    
     fileprivate let searchController = UISearchController(searchResultsController: nil)
     fileprivate var searchResult: [Person]?
+    fileprivate var historyResult: [Person]?
     fileprivate var dialEmail: String?
-    private var spark: Spark!
-    
-    fileprivate var localVideoView: MediaRenderView {
-        return videoCallViewController.localVideoView
-    }
-    
-    fileprivate var remoteVideoView: MediaRenderView {
-        return videoCallViewController.remoteVideoView
-    }
-    
-    
+    fileprivate var segmentedControl: UISegmentedControl?
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.spark = AppDelegate.spark
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(dissmissKeyboard))
+        view.addGestureRecognizer(tap)
+        
         setupView()
+        
     }
+    
+    deinit {
+        searchController.view.removeFromSuperview()
+    }
+    
     
     // MARK: - Dial call
     
     func dial(_ address: String) {
         if address.isEmpty {
+            showNoticeAlert("Address is empty")
             return
         }
         
-        spark.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
-            if granted {
-                self.presentVideoCallView(address)
-                
-                var mediaOption = MediaOption.audioOnly
-                if VideoAudioSetup.sharedInstance.isVideoEnabled() {
-                    mediaOption = MediaOption.audioVideo(local: self.localVideoView, remote: self.remoteVideoView)
-                }
-                let call = self.spark.phone.dial(address, option: mediaOption) { success in
-                    if !success {
-                        self.dismissVideoCallView()
-                        print("Failed to dial call.")
-                    }
-                }
-                self.videoCallViewController.call = call
-            } else {
-                Utils.showCameraMicrophoneAccessDeniedAlert(self)
-            }
-        }
+        self.presentVideoCallView(address)
     }
     
     @IBAction func dialAddress(_ sender: AnyObject) {
@@ -82,12 +71,19 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
     }
     
     @IBAction func switchDialWay(_ sender: AnyObject) {
+        dissmissKeyboard()
         switch sender.selectedSegmentIndex
         {
         case 0:
+            hideHistoryView(false)
+            hideDialAddressView(true)
+            hideSearchView(true)
+        case 1:
             hideDialAddressView(true)
             hideSearchView(false)
-        case 1:
+            hideHistoryView(true)
+        case 2:
+            hideHistoryView(true)
             hideSearchView(true)
             hideDialAddressView(false)
         default:
@@ -106,10 +102,12 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
             return
         }
         
+        indicatorView.startAnimating()
         if let email = EmailAddress.fromString(searchString) {
-            spark.people.list(email: email, max: 10) {
+            SparkContext.sharedInstance.spark?.people.list(email: email, max: 10) {
                 (response: ServiceResponse<[Person]>) in
                 
+                self.indicatorView.stopAnimating()
                 switch response.result {
                 case .success(let value):
                     self.searchResult = value
@@ -121,9 +119,9 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
                 }
             }
         } else {
-            spark.people.list(displayName: searchString, max: 10) {
+            SparkContext.sharedInstance.spark?.people.list(displayName: searchString, max: 10) {
                 (response: ServiceResponse<[Person]>) in
-                
+                self.indicatorView.stopAnimating()
                 switch response.result {
                 case .success(let value):
                     self.searchResult = value
@@ -138,18 +136,33 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
     }
     
     // MARK: - UITableViewDataSource
-    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 100 * Utils.HEIGHT_SCALE
+    }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if searchResult != nil  {
+        
+        if tableView == self.tableView && searchResult != nil  {
             return searchResult!.count
-        } else {
+        } else if tableView == self.historyTableView {
+            return historyResult?.count ?? 0
+        }
+        else {
             return 0
         }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PersonCell", for: indexPath) as! PersonTableViewCell
-        let person = searchResult?[indexPath.row]
+        let dataSource: [Person]?
+        
+        if tableView == self.tableView {
+            dataSource = searchResult
+        }
+        else {
+            dataSource = historyResult
+        }
+        
+        let person = dataSource?[indexPath.row]
         let email = person?.emails?.first
         cell.address = email?.toString()
         cell.initiateCallViewController = self
@@ -158,46 +171,96 @@ class InitiateCallViewController: UIViewController, UISearchResultsUpdating, UIT
             cell.avatarImageView.image = $0
         })
         cell.nameLabel.text = person?.displayName
+        
         return cell
     }
     
     // MARK: - UI views
-    
+    override func initView() {
+        for textfield in textFieldScaleCollection {
+            textfield.font = UIFont.textViewLightFont(ofSize: (textfield.font?.pointSize)! * Utils.HEIGHT_SCALE)
+        }
+        for heightConstraint in heightScaleCollection {
+            heightConstraint.constant *= Utils.HEIGHT_SCALE
+        }
+        for widthConstraint in widthScaleCollection {
+            widthConstraint.constant *= Utils.WIDTH_SCALE
+        }
+    }
     fileprivate func setupView() {
+        historyTableView.dataSource = self
+        historyTableView.delegate = self
         tableView.dataSource = self
         tableView.delegate = self
-        
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
         searchController.hidesNavigationBarDuringPresentation = false
         searchController.searchBar.placeholder = "Email or user name"
         definesPresentationContext = true
         tableView.tableHeaderView = searchController.searchBar
+        view.bringSubview(toFront: indicatorView)
+        dialAddressTextField.layer.borderColor = UIColor.gray.cgColor
+        
+        let itemArray = [UIImage.fontAwesomeIcon(name: .history, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .search, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .phone, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29))]
+        segmentedControl = UISegmentedControl.init(items: itemArray)
+        segmentedControl?.frame = CGRect.init(x: 0, y: 0, width: 150, height: 29)
+        segmentedControl?.tintColor = UIColor.titleGreyColor()
+        segmentedControl?.selectedSegmentIndex = 0
+        segmentedControl?.addTarget(self, action: #selector(switchDialWay(_:)),for:.valueChanged)
+        navigationItem.titleView = segmentedControl
+        
+        //init history tableView data
+        historyResult = UserDefaultsUtil.callPersonHistory
+        historyResult?.reverse()
+        historyTableView.reloadData()
+        
+        
     }
     
     fileprivate func presentVideoCallView(_ remoteAddr: String) {
-        videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController!
-        
-        videoCallViewController.remoteAddr = remoteAddr
-        videoCallViewController.modalPresentationStyle = .fullScreen
-        present(videoCallViewController, animated: true, completion: nil)
-        if let popoverController = videoCallViewController.popoverPresentationController {
-            popoverController.sourceView = view
-            popoverController.sourceRect = view.bounds
-            popoverController.permittedArrowDirections = .any
+        if let videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController! {
+            
+            videoCallViewController.videoCallRole = .Caller(remoteAddr)
+            navigationController?.pushViewController(videoCallViewController, animated: true)
         }
-    }
-    
-    fileprivate func dismissVideoCallView() {
-        videoCallViewController.dismiss(animated: false, completion: nil)
     }
     
     fileprivate func hideSearchView(_ hidden: Bool) {
         searchController.isActive = false
         tableView.isHidden = hidden
+        if !hidden {
+            searchController.searchBar.becomeFirstResponder()
+        }
+    }
+    
+    fileprivate func hideHistoryView(_ hidden: Bool) {
+        historyTableView.isHidden = hidden
+        
+        if !hidden {
+            historyResult = UserDefaultsUtil.callPersonHistory
+            historyResult?.reverse()
+            historyTableView.reloadData()
+        }
     }
     
     fileprivate func hideDialAddressView(_ hidden: Bool) {
         dialAddressTextField.isHidden = hidden
+        if !hidden {
+            dialAddressTextField.becomeFirstResponder()
+        }
     }
+    
+    override func dissmissKeyboard() {
+        super.dissmissKeyboard()
+        searchController.searchBar.endEditing(true)
+    }
+    
+    fileprivate func showNoticeAlert(_ notice:String) {
+        let alert = UIAlertController(title: "Alert", message: notice, preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
+
+    
 }
