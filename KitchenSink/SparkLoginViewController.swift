@@ -35,6 +35,13 @@ class SparkLoginViewController: BaseViewController {
     @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var buttonFontScaleCollection: [UIButton]!
     @IBOutlet weak var loginButtonHeight: NSLayoutConstraint!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        SparkContext.initSparkForSparkIdLogin()
+        oauthStrategy = SparkContext.sharedInstance.spark?.authenticationStrategy as! OAuthStrategy
+    }
+    
     // MARK: - Life cycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -42,8 +49,6 @@ class SparkLoginViewController: BaseViewController {
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        SparkContext.initSparkForSparkIdLogin()
-        oauthStrategy = SparkContext.sharedInstance.spark?.authenticationStrategy as! OAuthStrategy
         if oauthStrategy.authorized {
             showApplicationHome()
         }
@@ -72,7 +77,7 @@ class SparkLoginViewController: BaseViewController {
     @IBAction func loginWithSpark(_ sender: AnyObject) {
         oauthStrategy.authorize(parentViewController: self) { success in
             if success {
-                self.showApplicationHome()
+                print("loginWithSpark success")
             }
         }
     }
