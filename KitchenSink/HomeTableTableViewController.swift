@@ -1,4 +1,4 @@
-// Copyright 2016 Cisco Systems Inc
+// Copyright 2016-2017 Cisco Systems Inc
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ import SparkSDK
 class HomeTableTableViewController: BaseTableViewController {
     
     @IBOutlet weak var statusLabel: UILabel!
-    fileprivate var registerState = "Connecting to Cisco Spark Cloud"
+    fileprivate var registerState = "connecting"
     @IBOutlet weak var buttonHeight: NSLayoutConstraint!
     @IBOutlet weak var footerView: UIView!
     
@@ -56,19 +56,17 @@ class HomeTableTableViewController: BaseTableViewController {
                 }
             }
         }
-        SparkContext.sharedInstance.spark?.phone.register() { [weak self] success in
-            print("homepage phone register callback in")
+        SparkContext.sharedInstance.spark?.phone.register() { [weak self] error in
             if let strongSelf = self {
-                print("homepage phone register strongSelf is not nil")
-                if success {
-                    strongSelf.registerState = "Registered at Cisco Spark Cloud"
-                    strongSelf.updateStatusLabel()
-                } else {
-                    strongSelf.registerState = "Registered at Cisco Spark Cloud failed"
+                if error != nil {
+                    strongSelf.registerState = "fail"
                     strongSelf.showPhoneRegisterFailAlert()
+                } else {
+                    strongSelf.registerState = "ok"
+                    strongSelf.updateStatusLabel()
+
                 }
             }
-            print("homepage phone register callback in")
         }
     }
     
@@ -140,8 +138,8 @@ class HomeTableTableViewController: BaseTableViewController {
     
     
     fileprivate func updateStatusLabel() {
-        statusLabel.text = "Authenticated User: \(SparkContext.sharedInstance.selfInfo?.displayName ?? "Unknown")"
-        statusLabel.text = statusLabel.text! + "\n" + registerState
+        statusLabel.text = "login as \(SparkContext.sharedInstance.selfInfo?.displayName ?? "NONE")"
+        statusLabel.text = statusLabel.text! + "\nRegistration to Cisco cloud : " + registerState
     }
     
     fileprivate func showPhoneRegisterFailAlert() {

@@ -1,8 +1,22 @@
+// Copyright 2016-2017 Cisco Systems Inc
 //
-//  SparkContext.swift
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
-//  Copyright © 2017 Cisco Systems Inc. All rights reserved.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 import Foundation
 import SparkSDK
@@ -38,14 +52,9 @@ class SparkContext: NSObject {
         guard call != nil else {
             return
         }
-        if call!.status != .Disconnected {
-            call?.hangup() { ret in
-                self.call = nil
-            }
-        }
-        else {
-            call = nil
-        }
+        
+        call?.hangup()
+        self.call = nil
     }
     
     func deinitSpark() {
@@ -58,7 +67,7 @@ class SparkContext: NSObject {
         }
         
         spark!.phone.deregister() { ret in
-            self.spark?.authenticationStrategy.deauthorize()
+            self.spark?.authenticator.deauthorize()
             self.selfInfo = nil
             self.spark = nil
         }
@@ -70,11 +79,25 @@ class SparkContext: NSObject {
     }
     
     static func initSparkForSparkIdLogin() {
-        SparkContext.sharedInstance.spark = Spark(authenticationStrategy: SparkContext.getOAuthStrategy())
+        SparkContext.sharedInstance.spark = Spark(authenticator: SparkContext.getOAuthStrategy())
     }
     
     static func initSparkForJWTLogin() {
-        SparkContext.sharedInstance.spark = Spark(authenticationStrategy: JWTAuthStrategy())
+        SparkContext.sharedInstance.spark = Spark(authenticator: JWTAuthStrategy())
     }
+    
+    static var callerEmail: String {
+        get {
+            if let call = SparkContext.sharedInstance.call {
+                for member in call.memberships {
+                    if member.isInitiator == true {
+                        return member.email ?? "Unknow"
+                    }
+                }
+            }
+            return "Unknow"
+        }
+    }
+    
 }
 

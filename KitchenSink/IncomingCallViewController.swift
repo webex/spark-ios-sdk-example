@@ -1,4 +1,4 @@
-// Copyright 2016 Cisco Systems Inc
+// Copyright 2016-2017 Cisco Systems Inc
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
 import UIKit
 import SparkSDK
 
-class IncomingCallViewController: BaseViewController, CallObserver, IncomingCallDelegate {
+class IncomingCallViewController: BaseViewController, IncomingCallDelegate {
     @IBOutlet var labelFontScaleCollection: [UILabel]!
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
     
@@ -39,7 +39,8 @@ class IncomingCallViewController: BaseViewController, CallObserver, IncomingCall
     // MARK: - Life cycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        SparkContext.sharedInstance.spark?.callNotificationCenter.add(observer: self)
+        //call callback init
+        sparkCallBackInit()
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -47,25 +48,28 @@ class IncomingCallViewController: BaseViewController, CallObserver, IncomingCall
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        SparkContext.sharedInstance.spark?.callNotificationCenter.remove(observer: self)
         stopWaitingAnimation()
     }
     
     // MARK: - PhoneObserver
-    func callIncoming(_ call: Call) {
-        SparkContext.sharedInstance.call = call
-        presentCallToastView(call)
+    func sparkCallBackInit() {
+        if let phone = SparkContext.sharedInstance.spark?.phone {
+            phone.onIncoming = { [weak self] call in
+                if let strongSelf = self {
+                    SparkContext.sharedInstance.call = call
+                    strongSelf.presentCallToastView(call)
+                }
+            }
+        }
     }
     
     // MARK: - IncomingCallDelegate
     func didAnswerIncomingCall() {
-        
-        self.presentVideoCallView(SparkContext.sharedInstance.call?.from ?? "")
-        
+        self.presentVideoCallView(SparkContext.callerEmail)
     }
     
     func didDeclineIncomingCall() {
-        SparkContext.sharedInstance.call?.reject(nil)
+        SparkContext.sharedInstance.call?.reject()
     }
     
     // MARK: - UI views

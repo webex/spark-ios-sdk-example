@@ -1,4 +1,4 @@
-// Copyright 2016 Cisco Systems Inc
+// Copyright 2016-2017 Cisco Systems Inc
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@ class JWTLoginViewController: BaseViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         SparkContext.initSparkForJWTLogin()
-        jwtAuthStrategy = SparkContext.sharedInstance.spark?.authenticationStrategy as! JWTAuthStrategy!
+        jwtAuthStrategy = SparkContext.sharedInstance.spark?.authenticator as! JWTAuthStrategy!
         Spark.toggleConsoleLogger(true)
         hideWaitingView()
         jwtTextField.becomeFirstResponder()
@@ -74,7 +74,7 @@ class JWTLoginViewController: BaseViewController {
         for textField in textFieldFontScaleCollection {
             textField.font = UIFont.textViewLightFont(ofSize: (textField.font?.pointSize)! * Utils.HEIGHT_SCALE)
         }
-        statusLabel.text = "Powered by Cisco Spark iOS SDK v" + Spark.version
+        statusLabel.text = "Powered by SparkSDK v" + Spark.version
         jwtLoginButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueNormal(), background: nil), for: .normal)
         jwtLoginButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueHightlight(), background: nil), for: .highlighted)
         jwtLoginButton.layer.cornerRadius = buttonHeightConstraint.constant/2
@@ -103,7 +103,7 @@ class JWTLoginViewController: BaseViewController {
             jwtAuthStrategy.authorizedWith(jwt: jwt)
         }
 
-        if SparkContext.sharedInstance.spark?.authenticationStrategy.authorized == true {
+        if jwtAuthStrategy.authorized == true {
             SparkContext.sharedInstance.spark?.people.getMe() { response in
                 self.hideWaitingView()
                 
@@ -112,7 +112,7 @@ class JWTLoginViewController: BaseViewController {
                     SparkContext.sharedInstance.selfInfo = person
                     let emailAddress = (person.emails ?? []).first
                     let emailString = emailAddress == nil ? "NONE" : emailAddress!.toString()
-                    let alert = UIAlertController(title: "Logged in", message: "Logged in as \(person.displayName ?? "Unknow") with id \n\(emailString)", preferredStyle: .alert)
+                    let alert = UIAlertController(title: "Logged in", message: "Logged in as \(person.displayName ?? "NONE") with id \n\(emailString)", preferredStyle: .alert)
                     let okAction = UIAlertAction(title: "OK", style: .cancel) { action in
                         self.showApplicationHome()
                     }
@@ -121,7 +121,7 @@ class JWTLoginViewController: BaseViewController {
                     
                 case .failure(let error):
                     SparkContext.sharedInstance.selfInfo = nil
-                    let alert = UIAlertController(title: "Could Not Get Personal Info", message: "Unable to retrieve information about the user logged in using the Guest ID: Please make sure your token is correct. \(error)", preferredStyle: .alert)
+                    let alert = UIAlertController(title: "Could Not Get Personal Info", message: "Unable to retrieve information about the user logged in using the JWT: Please make sure your JWT is correct. \(error)", preferredStyle: .alert)
                     let okAction = UIAlertAction(title: "OK", style: .cancel)
                     alert.addAction(okAction)
                     self.present(alert, animated: true)
@@ -139,7 +139,7 @@ class JWTLoginViewController: BaseViewController {
     }
     
     private func showLoginError() {
-        let alert = UIAlertController(title: "Could Not Login", message: "Unable to Login: Please make sure your Guest ID Token is correct.", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Could Not Login", message: "Unable to Login: Please make sure your JWT is correct.", preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .cancel) {
             action in
             

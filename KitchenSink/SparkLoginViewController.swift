@@ -1,4 +1,4 @@
-// Copyright 2016 Cisco Systems Inc
+// Copyright 2016-2017 Cisco Systems Inc
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ class SparkLoginViewController: BaseViewController {
     
     @IBOutlet weak var loginButton: UIButton!
     @IBOutlet weak var statusLabel: UILabel!
-    private var oauthStrategy: OAuthStrategy!
+    private var oauthenticator: OAuthStrategy!
     
     @IBOutlet var labelFontScaleCollection: [UILabel]!
     
@@ -39,17 +39,17 @@ class SparkLoginViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         SparkContext.initSparkForSparkIdLogin()
-        oauthStrategy = SparkContext.sharedInstance.spark?.authenticationStrategy as! OAuthStrategy
+        oauthenticator = SparkContext.sharedInstance.spark?.authenticator as! OAuthStrategy
     }
     
     // MARK: - Life cycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        statusLabel.text = "Powered by Cisco Spark iOS SDK v" + Spark.version
+        statusLabel.text = "Powered by SparkSDK v" + Spark.version
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if oauthStrategy.authorized {
+        if oauthenticator.authorized {
             showApplicationHome()
         }
     }
@@ -75,7 +75,7 @@ class SparkLoginViewController: BaseViewController {
     }
     // MARK: - Login/Auth handling
     @IBAction func loginWithSpark(_ sender: AnyObject) {
-        oauthStrategy.authorize(parentViewController: self) { success in
+        oauthenticator.authorize(parentViewController: self) { success in
             if success {
                 print("loginWithSpark success")
             }

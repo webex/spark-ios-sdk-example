@@ -1,4 +1,4 @@
-// Copyright 2016 Cisco Systems Inc
+// Copyright 2016-2017 Cisco Systems Inc
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -142,7 +142,7 @@ class VideoAudioSetupViewController: BaseViewController {
     
     @IBAction func loudSpeakerSwitchChange(_ sender: Any) {
         let speakerSwitch = sender as! UISwitch
-        setup.setLoudSpeaker(speakerSwitch.isOn)
+        setup.isLoudSpeaker = speakerSwitch.isOn
     }
     
     func handleCapGestureEvent(sender:UITapGestureRecognizer) {
@@ -163,14 +163,14 @@ class VideoAudioSetupViewController: BaseViewController {
     func handleCameraGestureEvent(sender:UITapGestureRecognizer) {
         if let view = sender.view {
             if view == frontCameraView {
-                setup.setFacingMode(Call.FacingMode.User)
+                setup.facingMode = .user
                 setup.isSelfViewShow = true
             }
             else if view == selfViewCloseView {
                 setup.isSelfViewShow = false
             }
             else {
-                setup.setFacingMode(Call.FacingMode.Environment)
+                setup.facingMode = .user
                 setup.isSelfViewShow = true
             }
             
@@ -204,7 +204,7 @@ class VideoAudioSetupViewController: BaseViewController {
             backImage.image = uncheckImage
             selfViewCloseImage.image = checkImage
         }
-        else if setup.getFacingMode() == Call.FacingMode.User {
+        else if setup.facingMode == .user {
             frontImage.image = checkImage
             backImage.image = uncheckImage
             selfViewCloseImage.image = uncheckImage
@@ -217,7 +217,7 @@ class VideoAudioSetupViewController: BaseViewController {
     }
     
     func updateLoudspeakerStatus() {
-        loudSpeakerSwitch.isOn = setup.isLoudSpeaker()
+        loudSpeakerSwitch.isOn = setup.isLoudSpeaker
     }
     
     func updateVideoView(_ isHidden:Bool) {
