@@ -74,7 +74,7 @@ class JWTLoginViewController: BaseViewController {
         for textField in textFieldFontScaleCollection {
             textField.font = UIFont.textViewLightFont(ofSize: (textField.font?.pointSize)! * Utils.HEIGHT_SCALE)
         }
-        statusLabel.text = "Powered by SparkSDK v" + Spark.version
+        statusLabel.text = "Powered by Cisco Spark iOS SDK v" + Spark.version
         jwtLoginButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueNormal(), background: nil), for: .normal)
         jwtLoginButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueHightlight(), background: nil), for: .highlighted)
         jwtLoginButton.layer.cornerRadius = buttonHeightConstraint.constant/2
@@ -112,7 +112,7 @@ class JWTLoginViewController: BaseViewController {
                     SparkContext.sharedInstance.selfInfo = person
                     let emailAddress = (person.emails ?? []).first
                     let emailString = emailAddress == nil ? "NONE" : emailAddress!.toString()
-                    let alert = UIAlertController(title: "Logged in", message: "Logged in as \(person.displayName ?? "NONE") with id \n\(emailString)", preferredStyle: .alert)
+                    let alert = UIAlertController(title: "Logged in", message: "Logged in as \(person.displayName ?? "Unknow") with id \n\(emailString)", preferredStyle: .alert)
                     let okAction = UIAlertAction(title: "OK", style: .cancel) { action in
                         self.showApplicationHome()
                     }
@@ -121,7 +121,7 @@ class JWTLoginViewController: BaseViewController {
                     
                 case .failure(let error):
                     SparkContext.sharedInstance.selfInfo = nil
-                    let alert = UIAlertController(title: "Could Not Get Personal Info", message: "Unable to retrieve information about the user logged in using the JWT: Please make sure your JWT is correct. \(error)", preferredStyle: .alert)
+                    let alert = UIAlertController(title: "Could Not Get Personal Info", message: "Unable to retrieve information about the user logged in using the Guest ID: Please make sure your token is correct. \(error)", preferredStyle: .alert)
                     let okAction = UIAlertAction(title: "OK", style: .cancel)
                     alert.addAction(okAction)
                     self.present(alert, animated: true)
@@ -139,7 +139,7 @@ class JWTLoginViewController: BaseViewController {
     }
     
     private func showLoginError() {
-        let alert = UIAlertController(title: "Could Not Login", message: "Unable to Login: Please make sure your JWT is correct.", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Could Not Login", message: "Unable to Login: Please make sure your Guest ID Token is correct.", preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .cancel) {
             action in
             

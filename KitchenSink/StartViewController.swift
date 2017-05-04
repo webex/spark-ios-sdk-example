@@ -97,7 +97,7 @@ class StartViewController: BaseViewController {
     }
     
     func updateStatusLabel() {
-        statusLabel.text = "Powered by SparkSDK v" + Spark.version
+        statusLabel.text = "Powered by Cisco Spark iOS SDK v" + Spark.version
     }
     
     func setupHelpLabels() {

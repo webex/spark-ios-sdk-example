@@ -45,7 +45,7 @@ class SparkLoginViewController: BaseViewController {
     // MARK: - Life cycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        statusLabel.text = "Powered by SparkSDK v" + Spark.version
+        statusLabel.text = "Powered by Cisco Spark iOS SDK v" + Spark.version
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)

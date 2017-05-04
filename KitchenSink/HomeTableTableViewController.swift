@@ -24,7 +24,7 @@ import SparkSDK
 class HomeTableTableViewController: BaseTableViewController {
     
     @IBOutlet weak var statusLabel: UILabel!
-    fileprivate var registerState = "connecting"
+    fileprivate var registerState = "Connecting to Cisco Spark Cloud"
     @IBOutlet weak var buttonHeight: NSLayoutConstraint!
     @IBOutlet weak var footerView: UIView!
     
@@ -57,15 +57,18 @@ class HomeTableTableViewController: BaseTableViewController {
             }
         }
         SparkContext.sharedInstance.spark?.phone.register() { [weak self] success in
+            print("homepage phone register callback in")
             if let strongSelf = self {
+                print("homepage phone register strongSelf is not nil")
                 if success {
-                    strongSelf.registerState = "ok"
+                    strongSelf.registerState = "Registered at Cisco Spark Cloud"
                     strongSelf.updateStatusLabel()
                 } else {
-                    strongSelf.registerState = "fail"
+                    strongSelf.registerState = "Registered at Cisco Spark Cloud failed"
                     strongSelf.showPhoneRegisterFailAlert()
                 }
             }
+            print("homepage phone register callback in")
         }
     }
     
@@ -137,8 +140,8 @@ class HomeTableTableViewController: BaseTableViewController {
     
     
     fileprivate func updateStatusLabel() {
-        statusLabel.text = "login as \(SparkContext.sharedInstance.selfInfo?.displayName ?? "NONE")"
-        statusLabel.text = statusLabel.text! + "\nRegistration to Cisco cloud : " + registerState
+        statusLabel.text = "Authenticated User: \(SparkContext.sharedInstance.selfInfo?.displayName ?? "Unknown")"
+        statusLabel.text = statusLabel.text! + "\n" + registerState
     }
     
     fileprivate func showPhoneRegisterFailAlert() {
