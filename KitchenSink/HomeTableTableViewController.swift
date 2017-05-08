@@ -49,13 +49,6 @@ class HomeTableTableViewController: BaseTableViewController {
     // MARK: - Phone register
     
     func registerPhone() {
-        SparkContext.sharedInstance.spark?.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { [weak self] granted in
-            if !granted {
-                if let strongSelf = self {
-                    Utils.showCameraMicrophoneAccessDeniedAlert(strongSelf)
-                }
-            }
-        }
         SparkContext.sharedInstance.spark?.phone.register() { [weak self] error in
             if let strongSelf = self {
                 if error != nil {

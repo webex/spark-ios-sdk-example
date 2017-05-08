@@ -69,7 +69,12 @@ class IncomingCallViewController: BaseViewController, IncomingCallDelegate {
     }
     
     func didDeclineIncomingCall() {
-        SparkContext.sharedInstance.call?.reject()
+        SparkContext.sharedInstance.call?.reject() { error in
+            if error != nil {
+                print("Decline error :\(error!)")
+            }
+            
+        }
     }
     
     // MARK: - UI views

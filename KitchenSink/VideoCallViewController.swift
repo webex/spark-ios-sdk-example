@@ -163,10 +163,10 @@ class VideoCallViewController: BaseViewController {
     func sparkCallBackInit() {
         if let call = SparkContext.sharedInstance.call {
             call.onRinging = { [weak self] in
-                    if let strongSelf = self {
-                        strongSelf.callStatus = .ringing
-                        strongSelf.updateUIStatus()
-                    }
+                if let strongSelf = self {
+                    strongSelf.callStatus = .ringing
+                    strongSelf.updateUIStatus()
+                }
             }
             call.onConnected = { [weak self] in
                 if let strongSelf = self {
@@ -178,7 +178,7 @@ class VideoCallViewController: BaseViewController {
                 }
                 
             }
-
+            
             call.onDisconnected = {[weak self] disconnectionType in
                 if let strongSelf = self {
                     strongSelf.callStatus = .disconnected
@@ -188,14 +188,7 @@ class VideoCallViewController: BaseViewController {
                     strongSelf.presentRateView()
                 }
             }
-            call.onError = {[weak self] error in
-                if let strongSelf = self {
-                    strongSelf.view.makeToast("Call statue error:\(error)", duration: 2, position: ToastPosition.center, title: nil, image: nil, style: nil)
-                    { bRet in
-                        
-                    }
-                }
-            }
+
             call.onMediaChanged = {[weak self] mediaChangeType in
                 if let strongSelf = self {
                     print("remoteMediaDidChange Entering")
@@ -227,7 +220,16 @@ class VideoCallViewController: BaseViewController {
     // MARK: - Call control
     
     @IBAction private func hangup(_ sender: AnyObject) {
-        SparkContext.sharedInstance.call?.hangup()
+        SparkContext.sharedInstance.call?.hangup() { [weak self] error in
+            if let strongSelf = self {
+                if error != nil {
+                    strongSelf.view.makeToast("Call statue error:\(error!)", duration: 2, position: ToastPosition.center, title: nil, image: nil, style: nil)
+                    { bRet in
+                        
+                    }
+                }
+            }
+        }
     }
     
     func handleCapGestureEvent(sender:UITapGestureRecognizer) {
@@ -258,7 +260,7 @@ class VideoCallViewController: BaseViewController {
     }
     
     @IBAction private func toggleSendingAudio(_ sender: AnyObject) {
-        SparkContext.sharedInstance.call?.sendingVideo = sendingAudioSwitch.isOn
+        SparkContext.sharedInstance.call?.sendingAudio = sendingAudioSwitch.isOn
     }
     
     @IBAction private func toggleReceivingVideo(_ sender: AnyObject) {
@@ -459,30 +461,32 @@ class VideoCallViewController: BaseViewController {
         case .disconnected:
             navigationTitle = "Disconnected"
         case .initiated:
-           navigationTitle = "Initiated"
+            navigationTitle = "Initiated"
         case .ringing:
             navigationTitle = "Ringing"
         }
     }
-    private func showDisconnectionType(_ type: Call.DisconnectType) {
+    private func showDisconnectionType(_ type: Call.DisconnectReason) {
         var disconnectionTypeString = ""
         switch type {
-            case .localCancel:
-                disconnectionTypeString = "local cancel"
-            case .localDecline:
-                disconnectionTypeString = "local decline"
-            case .localLeft:
-                disconnectionTypeString = "local left"
-            case .otherConnected:
-                disconnectionTypeString = "other connected"
-            case .otherDeclined:
-                disconnectionTypeString = "other declined"
-            case .remoteCancel:
-                disconnectionTypeString = "remote cancel"
-            case .remoteDecline:
-                disconnectionTypeString = "remote decline"
-            case .remoteLeft:
-                disconnectionTypeString = "remote left"
+        case .localCancel:
+            disconnectionTypeString = "local cancel"
+        case .localDecline:
+            disconnectionTypeString = "local decline"
+        case .localLeft:
+            disconnectionTypeString = "local left"
+        case .otherConnected:
+            disconnectionTypeString = "other connected"
+        case .otherDeclined:
+            disconnectionTypeString = "other declined"
+        case .remoteCancel:
+            disconnectionTypeString = "remote cancel"
+        case .remoteDecline:
+            disconnectionTypeString = "remote decline"
+        case .remoteLeft:
+            disconnectionTypeString = "remote left"
+        case .error(let error):
+            disconnectionTypeString = "error: \(error)"
         }
         
         disconnectionTypeLabel.text = disconnectionTypeLabel.text! + disconnectionTypeString
@@ -574,7 +578,9 @@ class VideoCallViewController: BaseViewController {
         let endCallHandler = {
             (action: UIAlertAction!) in
             alert.dismiss(animated: true, completion: nil)
-            SparkContext.sharedInstance.call?.hangup()
+            SparkContext.sharedInstance.call?.hangup() { error in
+                
+            }
             _ = self.navigationController?.popViewController(animated: true)
         }
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
@@ -619,67 +625,65 @@ class VideoCallViewController: BaseViewController {
             return
         }
         
-        SparkContext.sharedInstance.spark?.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
-            if granted {
+        
+        
+        var mediaOption = MediaOption.audioOnly()
+        if VideoAudioSetup.sharedInstance.isVideoEnabled() {
+            mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
+        }
+        self.callStatus = .initiated
+        SparkContext.sharedInstance.spark?.phone.dial(remoteAddr, option: mediaOption) { [weak self] result in
+            if let strongSelf = self {
+                switch result {
+                case .success(let call):
+                    SparkContext.sharedInstance.call = call
+                    strongSelf.sparkCallBackInit()
+                case .failure(let error):
+                    _ = strongSelf.navigationController?.popViewController(animated: true)
+                    print("Dial call error: \(error)")
+                }
                 
-                var mediaOption = MediaOption.audioOnly
-                if VideoAudioSetup.sharedInstance.isVideoEnabled() {
-                    mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
+                // self view init
+                if VideoAudioSetup.sharedInstance.isVideoEnabled() && !VideoAudioSetup.sharedInstance.isSelfViewShow {
+                    strongSelf.toggleSendingVideo(strongSelf.sendingVideoSwitch)
                 }
-                self.callStatus = .initiated
-                SparkContext.sharedInstance.spark?.phone.dial(remoteAddr, option: mediaOption) { [weak self] result in
-                    if let strongSelf = self {
-                        switch result {
-                            case .success(let call):
-                                SparkContext.sharedInstance.call = call
-                            case .failure(let error):
-                                _ = strongSelf.navigationController?.popViewController(animated: true)
-                                print("Dial call error: \(error)")
-                        }
-                        
-                        // self view init
-                        if VideoAudioSetup.sharedInstance.isVideoEnabled() && !VideoAudioSetup.sharedInstance.isSelfViewShow {
-                            strongSelf.toggleSendingVideo(strongSelf.sendingVideoSwitch)
-                        }
-                    }
-                }
-            } else {
-                Utils.showCameraMicrophoneAccessDeniedAlert(self)
             }
         }
     }
     
     func didAnswerIncomingCall() {
-        SparkContext.sharedInstance.spark?.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { [weak self] granted in
+        
+        
+        var mediaOption = MediaOption.audioOnly()
+        if VideoAudioSetup.sharedInstance.isVideoEnabled() {
+            mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
+        }
+        
+        if !VideoAudioSetup.sharedInstance.isSelfViewShow {
+            sendingVideoSwitch.isOn = false
+            showSelfView(sendingVideoSwitch.isOn)
+        }
+        
+        if !VideoAudioSetup.sharedInstance.isLoudSpeaker {
+            loudSpeakerSwitch.isOn = false
+        }
+        
+        SparkContext.sharedInstance.call?.answer(option: mediaOption) { [weak self] error in
             if let strongSelf = self {
-                if granted {
-                    
-                    var mediaOption = MediaOption.audioOnly
-                    if VideoAudioSetup.sharedInstance.isVideoEnabled() {
-                        mediaOption = MediaOption.audioVideo(local: strongSelf.selfView, remote: strongSelf.remoteView)
+                if error != nil {
+                    strongSelf.view.makeToast("Call statue error:\(error!)", duration: 2, position: ToastPosition.center, title: nil, image: nil, style: nil)
+                    { bRet in
+                        
                     }
-                    
-                    if !VideoAudioSetup.sharedInstance.isSelfViewShow {
-                        strongSelf.sendingVideoSwitch.isOn = false
-                        strongSelf.showSelfView(strongSelf.sendingVideoSwitch.isOn)
-                    }
-                    
-                    if !VideoAudioSetup.sharedInstance.isLoudSpeaker {
-                        strongSelf.loudSpeakerSwitch.isOn = false
-                    }
-                    
-                    SparkContext.sharedInstance.call?.answer(option: mediaOption)
-                    
-                } else {
-                    SparkContext.sharedInstance.call?.reject()
-                    Utils.showCameraMicrophoneAccessDeniedAlert(strongSelf)
                 }
             }
         }
+        
     }
     
     
-    private func isFacingModeUser(_ mode: MediaOption.FacingMode) -> Bool {
+    
+    private func isFacingModeUser(_ mode: Phone.FacingMode) -> Bool {
         return mode == .user
     }
     

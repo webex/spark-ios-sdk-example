@@ -26,7 +26,7 @@ class SparkLoginViewController: BaseViewController {
     
     @IBOutlet weak var loginButton: UIButton!
     @IBOutlet weak var statusLabel: UILabel!
-    private var oauthenticator: OAuthStrategy!
+    private var oauthenticator: OAuthAuthenticator!
     
     @IBOutlet var labelFontScaleCollection: [UILabel]!
     
@@ -39,7 +39,7 @@ class SparkLoginViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         SparkContext.initSparkForSparkIdLogin()
-        oauthenticator = SparkContext.sharedInstance.spark?.authenticator as! OAuthStrategy
+        oauthenticator = SparkContext.sharedInstance.spark?.authenticator as! OAuthAuthenticator
     }
     
     // MARK: - Life cycle

@@ -838,7 +838,7 @@
                                 </userDefinedRuntimeAttributes>
                             </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="m1u-gb-CjX">
-                                <rect key="frame" x="0.0" y="214" width="414" height="228"/>
+                                <rect key="frame" x="0.0" y="214" width="414" height="486"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loud speaker" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e7m-vz-qFH" userLabel="Loud speaker">
@@ -855,7 +855,7 @@
                                 </connections>
                             </switch>
                             <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Cs3-Rx-Nex" userLabel="videoView">
-                                <rect key="frame" x="0.0" y="300" width="414" height="142"/>
+                                <rect key="frame" x="0.0" y="300" width="414" height="400"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Call camera" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dpE-Hn-Nn6">
                                         <rect key="frame" x="19.999999999999993" y="0.0" width="103.33333333333331" height="24"/>
@@ -960,22 +960,22 @@
                                         </userDefinedRuntimeAttributes>
                                     </label>
                                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bFE-wb-n1y" userLabel="selfView">
-                                        <rect key="frame" x="0.0" y="108" width="414" height="0.0"/>
+                                        <rect key="frame" x="0.0" y="148" width="414" height="220"/>
                                         <subviews>
-                                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KvM-Ze-GeK">
-                                                <rect key="frame" x="132" y="0.0" width="150" height="200"/>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KvM-Ze-GeK" customClass="MediaRenderView">
+                                                <rect key="frame" x="132" y="0.0" width="150" height="250"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="150" id="AtH-pk-2cb"/>
-                                                    <constraint firstAttribute="height" constant="200" id="jn2-Ft-FZs"/>
+                                                    <constraint firstAttribute="height" constant="250" id="jn2-Ft-FZs"/>
                                                 </constraints>
                                             </view>
                                         </subviews>
-                                        <color key="backgroundColor" red="0.027450980390000001" green="0.75686274509999996" blue="0.89411764709999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         <constraints>
                                             <constraint firstItem="KvM-Ze-GeK" firstAttribute="centerX" secondItem="bFE-wb-n1y" secondAttribute="centerX" id="0ql-eM-8bS"/>
                                             <constraint firstItem="KvM-Ze-GeK" firstAttribute="top" secondItem="bFE-wb-n1y" secondAttribute="top" id="3lL-b7-jJJ"/>
-                                            <constraint firstAttribute="height" id="i6j-EU-cfc"/>
+                                            <constraint firstAttribute="height" constant="220" id="i6j-EU-cfc"/>
                                         </constraints>
                                     </view>
                                 </subviews>
@@ -986,15 +986,14 @@
                                     <constraint firstItem="YZ1-fM-VhZ" firstAttribute="centerY" secondItem="Yah-Ua-sZL" secondAttribute="centerY" id="3Aq-o1-FQf"/>
                                     <constraint firstItem="0cU-TG-tCh" firstAttribute="top" secondItem="Vk9-ig-VIr" secondAttribute="bottom" constant="5" id="4ER-9R-xbf"/>
                                     <constraint firstItem="dpE-Hn-Nn6" firstAttribute="top" secondItem="Cs3-Rx-Nex" secondAttribute="top" id="A6m-at-HZt"/>
-                                    <constraint firstItem="bFE-wb-n1y" firstAttribute="top" secondItem="Vk9-ig-VIr" secondAttribute="bottom" constant="30" id="FYA-9t-ZXb"/>
+                                    <constraint firstItem="bFE-wb-n1y" firstAttribute="top" secondItem="Vk9-ig-VIr" secondAttribute="bottom" constant="70" id="FYA-9t-ZXb"/>
                                     <constraint firstItem="Yah-Ua-sZL" firstAttribute="leading" secondItem="Vk9-ig-VIr" secondAttribute="trailing" constant="50" id="Isp-J1-FNr"/>
                                     <constraint firstItem="0cU-TG-tCh" firstAttribute="leading" secondItem="dpE-Hn-Nn6" secondAttribute="leading" id="NaJ-NF-lCH"/>
                                     <constraint firstAttribute="trailing" secondItem="0cU-TG-tCh" secondAttribute="trailing" constant="20" id="OhA-vE-LwA"/>
                                     <constraint firstAttribute="trailing" secondItem="bFE-wb-n1y" secondAttribute="trailing" id="Or2-ZP-rlN"/>
                                     <constraint firstItem="Vk9-ig-VIr" firstAttribute="top" secondItem="dpE-Hn-Nn6" secondAttribute="bottom" constant="10" id="bVs-m9-k36"/>
                                     <constraint firstItem="bFE-wb-n1y" firstAttribute="leading" secondItem="Cs3-Rx-Nex" secondAttribute="leading" id="cli-i2-qnd"/>
-                                    <constraint firstAttribute="height" priority="250" constant="100" id="tcN-CM-4jP"/>
-                                    <constraint firstAttribute="bottom" secondItem="0cU-TG-tCh" secondAttribute="bottom" constant="5" id="xcv-LW-6m2"/>
+                                    <constraint firstAttribute="height" constant="400" id="tcN-CM-4jP"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -1045,6 +1044,7 @@
                         <outlet property="frontImage" destination="25K-xS-feW" id="9X3-HA-j1a"/>
                         <outlet property="loudSpeakerLabel" destination="e7m-vz-qFH" id="MUq-L7-Ptt"/>
                         <outlet property="loudSpeakerSwitch" destination="iNN-xQ-gYd" id="0MR-Zy-YF9"/>
+                        <outlet property="preview" destination="KvM-Ze-GeK" id="sbS-zC-1QL"/>
                         <outlet property="selfViewCloseImage" destination="9KF-L8-LfY" id="EUR-d9-Tmd"/>
                         <outlet property="selfViewCloseView" destination="Vk9-ig-VIr" id="jjF-kq-t90"/>
                         <outlet property="selfViewHiddenHelpLabel" destination="0cU-TG-tCh" id="ZeK-S1-hLj"/>

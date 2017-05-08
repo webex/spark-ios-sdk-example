@@ -28,8 +28,6 @@ class Utils {
         if let emailAddress = EmailAddress.fromString(emailString) {
             // Person list is empty with SIP email address
             SparkContext.sharedInstance.spark?.people.list(email: emailAddress, max: 1) { response in
-//                var name = emailString
-//                var avatarUrlString = ""
                 var persons: [Person] = []
                 
                 switch response.result {
@@ -40,12 +38,6 @@ class Utils {
                 }
                 
                 if let person = persons.first {
-//                    if let displayName = person.displayName {
-//                        name = displayName
-//                    }
-//                    if let avatarUrl = person.avatar {
-//                        avatarUrlString = avatarUrl
-//                    }
                     completionHandler(person)
                 }
                 

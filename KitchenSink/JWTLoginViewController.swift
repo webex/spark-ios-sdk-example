@@ -28,7 +28,7 @@ class JWTLoginViewController: BaseViewController {
     @IBOutlet weak var jwtTextField: UITextField!
     @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var jwtLoginButton: UIButton!
-    private var jwtAuthStrategy: JWTAuthStrategy!
+    private var jwtAuthStrategy: JWTAuthenticator!
     @IBOutlet weak var waitingView: UIActivityIndicatorView!
     
     @IBOutlet var textFieldFontScaleCollection: [UITextField]!
@@ -51,7 +51,7 @@ class JWTLoginViewController: BaseViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         SparkContext.initSparkForJWTLogin()
-        jwtAuthStrategy = SparkContext.sharedInstance.spark?.authenticator as! JWTAuthStrategy!
+        jwtAuthStrategy = SparkContext.sharedInstance.spark?.authenticator as! JWTAuthenticator!
         Spark.toggleConsoleLogger(true)
         hideWaitingView()
         jwtTextField.becomeFirstResponder()
