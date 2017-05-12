@@ -113,6 +113,7 @@ class AppFeedbackViewController: BaseViewController, MFMailComposeViewController
             showSendMailErrorAlert()
         }
     }
+    
     func configuredMailComposeViewController() -> MFMailComposeViewController {
         let mailComposerVC = MFMailComposeViewController()
         mailComposerVC.mailComposeDelegate = self
@@ -128,6 +129,7 @@ class AppFeedbackViewController: BaseViewController, MFMailComposeViewController
         
         return mailComposerVC
     }
+    
     func showSendMailErrorAlert() {
         let sendMailErrorAlert = UIAlertController(title: "Could Not Send Email", message: "Your device could not send e-mail.  Please check e-mail configuration and try again.", preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .cancel)

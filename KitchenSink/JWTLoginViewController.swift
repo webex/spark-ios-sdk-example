@@ -50,9 +50,10 @@ class JWTLoginViewController: BaseViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        // A [JSON Web Token](https://jwt.io/introduction) (JWT) based authentication strategy
+        // is to be used to authenticate a guest user on Cisco Spark.
         SparkContext.initSparkForJWTLogin()
         jwtAuthStrategy = SparkContext.sharedInstance.spark?.authenticator as! JWTAuthenticator!
-        Spark.toggleConsoleLogger(true)
         hideWaitingView()
         jwtTextField.becomeFirstResponder()
     }

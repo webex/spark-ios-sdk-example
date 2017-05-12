@@ -92,7 +92,7 @@ class CallFeedbackViewController: BaseViewController, UITextViewDelegate {
     }
     
     // MARK: - Call sendFeedback
-    
+    /// Sends feedback for this call to Cisco Spark team.
     @IBAction func sendFeedback(_ sender: AnyObject) {
         SparkContext.sharedInstance.call?.sendFeedbackWith(rating: Int(callRateView.rating), comments: userCommentsTextView.text!, includeLogs: includeLogSwitch.isOn)
         

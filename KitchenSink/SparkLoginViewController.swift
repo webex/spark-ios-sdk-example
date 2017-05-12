@@ -38,6 +38,8 @@ class SparkLoginViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        // An [OAuth](https://oauth.net/2/) based authentication strategy
+        // is to be used to authenticate a user on Cisco Spark.
         SparkContext.initSparkForSparkIdLogin()
         oauthenticator = SparkContext.sharedInstance.spark?.authenticator as! OAuthAuthenticator
     }
@@ -49,6 +51,11 @@ class SparkLoginViewController: BaseViewController {
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        // Returns True if the user is logically authorized.
+        // This may not mean the user has a valid
+        // access token yet, but the authentication strategy should be able to obtain one without
+        // further user interaction.
         if oauthenticator.authorized {
             showApplicationHome()
         }
@@ -75,6 +82,9 @@ class SparkLoginViewController: BaseViewController {
     }
     // MARK: - Login/Auth handling
     @IBAction func loginWithSpark(_ sender: AnyObject) {
+        // Brings up a web-based authorization view controller and directs the user through the OAuth process.
+        // note: parentViewController must contain a navigation Controller,
+        // so that the OAuth view controller can push on it.
         oauthenticator.authorize(parentViewController: self) { success in
             if success {
                 print("loginWithSpark success")

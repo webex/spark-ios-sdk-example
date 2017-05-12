@@ -30,7 +30,9 @@ enum VideoCallRole {
 
 class VideoCallViewController: BaseViewController {
     
+    /// MediaRenderView is an OpenGL backed UIView
     @IBOutlet private weak var selfView: MediaRenderView!
+    /// MediaRenderView is an OpenGL backed UIView
     @IBOutlet private weak var remoteView: MediaRenderView!
     
     @IBOutlet private weak var disconnectionTypeLabel: UILabel!
@@ -160,14 +162,17 @@ class VideoCallViewController: BaseViewController {
     }
     
     // MARK: - Call call back
+    /// Init all call back func.
     func sparkCallBackInit() {
         if let call = SparkContext.sharedInstance.call {
+            // Callback when remote participant(s) is ringing.
             call.onRinging = { [weak self] in
                 if let strongSelf = self {
                     strongSelf.callStatus = .ringing
                     strongSelf.updateUIStatus()
                 }
             }
+            // Callback when remote participant(s) answered and this *call* is connected.
             call.onConnected = { [weak self] in
                 if let strongSelf = self {
                     strongSelf.callStatus = .connected
@@ -178,7 +183,7 @@ class VideoCallViewController: BaseViewController {
                 }
                 
             }
-            
+            // Callback when this *call* is disconnected (hangup, cancelled, get declined or other self device pickup the call).
             call.onDisconnected = {[weak self] disconnectionType in
                 if let strongSelf = self {
                     strongSelf.callStatus = .disconnected
@@ -188,24 +193,31 @@ class VideoCallViewController: BaseViewController {
                     strongSelf.presentRateView()
                 }
             }
-
+            // Callback when the media types of this *call* have changed.
             call.onMediaChanged = {[weak self] mediaChangeType in
                 if let strongSelf = self {
                     print("remoteMediaDidChange Entering")
                     strongSelf.updateAvatarViewVisibility()
                     switch mediaChangeType {
+                    //Local/Remote video rendering view size has changed
                     case .localVideoViewSize,.remoteVideoViewSize:
                         break
+                    // This might be triggered when the remote party muted or unmuted the audio.
                     case .remoteSendingAudio(let isSending):
                         strongSelf.receivingAudioSwitch.isOn = isSending
+                    // This might be triggered when the remote party muted or unmuted the video.
                     case .remoteSendingVideo(let isSending):
                         strongSelf.receivingVideoSwitch.isOn = isSending
+                    // This might be triggered when the local party muted or unmuted the video.
                     case .sendingAudio(let isSending):
                         strongSelf.sendingAudioSwitch.isOn = isSending
+                    // This might be triggered when the local party muted or unmuted the aideo.
                     case .sendingVideo(let isSending):
                         strongSelf.sendingVideoSwitch.isOn = isSending
+                    // Camera FacingMode on local device has switched.
                     case .cameraSwitched:
                         strongSelf.updateCheckBoxStatus()
+                    // Whether loud speaker on local device is on or not has switched.
                     case .spearkerSwitched:
                         strongSelf.loudSpeakerSwitch.isOn = call.isSpeaker
                     default:
@@ -220,6 +232,7 @@ class VideoCallViewController: BaseViewController {
     // MARK: - Call control
     
     @IBAction private func hangup(_ sender: AnyObject) {
+        // Disconnects this call.
         SparkContext.sharedInstance.call?.hangup() { [weak self] error in
             if let strongSelf = self {
                 if error != nil {
@@ -233,6 +246,7 @@ class VideoCallViewController: BaseViewController {
     }
     
     func handleCapGestureEvent(sender:UITapGestureRecognizer) {
+        // Switch the camera facing mode selected for this *call*.
         if let view = sender.view {
             if view == frontCameraView {
                 if SparkContext.sharedInstance.call?.facingMode != .user {
@@ -251,24 +265,29 @@ class VideoCallViewController: BaseViewController {
     
     
     @IBAction private func toggleLoudSpeaker(_ sender: AnyObject) {
+        // True if the loud speaker is selected as the audio output device for this *call*. Otherwise, false.
         SparkContext.sharedInstance.call?.isSpeaker = loudSpeakerSwitch.isOn
     }
     
     @IBAction private func toggleSendingVideo(_ sender: AnyObject) {
+        // True if the local party of this *call* is sending video. Otherwise, false.
         SparkContext.sharedInstance.call?.sendingVideo = sendingVideoSwitch.isOn
         showSelfView(sendingVideoSwitch.isOn)
     }
     
     @IBAction private func toggleSendingAudio(_ sender: AnyObject) {
+        // True if this *call* is sending audio. Otherwise, false.
         SparkContext.sharedInstance.call?.sendingAudio = sendingAudioSwitch.isOn
     }
     
     @IBAction private func toggleReceivingVideo(_ sender: AnyObject) {
+        // True if the local party of this *call* is receiving video. Otherwise, false.
         SparkContext.sharedInstance.call?.receivingVideo = receivingVideoSwitch.isOn
         updateAvatarViewVisibility()
     }
     
     @IBAction private func toggleReceivingAudio(_ sender: AnyObject) {
+        // True if the local party of this *call* is receiving audio. Otherwise, false.
         SparkContext.sharedInstance.call?.receivingAudio = receivingAudioSwitch.isOn
     }
     @IBAction func fullScreenButtonTouchUpInside(_ sender: Any) {
@@ -626,12 +645,13 @@ class VideoCallViewController: BaseViewController {
         }
         
         
-        
+        // audioVideo as making a Video call,audioOnly as making Voice only call.The default is audio call.
         var mediaOption = MediaOption.audioOnly()
         if VideoAudioSetup.sharedInstance.isVideoEnabled() {
             mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
         }
         self.callStatus = .initiated
+        // Makes a call to an intended recipient on behalf of the authenticated user.
         SparkContext.sharedInstance.spark?.phone.dial(remoteAddr, option: mediaOption) { [weak self] result in
             if let strongSelf = self {
                 switch result {
@@ -667,7 +687,9 @@ class VideoCallViewController: BaseViewController {
         if !VideoAudioSetup.sharedInstance.isLoudSpeaker {
             loudSpeakerSwitch.isOn = false
         }
-        
+        // Answers this call.
+        // This can only be invoked when this call is incoming and in rining status.
+        // Otherwise error will occur and onError callback will be dispatched.
         SparkContext.sharedInstance.call?.answer(option: mediaOption) { [weak self] error in
             if let strongSelf = self {
                 if error != nil {
@@ -680,8 +702,6 @@ class VideoCallViewController: BaseViewController {
         }
         
     }
-    
-    
     
     private func isFacingModeUser(_ mode: Phone.FacingMode) -> Bool {
         return mode == .user

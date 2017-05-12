@@ -28,6 +28,10 @@ public class UserDefaultsUtil {
     private static let CALL_VIDEO_ENABLE_KEY = "KSCallVideoEnable"
     private static let CALL_SELF_VIEW_ENABLE_KEY = "KSCallSelfViewEnable"
     static let userDefault = UserDefaults.standard
+    
+    /// Call history person array.
+    /// See addPersonHistory to add a call history.
+    /// - note: if person's has no email address,discard it.
     static var callPersonHistory: [Person] {
         get {
             var resutlArray: [Person] = []
@@ -51,6 +55,8 @@ public class UserDefaultsUtil {
         }
     }
     
+    /// add a call history person into system user defaults
+    /// - note: every log in user has there own call history array.
     static func addPersonHistory(_ person:Person) {
         let personString = person.toJSONString()
         

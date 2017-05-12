@@ -24,9 +24,12 @@ import SparkSDK
 class Utils {
     static let HEIGHT_SCALE: CGFloat = UIScreen.main.bounds.height / 736.0
     static let WIDTH_SCALE: CGFloat = UIScreen.main.bounds.width / 414.0
+    
+    ///Fetch Spark user with email address
     static func fetchUserProfile(_ emailString: String, completionHandler: @escaping (Person?) -> Void) {
         if let emailAddress = EmailAddress.fromString(emailString) {
             // Person list is empty with SIP email address
+            // Lists people in the authenticated user's organization.
             SparkContext.sharedInstance.spark?.people.list(email: emailAddress, max: 1) { response in
                 var persons: [Person] = []
                 
@@ -56,6 +59,7 @@ class Utils {
         task.resume()
     }
     
+    ///Download a image with image url
     static func downloadAvatarImage(_ url: String?, completionHandler: @escaping (_ image : UIImage) -> Void) {
         if url == nil || url!.isEmpty {
             let image = UIImage(named: "DefaultAvatar")

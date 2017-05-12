@@ -22,12 +22,14 @@ import UIKit
 import SparkSDK
 
 
-//VideoAudioSetup store the user configuration in demo app
-//the configuration just saved in memory.
+/// VideoAudioSetup store the user configuration in demo app
+/// - note: this configuration just saved in memory.
 class VideoAudioSetup {
     
     static let sharedInstance = VideoAudioSetup()
+    /// Switch of Video/Audio call or Audio call.Default is Video/Audio call
     fileprivate var videoEnabled = true
+    /// Ture is sending Video stream to remote,false is not.Default is true
     fileprivate var selfViewShowed = true
     var isSelfViewShow: Bool{
         get {
@@ -37,7 +39,7 @@ class VideoAudioSetup {
             self.selfViewShowed = newValue
         }
     }
-    //Switch Front camera or Back camera.
+    /// Switch Front camera or Back camera.Defalut is front.
     var facingMode:Phone.FacingMode {
         get {
            return SparkContext.sharedInstance.spark?.phone.defaultFacingMode ?? .user
@@ -47,7 +49,7 @@ class VideoAudioSetup {
         }
     }
     
-    // True as using loud speaker, False as not. The default is using loud speaker.
+    /// True as using loud speaker, False as not. The default is using loud speaker.
     var isLoudSpeaker:Bool {
         get {
             return SparkContext.sharedInstance.spark?.phone.defaultLoudSpeaker ?? true
@@ -57,7 +59,7 @@ class VideoAudioSetup {
         }
     }
     
-    // True as making a Video call,Flase as making Voice only call.The default is Video call.
+    /// True as making a Video call,Flase as making Voice only call.The default is Video call.
     func setVideoEnabled(_ enable: Bool) {
         videoEnabled = enable
     }

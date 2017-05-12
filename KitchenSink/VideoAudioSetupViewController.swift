@@ -80,9 +80,10 @@ class VideoAudioSetupViewController: BaseViewController {
     
     // MARK: - Life cycle
     
-    //make sure stopPreview before calling
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        //note:make sure stopPreview before calling
         SparkContext.sharedInstance.spark?.phone.stopPreview()
     }
     
@@ -173,6 +174,7 @@ class VideoAudioSetupViewController: BaseViewController {
                 setup.isSelfViewShow = true
             }
             else if view == selfViewCloseView {
+                // Ture is sending Video stream to remote,false is not.Default is true
                 setup.isSelfViewShow = false
             }
             else {
@@ -209,12 +211,14 @@ class VideoAudioSetupViewController: BaseViewController {
             frontImage.image = uncheckImage
             backImage.image = uncheckImage
             selfViewCloseImage.image = checkImage
+            //note:stopPreview stream will not sent to remote side
             SparkContext.sharedInstance.spark?.phone.stopPreview()
         }
         else if setup.facingMode == .user {
             frontImage.image = checkImage
             backImage.image = uncheckImage
             selfViewCloseImage.image = uncheckImage
+            //note:when change the facing mode ,please stop previous preview stream
             SparkContext.sharedInstance.spark?.phone.stopPreview()
             SparkContext.sharedInstance.spark?.phone.startPreview(view: self.preview)
         }
@@ -222,6 +226,7 @@ class VideoAudioSetupViewController: BaseViewController {
             frontImage.image = uncheckImage
             backImage.image = checkImage
             selfViewCloseImage.image = uncheckImage
+            //note:when change the facing mode ,please stop previous preview stream
             SparkContext.sharedInstance.spark?.phone.stopPreview()
             SparkContext.sharedInstance.spark?.phone.startPreview(view: self.preview)
             

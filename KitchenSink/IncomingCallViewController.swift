@@ -54,6 +54,7 @@ class IncomingCallViewController: BaseViewController, IncomingCallDelegate {
     // MARK: - PhoneObserver
     func sparkCallBackInit() {
         if let phone = SparkContext.sharedInstance.spark?.phone {
+            // Callback when call is incoming.
             phone.onIncoming = { [weak self] call in
                 if let strongSelf = self {
                     SparkContext.sharedInstance.call = call
@@ -112,8 +113,6 @@ class IncomingCallViewController: BaseViewController, IncomingCallDelegate {
         }
         
     }
-    
-    
     
     fileprivate func presentCallToastView(_ call: Call) {
         if let callToastViewController = storyboard?.instantiateViewController(withIdentifier: "CallToastViewController") as? CallToastViewController {

@@ -50,15 +50,6 @@ class CallToastViewController: BaseViewController {
         super.viewWillAppear(animated)
         //call callback init
         sparkCallBackInit()
-        //SparkContext.sharedInstance.spark?.phone.showPreview(previewRenderView)
-    }
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        //SparkContext.sharedInstance.spark?.phone.stopPreview()
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
     }
     
     // MARK: - Call answer/reject
@@ -76,6 +67,7 @@ class CallToastViewController: BaseViewController {
     // MARK: - CallObserver
     func sparkCallBackInit() {
         if let call = SparkContext.sharedInstance.call {
+            // Callback when this *call* is disconnected (hangup, cancelled, get declined or other self device pickup the call).
             call.onDisconnected = { [weak self] disconnectionType in
                 if let strongSelf = self {
                     strongSelf.dismissView()
@@ -126,6 +118,7 @@ class CallToastViewController: BaseViewController {
     // MARK: - People API
     
     private func fetchUserProfile() {
+        // check the user is logically authorized.
         if SparkContext.sharedInstance.spark?.authenticator.authorized == true {
             Utils.fetchUserProfile(SparkContext.callerEmail) { [weak self] (person:Person?) in
                 if person != nil {

@@ -49,6 +49,9 @@ class HomeTableTableViewController: BaseTableViewController {
     // MARK: - Phone register
     
     func registerPhone() {
+        // Registers this phone to Cisco Spark cloud on behalf of the authenticated user.
+        // It also creates the websocket and connects to Cisco Spark cloud.
+        // - note: make sure register device before calling
         SparkContext.sharedInstance.spark?.phone.register() { [weak self] error in
             if let strongSelf = self {
                 if error != nil {
@@ -64,6 +67,7 @@ class HomeTableTableViewController: BaseTableViewController {
     }
     
     func getUserInfo() {
+        // Retrieves the details for the authenticated user.
         SparkContext.sharedInstance.spark?.people.getMe() {[weak self] response in
             if let strongSelf = self {
                 switch response.result {

@@ -22,40 +22,40 @@ import Foundation
 import SparkSDK
 
 
-//Get your own App Client information from https://developer.ciscospark.com
+///Get your own App Client information from https://developer.ciscospark.com
 class SparkEnvirmonment {
     static let ClientId = "Cb3f891d2044fec65bfe36a8d1b3d69b3098448e9e0335c58bab42f5b94ad06c9"
     static let ClientSecret = ProcessInfo().environment["CLIENTSECRET"] ?? "f2660da9c8b90a9cdfe713f7c115473b76da531bb7ec9c66fdb8ec1481585879"
-    static let Scope = "spark:people_read spark:rooms_read spark:rooms_write spark:memberships_read spark:memberships_write spark:messages_read spark:messages_write"
-    //Uri is that a user will be redirected to when completing an OAuth grant flow
+    ///Scopes define the level of access that your integration requires
+    static let Scope = "spark:all"
+    ///Uri is that a user will be redirected to when completing an OAuth grant flow
     static let RedirectUri = "KitchenSink://response"
 }
 
-//*Spark* object is the entry point to use this Cisco Spark iOS SDK
-//this app simplely use one Spark instance to demo all the SDK function.
+///*Spark* object is the entry point to use this Cisco Spark iOS SDK
+///This app simplely use one Spark instance to demo all the SDK function.
 class SparkContext: NSObject {
 
     static let sharedInstance: SparkContext = SparkContext()
     var spark: Spark?
-    //authorized user
+    ///Authorized user
     var selfInfo :Person?
-    //The recent active call
+    ///The recent active call
     var call: Call?
 
-    //make sure hangup the last call before your create a new one.
+    ///Make sure hangup the last call before your create a new one.
     func deinitCall() {
         guard call != nil else {
             return
         }
-        // Disconnects this call. 
-        // Otherwise error will occur and completionHandler will be dispatched.
+        // NOTE: Disconnects this call,Otherwise error will occur and completionHandler will be dispatched.
         call?.hangup() { error in
             
         }
         self.call = nil
     }
     
-    //when the user log out,you must delloc the spark to release the memory.
+    /// - note: When the user log out,you must delloc the spark to release the memory.
     func deinitSpark() {
         guard spark != nil else {
             return
@@ -78,22 +78,31 @@ class SparkContext: NSObject {
         
     }
     
-    //OAuth helper function
+    /// Create OAuth Authenticator helper function
+    /// An [OAuth](https://oauth.net/2/) based authentication strategy
+    /// is to be used to authenticate a user on Cisco Spark.
     static func getOAuthStrategy() -> OAuthAuthenticator {
         return OAuthAuthenticator(clientId: SparkEnvirmonment.ClientId, clientSecret: SparkEnvirmonment.ClientSecret, scope: SparkEnvirmonment.Scope, redirectUri: SparkEnvirmonment.RedirectUri)
     }
     
-    //log in with Spark ID helper function
+    /// Log in with Spark ID helper function
     static func initSparkForSparkIdLogin() {
         SparkContext.sharedInstance.spark = Spark(authenticator: SparkContext.getOAuthStrategy())
+        //Register a console logger into SDK
+        SparkContext.sharedInstance.spark?.logger = KSLogger()
     }
     
-    //log in with Spark ID helper function
+    /// Log in with App ID helper function
+    /// A [JSON Web Token](https://jwt.io/introduction) (JWT) based authentication strategy
+    /// is to be used to authenticate a guest user on Cisco Spark.
     static func initSparkForJWTLogin() {
         SparkContext.sharedInstance.spark = Spark(authenticator: JWTAuthenticator())
+        //Register a console logger into SDK
+        SparkContext.sharedInstance.spark?.logger = KSLogger()
     }
     
-    //call memberships include yourself,so if you are calling someone,callerEmail is your email address.
+    /// The caller Email address
+    /// - note: Call memberships include yourself,so if you calling someone,callerEmail is your email address.
     static var callerEmail: String {
         get {
             if let call = SparkContext.sharedInstance.call {

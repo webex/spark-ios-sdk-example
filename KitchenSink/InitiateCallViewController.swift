@@ -104,6 +104,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         
         indicatorView.startAnimating()
         if let email = EmailAddress.fromString(searchString) {
+            // Lists people with email address in the authenticated user's organization.
             SparkContext.sharedInstance.spark?.people.list(email: email, max: 10) {
                 (response: ServiceResponse<[Person]>) in
                 
@@ -119,6 +120,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
                 }
             }
         } else {
+            // Lists people with display name in the authenticated user's organization.
             SparkContext.sharedInstance.spark?.people.list(displayName: searchString, max: 10) {
                 (response: ServiceResponse<[Person]>) in
                 self.indicatorView.stopAnimating()
