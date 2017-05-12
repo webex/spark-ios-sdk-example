@@ -29,12 +29,12 @@ Below is code snippets of the SDK calling in the demo.
    class SparkEnvirmonment {
     static let ClientId = "your client ID"
     static let ClientSecret = ProcessInfo().environment["CLIENTSECRET"] ?? "your secret"
-    static let Scope = "spark:people_read spark:rooms_read spark:rooms_write spark:memberships_read spark:memberships_write spark:messages_read spark:messages_write"
+    static let Scope = "spark:all"
     static let RedirectUri = "KitchenSink://response"
     }
     ```
 
-1. Register device
+1. Register the device to send and receive calls.
     ```swift
     SparkContext.sharedInstance.spark?.phone.register() { [weak self] success in
             if let strongSelf = self {
@@ -52,47 +52,103 @@ Below is code snippets of the SDK calling in the demo.
     @IBOutlet weak var selfView: MediaRenderView!
     @IBOutlet weak var remoteView: MediaRenderView!
     
-    // Make a call
-    SparkContext.sharedInstance.spark?.phone.requestMediaAccess(Phone.MediaAccessType.audioVideo) { granted in
-            if granted {
-                  mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
-                  SparkContext.sharedInstance.call = SparkContext.sharedInstance.spark?.phone.dial(remoteAddr, option: mediaOption) { [weak self] success in
-                    if let strongSelf = self {
-                        if !success {
-                            ....
+    // Make an outgoing call.
+    // audioVideo as making a Video call,audioOnly as making Voice only call.The default is audio call.
+        var mediaOption = MediaOption.audioOnly()
+        if VideoAudioSetup.sharedInstance.isVideoEnabled() {
+            mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
+        }
+        // Makes a call to an intended recipient on behalf of the authenticated user.
+        SparkContext.sharedInstance.spark?.phone.dial(remoteAddr, option: mediaOption) { [weak self] result in
+            if let strongSelf = self {
+                switch result {
+                case .success(let call):
+                    SparkContext.sharedInstance.call = call
+                    // Callback when remote participant(s) is ringing.
+                    call.onRinging = { [weak self] in
+                        if let strongSelf = self {
+                            //...
                         }
                     }
-              }  
-            } else {
-                Utils.showCameraMicrophoneAccessDeniedAlert(self)
+                    // Callback when remote participant(s) answered and this *call* is connected.
+                    call.onConnected = { [weak self] in
+                        if let strongSelf = self {
+                            //...
+                        }
+                     }
+                    //Callback when this *call* is disconnected (hangup, cancelled, get declined or other self device pickup the call).
+                    call.onDisconnected = {[weak self] disconnectionType in
+                        if let strongSelf = self {
+                            //...
+                        }
+                    }
+                    // Callback when the media types of this *call* have changed.
+                    call.onMediaChanged = {[weak self] mediaChangeType in
+                        if let strongSelf = self {
+                            strongSelf.updateAvatarViewVisibility()
+                            switch mediaChangeType {
+                            //Local/Remote video rendering view size has changed
+                            case .localVideoViewSize,.remoteVideoViewSize:
+                                break
+                            // This might be triggered when the remote party muted or unmuted the audio.
+                            case .remoteSendingAudio(let isSending):
+                                break
+                            // This might be triggered when the remote party muted or unmuted the video.
+                            case .remoteSendingVideo(let isSending):
+                                break
+                            // This might be triggered when the local party muted or unmuted the video.
+                            case .sendingAudio(let isSending):
+                                break
+                            // This might be triggered when the local party muted or unmuted the aideo.
+                            case .sendingVideo(let isSending):
+                                break
+                            // Camera FacingMode on local device has switched.
+                            case .cameraSwitched:
+                                break
+                            // Whether loud speaker on local device is on or not has switched.
+                            case .spearkerSwitched:
+                                break
+                            default:
+                                break
+                            }
+                        }
+                    }
+                case .failure(let error):
+                    _ = strongSelf.navigationController?.popViewController(animated: true)
+                    print("Dial call error: \(error)")
+                }
+            }
+        }
+        
+    // Recive a call
+    if let phone = SparkContext.sharedInstance.spark?.phone {
+            // Callback when call is incoming.
+            phone.onIncoming = { [weak self] call in
+                if let strongSelf = self {
+                    SparkContext.sharedInstance.call = call
+                    //...
+                }
             }
         }
     
-    // Recive a call
-    class IncomingCallViewController: UIViewController, PhoneObserver {
-    override func viewWillAppear(...) {
-        SparkContext.sharedInstance.spark?.callNotificationCenter.add(observer: self)
-    }
-    override func viewWillDisappear(...) {
-        SparkContext.sharedInstance.spark?.callNotificationCenter.remove(observer: self)
-    }
-    func callIncoming(call: Call) {
-        // Show incoming call toast view
+    // Answers this call.
+    // This can only be invoked when this call is incoming and in rining status.
+    // Otherwise error will occur and onError callback will be dispatched.
+    SparkContext.sharedInstance.call?.answer(option: MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)) {
+        [weak self] error in
+        if let strongSelf = self {
+           if error != nil {
+              //...
+           }
+        }
     }
     
-    // Answer and reject call
-    call.answer(option: MediaOption.AudioVideo(local: videoCallViewController.selfView, remote: videoCallViewController.remoteView), completionHandler: nil)
-    call.reject(nil)
+    // Rejects this call. 
+    // This can only be invoked when this call is incoming and in rining status.
+    // Otherwise error will occur and onError callback will be dispatched.
+    SparkContext.sharedInstance.call?.reject() { error in
+            if error != nil {
+                //...
+            }
+        }
     ```
-
-
-## Note
-
-1. Strip unsupported achitecture before submitting to App store:  
-
-   Wme framework of media engine in SDK contains a build for both the simulator (x86_64) and the actual devices (ARM).  
-   Of course, you aren't allowed to submit to the App Store a binary for an unsupported achitecture, so the solution is to "manually" remove the unneeded architectures from the final binary, before submitting it.  
-   Daniel Kennett came up with a nice solution and provides this script to add to the build phase.  
-   http://stackoverflow.com/questions/30547283/submit-to-app-store-issues
-   
-   Note this script only work in Release scheme and use for achive binary.
