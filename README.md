@@ -58,7 +58,7 @@ Below is code snippets of the SDK calling in the demo.
         if VideoAudioSetup.sharedInstance.isVideoEnabled() {
             mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
         }
-        // Makes a call to an intended recipient on behalf of the authenticated user.
+        // Makes a call to an intended recipient on behalf of the authenticated user.
         SparkContext.sharedInstance.spark?.phone.dial(remoteAddr, option: mediaOption) { [weak self] result in
             if let strongSelf = self {
                 switch result {
@@ -127,10 +127,9 @@ Below is code snippets of the SDK calling in the demo.
                 if let strongSelf = self {
                     SparkContext.sharedInstance.call = call
                     //...
-                }
+                }
             }
-        }
-    
+    }
     // Answers this call.
     // This can only be invoked when this call is incoming and in rining status.
     // Otherwise error will occur and onError callback will be dispatched.
@@ -139,7 +138,6 @@ Below is code snippets of the SDK calling in the demo.
         if let strongSelf = self {
            if error != nil {
               //...
-           }
         }
     }
     
@@ -149,6 +147,6 @@ Below is code snippets of the SDK calling in the demo.
     SparkContext.sharedInstance.call?.reject() { error in
             if error != nil {
                 //...
-            }
-        }
+            }
+    }
     ```
