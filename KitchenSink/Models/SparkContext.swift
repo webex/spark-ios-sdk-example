@@ -24,8 +24,8 @@ import SparkSDK
 
 ///Get your own App Client information from https://developer.ciscospark.com
 class SparkEnvirmonment {
-    static let ClientId = "Cb3f891d2044fec65bfe36a8d1b3d69b3098448e9e0335c58bab42f5b94ad06c9"
-    static let ClientSecret = ProcessInfo().environment["CLIENTSECRET"] ?? "f2660da9c8b90a9cdfe713f7c115473b76da531bb7ec9c66fdb8ec1481585879"
+    static let ClientId = "C416dd36dd57b536a35816978e4f063a98849d285ca191f5566a32c0f0c3481ab"
+    static let ClientSecret = ProcessInfo().environment["CLIENTSECRET"] ?? "bc851e0f4d4bd62c020a45de08e374101910200d43096f32d14b9e08164adac7"
     ///Scopes define the level of access that your integration requires
     static let Scope = "spark:all"
     ///Uri is that a user will be redirected to when completing an OAuth grant flow

@@ -85,9 +85,15 @@ class SparkLoginViewController: BaseViewController {
         // Brings up a web-based authorization view controller and directs the user through the OAuth process.
         // note: parentViewController must contain a navigation Controller,
         // so that the OAuth view controller can push on it.
-        oauthenticator.authorize(parentViewController: self) { success in
+        oauthenticator.authorize(parentViewController: self) { [weak self] success in
             if success {
                 print("loginWithSpark success")
+            }
+            else {
+                if let strongSelf = self {
+                    strongSelf.showLoginFailAlert()
+                }
+                
             }
         }
     }
@@ -95,5 +101,11 @@ class SparkLoginViewController: BaseViewController {
     private func showApplicationHome() {
         let viewController = storyboard?.instantiateViewController(withIdentifier: "HomeTableTableViewController") as! HomeTableTableViewController
         navigationController?.pushViewController(viewController, animated: true)
+    }
+    
+    fileprivate func showLoginFailAlert() {
+        let alert = UIAlertController(title: "Alert", message: "Spark login failed", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
 }

@@ -12,6 +12,13 @@ import SparkSDK
 ///Developer should implementation the SDK Logger protocol for troubleshooting.
 public class KSLogger : Logger {
     public func log(message: LogMessage) {
-        print(message)
+        //log level control
+        switch message.level {
+        case .debug,.warning,.error,.no:
+            print(message)
+        default:
+            break;
+        }
+        
     }
 }
