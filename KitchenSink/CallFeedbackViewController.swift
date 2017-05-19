@@ -1,4 +1,4 @@
-// Copyright 2016 Cisco Systems Inc
+// Copyright 2016-2017 Cisco Systems Inc
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -92,7 +92,7 @@ class CallFeedbackViewController: BaseViewController, UITextViewDelegate {
     }
     
     // MARK: - Call sendFeedback
-    
+    /// Sends feedback for this call to Cisco Spark team.
     @IBAction func sendFeedback(_ sender: AnyObject) {
         SparkContext.sharedInstance.call?.sendFeedbackWith(rating: Int(callRateView.rating), comments: userCommentsTextView.text!, includeLogs: includeLogSwitch.isOn)
         

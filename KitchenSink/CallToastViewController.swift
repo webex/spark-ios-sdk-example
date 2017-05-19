@@ -1,4 +1,4 @@
-// Copyright 2016 Cisco Systems Inc
+// Copyright 2016-2017 Cisco Systems Inc
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
 import UIKit
 import SparkSDK
 
-class CallToastViewController: BaseViewController, CallObserver {
+class CallToastViewController: BaseViewController {
     
     @IBOutlet private weak var avatarImage: UIImageView!
     @IBOutlet private weak var nameLabel: UILabel!
@@ -42,23 +42,14 @@ class CallToastViewController: BaseViewController, CallObserver {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        nameLabel.text = SparkContext.sharedInstance.call?.from
+        nameLabel.text = SparkContext.callerEmail
         fetchUserProfile()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        SparkContext.sharedInstance.spark?.callNotificationCenter.add(observer: self)
-        //SparkContext.sharedInstance.spark?.phone.showPreview(previewRenderView)
-    }
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        //SparkContext.sharedInstance.spark?.phone.stopPreview()
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        SparkContext.sharedInstance.spark?.callNotificationCenter.remove(observer: self)
+        //call callback init
+        sparkCallBackInit()
     }
     
     // MARK: - Call answer/reject
@@ -74,11 +65,17 @@ class CallToastViewController: BaseViewController, CallObserver {
     }
     
     // MARK: - CallObserver
-    
-    func callDidDisconnect(_ call: Call, disconnectionType: DisconnectionType) {
-        dismissView()
+    func sparkCallBackInit() {
+        if let call = SparkContext.sharedInstance.call {
+            // Callback when this *call* is disconnected (hangup, cancelled, get declined or other self device pickup the call).
+            call.onDisconnected = { [weak self] disconnectionType in
+                if let strongSelf = self {
+                    strongSelf.dismissView()
+                }
+                
+            }
+        }
     }
-    
     // MARK: - UI views
     override func initView() {
         for label in labelFontScaleCollection {
@@ -121,11 +118,12 @@ class CallToastViewController: BaseViewController, CallObserver {
     // MARK: - People API
     
     private func fetchUserProfile() {
-        if SparkContext.sharedInstance.spark?.authenticationStrategy.authorized == true, let email = SparkContext.sharedInstance.call?.from {
-            Utils.fetchUserProfile(email) { [weak self] (person:Person?) in
+        // check the user is logically authorized.
+        if SparkContext.sharedInstance.spark?.authenticator.authorized == true {
+            Utils.fetchUserProfile(SparkContext.callerEmail) { [weak self] (person:Person?) in
                 if person != nil {
-                    if let strongSelf = self{
-                        strongSelf.nameLabel.text = email
+                    if let strongSelf = self {
+                        strongSelf.nameLabel.text = SparkContext.callerEmail
                         if let displayName = person!.displayName {
                             strongSelf.nameLabel.text = displayName
                         }
@@ -134,7 +132,6 @@ class CallToastViewController: BaseViewController, CallObserver {
                         }
                     }
                 }
-
             }
         }
     }

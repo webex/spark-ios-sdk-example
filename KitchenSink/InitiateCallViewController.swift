@@ -1,4 +1,4 @@
-// Copyright 2016 Cisco Systems Inc
+// Copyright 2016-2017 Cisco Systems Inc
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -104,6 +104,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         
         indicatorView.startAnimating()
         if let email = EmailAddress.fromString(searchString) {
+            // Lists people with email address in the authenticated user's organization.
             SparkContext.sharedInstance.spark?.people.list(email: email, max: 10) {
                 (response: ServiceResponse<[Person]>) in
                 
@@ -119,6 +120,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
                 }
             }
         } else {
+            // Lists people with display name in the authenticated user's organization.
             SparkContext.sharedInstance.spark?.people.list(displayName: searchString, max: 10) {
                 (response: ServiceResponse<[Person]>) in
                 self.indicatorView.stopAnimating()

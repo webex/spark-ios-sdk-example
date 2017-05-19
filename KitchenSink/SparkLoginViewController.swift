@@ -1,4 +1,4 @@
-// Copyright 2016 Cisco Systems Inc
+// Copyright 2016-2017 Cisco Systems Inc
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ class SparkLoginViewController: BaseViewController {
     
     @IBOutlet weak var loginButton: UIButton!
     @IBOutlet weak var statusLabel: UILabel!
-    private var oauthStrategy: OAuthStrategy!
+    private var oauthenticator: OAuthAuthenticator!
     
     @IBOutlet var labelFontScaleCollection: [UILabel]!
     
@@ -38,18 +38,25 @@ class SparkLoginViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        // An [OAuth](https://oauth.net/2/) based authentication strategy
+        // is to be used to authenticate a user on Cisco Spark.
         SparkContext.initSparkForSparkIdLogin()
-        oauthStrategy = SparkContext.sharedInstance.spark?.authenticationStrategy as! OAuthStrategy
+        oauthenticator = SparkContext.sharedInstance.spark?.authenticator as! OAuthAuthenticator
     }
     
     // MARK: - Life cycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        statusLabel.text = "Powered by Cisco Spark iOS SDK v" + Spark.version
+        statusLabel.text = "Powered by SparkSDK v" + Spark.version
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if oauthStrategy.authorized {
+        
+        // Returns True if the user is logically authorized.
+        // This may not mean the user has a valid
+        // access token yet, but the authentication strategy should be able to obtain one without
+        // further user interaction.
+        if oauthenticator.authorized {
             showApplicationHome()
         }
     }
@@ -75,9 +82,18 @@ class SparkLoginViewController: BaseViewController {
     }
     // MARK: - Login/Auth handling
     @IBAction func loginWithSpark(_ sender: AnyObject) {
-        oauthStrategy.authorize(parentViewController: self) { success in
+        // Brings up a web-based authorization view controller and directs the user through the OAuth process.
+        // note: parentViewController must contain a navigation Controller,
+        // so that the OAuth view controller can push on it.
+        oauthenticator.authorize(parentViewController: self) { [weak self] success in
             if success {
                 print("loginWithSpark success")
+            }
+            else {
+                if let strongSelf = self {
+                    strongSelf.showLoginFailAlert()
+                }
+                
             }
         }
     }
@@ -85,5 +101,11 @@ class SparkLoginViewController: BaseViewController {
     private func showApplicationHome() {
         let viewController = storyboard?.instantiateViewController(withIdentifier: "HomeTableTableViewController") as! HomeTableTableViewController
         navigationController?.pushViewController(viewController, animated: true)
+    }
+    
+    fileprivate func showLoginFailAlert() {
+        let alert = UIAlertController(title: "Alert", message: "Spark login failed", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
 }

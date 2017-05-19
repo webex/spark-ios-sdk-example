@@ -23,6 +23,7 @@
 		04D9882A1CEDAEBF00C18422 /* CallFeedbackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D988291CEDAEBF00C18422 /* CallFeedbackViewController.swift */; };
 		12A1611E1DA4EFA48208E5D8 /* Pods_KitchenSink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A779AB3A31B809D134C73D0C /* Pods_KitchenSink.framework */; };
 		5A82441E1DF9E5F900481A55 /* JWTLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A82441D1DF9E5F900481A55 /* JWTLoginViewController.swift */; };
+		C7710D1A1EC4432C000FA609 /* KSLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7710D191EC4432C000FA609 /* KSLogger.swift */; };
 		C785D3101E9494A300A5A648 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = C785D30F1E9494A300A5A648 /* Utils.swift */; };
 		C785D3171E9494CA00A5A648 /* UIKitExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C785D3141E9494CA00A5A648 /* UIKitExtension.swift */; };
 		C785D31C1E9494E500A5A648 /* IncomingCallDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C785D3191E9494E500A5A648 /* IncomingCallDelegate.swift */; };
@@ -58,6 +59,7 @@
 		657C43FB45F7E9767BC98E93 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		87B55BD44833FEC88DC1F273 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A779AB3A31B809D134C73D0C /* Pods_KitchenSink.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7710D191EC4432C000FA609 /* KSLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KSLogger.swift; path = Utils/KSLogger.swift; sourceTree = "<group>"; };
 		C785D30F1E9494A300A5A648 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Utils.swift; path = Utils/Utils.swift; sourceTree = "<group>"; };
 		C785D3141E9494CA00A5A648 /* UIKitExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIKitExtension.swift; path = UIKitExtension/UIKitExtension.swift; sourceTree = "<group>"; };
 		C785D3191E9494E500A5A648 /* IncomingCallDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IncomingCallDelegate.swift; path = Models/IncomingCallDelegate.swift; sourceTree = "<group>"; };
@@ -153,6 +155,7 @@
 			children = (
 				C785D30F1E9494A300A5A648 /* Utils.swift */,
 				C785D3211E95EE6400A5A648 /* UserDefaultUtil.swift */,
+				C7710D191EC4432C000FA609 /* KSLogger.swift */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -334,6 +337,7 @@
 				04AE18261CDAD3D800A8F078 /* AppDelegate.swift in Sources */,
 				C785D31C1E9494E500A5A648 /* IncomingCallDelegate.swift in Sources */,
 				048969351CDB34AB008966FA /* VideoAudioSetupViewController.swift in Sources */,
+				C7710D1A1EC4432C000FA609 /* KSLogger.swift in Sources */,
 				0471A25E1CDC6BF600C6647E /* CallToastViewController.swift in Sources */,
 				C785D31E1E9494E500A5A648 /* VideoAudioSetup.swift in Sources */,
 				0471A2581CDC438300C6647E /* SparkLoginViewController.swift in Sources */,

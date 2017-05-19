@@ -1,4 +1,4 @@
-// Copyright 2016 Cisco Systems Inc
+// Copyright 2016-2017 Cisco Systems Inc
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -58,14 +58,14 @@ class VideoAudioSetupViewController: BaseViewController {
     @IBOutlet var widthScaleConstraintCollection: [NSLayoutConstraint]!
     @IBOutlet var heightScaleConstraintCollection: [NSLayoutConstraint]!
     
+    @IBOutlet weak var preview: MediaRenderView!
     private let uncheckImage = UIImage.fontAwesomeIcon(name: .squareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
     private let checkImage = UIImage.fontAwesomeIcon(name: .checkSquareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
     let setup = VideoAudioSetup.sharedInstance
-    //private let selfViewSetupHeightContant = 330 * Utils.HEIGHT_SCALE
-    private let selfViewSetupHeightContant = 0 * Utils.HEIGHT_SCALE
+    private let selfViewSetupHeightContant = 320 * Utils.HEIGHT_SCALE
     private let selfViewSetupHelpLabelHeightContant = 54 * Utils.HEIGHT_SCALE
     
-    private let videoViewSetupHeightContant = 100 * Utils.HEIGHT_SCALE
+    private let videoViewSetupHeightContant = 420 * Utils.HEIGHT_SCALE
     private let videoViewSetupHelpLabelHeightContant = 54 * Utils.HEIGHT_SCALE
     
     override var navigationTitle: String? {
@@ -79,6 +79,14 @@ class VideoAudioSetupViewController: BaseViewController {
     
     
     // MARK: - Life cycle
+    
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        //note:make sure stopPreview before calling
+        SparkContext.sharedInstance.spark?.phone.stopPreview()
+    }
+    
     override func initView() {
         for label in labelFontCollection {
             label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
@@ -139,10 +147,9 @@ class VideoAudioSetupViewController: BaseViewController {
         
     }
     // MARK: - hand checkbox change
-    
     @IBAction func loudSpeakerSwitchChange(_ sender: Any) {
         let speakerSwitch = sender as! UISwitch
-        setup.setLoudSpeaker(speakerSwitch.isOn)
+        setup.isLoudSpeaker = speakerSwitch.isOn
     }
     
     func handleCapGestureEvent(sender:UITapGestureRecognizer) {
@@ -163,14 +170,15 @@ class VideoAudioSetupViewController: BaseViewController {
     func handleCameraGestureEvent(sender:UITapGestureRecognizer) {
         if let view = sender.view {
             if view == frontCameraView {
-                setup.setFacingMode(Call.FacingMode.User)
+                setup.facingMode = .user
                 setup.isSelfViewShow = true
             }
             else if view == selfViewCloseView {
+                // Ture is sending Video stream to remote,false is not.Default is true
                 setup.isSelfViewShow = false
             }
             else {
-                setup.setFacingMode(Call.FacingMode.Environment)
+                setup.facingMode = .environment
                 setup.isSelfViewShow = true
             }
             
@@ -203,21 +211,30 @@ class VideoAudioSetupViewController: BaseViewController {
             frontImage.image = uncheckImage
             backImage.image = uncheckImage
             selfViewCloseImage.image = checkImage
+            //note:stopPreview stream will not sent to remote side
+            SparkContext.sharedInstance.spark?.phone.stopPreview()
         }
-        else if setup.getFacingMode() == Call.FacingMode.User {
+        else if setup.facingMode == .user {
             frontImage.image = checkImage
             backImage.image = uncheckImage
             selfViewCloseImage.image = uncheckImage
+            //note:when change the facing mode ,please stop previous preview stream
+            SparkContext.sharedInstance.spark?.phone.stopPreview()
+            SparkContext.sharedInstance.spark?.phone.startPreview(view: self.preview)
         }
         else {
             frontImage.image = uncheckImage
             backImage.image = checkImage
             selfViewCloseImage.image = uncheckImage
+            //note:when change the facing mode ,please stop previous preview stream
+            SparkContext.sharedInstance.spark?.phone.stopPreview()
+            SparkContext.sharedInstance.spark?.phone.startPreview(view: self.preview)
+            
         }
     }
     
     func updateLoudspeakerStatus() {
-        loudSpeakerSwitch.isOn = setup.isLoudSpeaker()
+        loudSpeakerSwitch.isOn = setup.isLoudSpeaker
     }
     
     func updateVideoView(_ isHidden:Bool) {
