@@ -22,6 +22,7 @@ import UIKit
 import MessageUI
 class AppFeedbackViewController: BaseViewController, MFMailComposeViewControllerDelegate, UIImagePickerControllerDelegate,UITextViewDelegate,UINavigationControllerDelegate {
 
+    // MARK: - UI outlets variables
     @IBOutlet weak var topicLabel: UILabel!
     @IBOutlet weak var userCommentsText: UITextView!
     @IBOutlet weak var mailAddressLabel: UILabel!
@@ -30,19 +31,14 @@ class AppFeedbackViewController: BaseViewController, MFMailComposeViewController
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
     @IBOutlet weak var placeholderLabel: UILabel!
-    
-    
     @IBOutlet weak var snapshotAngleImage: UIImageView!
     @IBOutlet weak var topicAngleImage: UIImageView!
     @IBOutlet weak var topicButton: UIButton!
     @IBOutlet weak var snapshotButton: UIButton!
-    
     let mailAddress = "devsupport@ciscospark.com"
     var imagePicker = UIImagePickerController()
-    
     var snapshotImage: UIImage!
     let snapshotFileName = "snapshot.png"
-
     override var navigationTitle: String? {
         get {
             return "Send feedback"
@@ -52,13 +48,14 @@ class AppFeedbackViewController: BaseViewController, MFMailComposeViewController
         }
     }
     
-    
+    // MARK: - Life Circle
     override func viewDidLoad() {
         super.viewDidLoad()
         let tap: UITapGestureRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(dissmissKeyboard))
         view.addGestureRecognizer(tap)
     }
     
+    // MARK: - UI Impelemetation
     override func initView() {
         for label in labelFontScaleCollection {
             label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
@@ -137,7 +134,6 @@ class AppFeedbackViewController: BaseViewController, MFMailComposeViewController
         present(sendMailErrorAlert, animated: true)
     }
     
-    // MARK: Delegates
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         controller.dismiss(animated: true, completion: nil)
         
@@ -199,7 +195,6 @@ class AppFeedbackViewController: BaseViewController, MFMailComposeViewController
         }
     }
     
-    // MARK: - UITextViewDelegate
     func textViewDidChange(_ textView: UITextView) {
         if !textView.text.isEmpty {
             placeholderLabel.isHidden = true

@@ -35,7 +35,7 @@ public class UserDefaultsUtil {
     static var callPersonHistory: [Person] {
         get {
             var resutlArray: [Person] = []
-            if let selfId = SparkContext.sharedInstance.selfInfo?.id {
+            if let selfId = loggedInUser?.id {
                 let key = CALL_PERSON_HISTORY_KEY + selfId
                 if let array = userDefault.array(forKey: key) {
                     for onePerson in array {
@@ -64,7 +64,7 @@ public class UserDefaultsUtil {
             return
         }
         var resultArray: [Any] = Array.init()
-        if let selfId = SparkContext.sharedInstance.selfInfo?.id {
+        if let selfId = loggedInUser?.id {
             let key = CALL_PERSON_HISTORY_KEY + selfId
             if var array = userDefault.array(forKey: key) {
                 

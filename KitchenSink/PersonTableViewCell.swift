@@ -57,6 +57,6 @@ class PersonTableViewCell: UITableViewCell {
     }
     
     func dial(_ sender: UIButton) {
-        initiateCallViewController.dial(address!)
+        initiateCallViewController.dialWithEmailAddress(address!)
     }
 }

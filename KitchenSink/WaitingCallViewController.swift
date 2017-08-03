@@ -21,21 +21,27 @@
 import UIKit
 import SparkSDK
 
-class IncomingCallViewController: BaseViewController, IncomingCallDelegate {
+class WaitingCallViewController: BaseViewController {
+    
+    //MARK: - UI outlets variables
     @IBOutlet var labelFontScaleCollection: [UILabel]!
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
-    
     private var waittingTimer: Timer?
     @IBOutlet weak var animationLabel: UILabel!
-    
     override var navigationTitle: String? {
         get {
-            return SparkContext.sharedInstance.selfInfo?.displayName
+            return loggedInUser?.displayName
         }
         set(newValue) {
             title = newValue
         }
     }
+    
+    /// receivedCall represent the call currently received
+    private var receivedCall: Call?
+    
+
+    
     // MARK: - Life cycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -51,34 +57,52 @@ class IncomingCallViewController: BaseViewController, IncomingCallDelegate {
         stopWaitingAnimation()
     }
     
-    // MARK: - PhoneObserver
+    // MARK: - SparkSDK Phone code for Call reception
     func sparkCallBackInit() {
-        if let phone = SparkContext.sharedInstance.spark?.phone {
-            // Callback when call is incoming.
+        if let phone = sparkSDK?.phone {
+            /* 
+              Callback when call is incoming.
+             */
             phone.onIncoming = { [weak self] call in
+                ///codes after receive cll here...
                 if let strongSelf = self {
-                    SparkContext.sharedInstance.call = call
+                    strongSelf.receivedCall = call
                     strongSelf.presentCallToastView(call)
                 }
             }
         }
     }
     
-    // MARK: - IncomingCallDelegate
-    func didAnswerIncomingCall() {
-        self.presentVideoCallView(SparkContext.callerEmail)
-    }
-    
-    func didDeclineIncomingCall() {
-        SparkContext.sharedInstance.call?.reject() { error in
-            if error != nil {
-                print("Decline error :\(error!)")
-            }
+    fileprivate func presentCallToastView(_ call: Call) {
+        if let callToastViewController = storyboard?.instantiateViewController(withIdentifier: "CallToastViewController") as? CallToastViewController {
+            callToastViewController.modalPresentationStyle = .fullScreen
+            callToastViewController.modalTransitionStyle = .coverVertical
             
+            /// Answer/Reject button click block
+            callToastViewController.answerBtnClickedBlock = {
+                self.presentVideoCallView()
+            }
+            callToastViewController.rejectBtnClickedBlock = {
+                self.receivedCall?.reject() { error in
+                    if error != nil {
+                        print("Decline error :\(error!)")
+                    }
+                }
+            }
+            present(callToastViewController, animated: true, completion: nil)
         }
     }
     
-    // MARK: - UI views
+    fileprivate func presentVideoCallView() {
+                
+        if let videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController! {
+            videoCallViewController.currentCall = self.receivedCall
+            videoCallViewController.remoteAddress = (self.receivedCall?.from?.email)!
+            navigationController?.pushViewController(videoCallViewController, animated: true)
+        }
+    }
+    
+    // MARK: - UI Implemetation
     override func initView() {
         for label in labelFontScaleCollection {
             label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
@@ -112,23 +136,5 @@ class IncomingCallViewController: BaseViewController, IncomingCallDelegate {
             }
         }
         
-    }
-    
-    fileprivate func presentCallToastView(_ call: Call) {
-        if let callToastViewController = storyboard?.instantiateViewController(withIdentifier: "CallToastViewController") as? CallToastViewController {
-            
-            callToastViewController.incomingCallDelegate = self
-            callToastViewController.modalPresentationStyle = .fullScreen
-            callToastViewController.modalTransitionStyle = .coverVertical
-            present(callToastViewController, animated: true, completion: nil)
-        }
-    }
-    
-    fileprivate func presentVideoCallView(_ remoteAddr: String) {
-        if let videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController! {
-            
-            videoCallViewController.videoCallRole = .Callee(remoteAddr)
-            navigationController?.pushViewController(videoCallViewController, animated: true)
-        }
     }
 }

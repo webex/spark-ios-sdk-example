@@ -23,11 +23,11 @@ import SparkSDK
 
 class VideoAudioSetupViewController: BaseViewController {
     
+    // MARK: - UI outlets variables
     @IBOutlet weak var audioView: UIView!
     @IBOutlet weak var audioImage: UIImageView!
     @IBOutlet weak var audioVideoView: UIView!
     @IBOutlet weak var audioVideoImage: UIImageView!
-    
     @IBOutlet weak var loudSpeakerSwitch: UISwitch!
     @IBOutlet weak var cameraSetupView: UIView!
     @IBOutlet weak var videoSetupView: UIView!
@@ -38,36 +38,25 @@ class VideoAudioSetupViewController: BaseViewController {
     @IBOutlet weak var loudSpeakerLabel: UILabel!
     @IBOutlet weak var selfViewHiddenHelpLabelHeight: NSLayoutConstraint!
     @IBOutlet weak var selfViewHiddenHelpLabel: KSLabel!
-    
     @IBOutlet weak var videoSetupBackoundViewTop: NSLayoutConstraint!
-    
-    
     @IBOutlet weak var videoSetupBackoundView: UIView!
     @IBOutlet var videoSetupBackroundViewBottom: NSLayoutConstraint!
     @IBOutlet weak var selfViewCloseView: UIView!
     @IBOutlet weak var selfViewCloseImage: UIImageView!
-    
-    
     @IBOutlet weak var videoViewHiddenHelpLabel: KSLabel!
     @IBOutlet weak var videoViewhiddenHelpLabelHeight: NSLayoutConstraint!
-    
-    
     @IBOutlet weak var selfViewSetupHeight: NSLayoutConstraint!
     @IBOutlet weak var videoViewHeight: NSLayoutConstraint!
     @IBOutlet var labelFontCollection: [UILabel]!
     @IBOutlet var widthScaleConstraintCollection: [NSLayoutConstraint]!
     @IBOutlet var heightScaleConstraintCollection: [NSLayoutConstraint]!
-    
     @IBOutlet weak var preview: MediaRenderView!
     private let uncheckImage = UIImage.fontAwesomeIcon(name: .squareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
     private let checkImage = UIImage.fontAwesomeIcon(name: .checkSquareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
-    let setup = VideoAudioSetup.sharedInstance
     private let selfViewSetupHeightContant = 320 * Utils.HEIGHT_SCALE
     private let selfViewSetupHelpLabelHeightContant = 54 * Utils.HEIGHT_SCALE
-    
     private let videoViewSetupHeightContant = 420 * Utils.HEIGHT_SCALE
     private let videoViewSetupHelpLabelHeightContant = 54 * Utils.HEIGHT_SCALE
-    
     override var navigationTitle: String? {
         get {
             return "Video/Audio setup"
@@ -77,16 +66,15 @@ class VideoAudioSetupViewController: BaseViewController {
         }
     }
     
-    
     // MARK: - Life cycle
-    
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillAppear(animated)
         //note:make sure stopPreview before calling
-        SparkContext.sharedInstance.spark?.phone.stopPreview()
+        sparkSDK?.phone.stopPreview()
     }
     
+    // MARK: - UI Implemetation
     override func initView() {
         for label in labelFontCollection {
             label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
@@ -127,12 +115,12 @@ class VideoAudioSetupViewController: BaseViewController {
         tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:)))
         audioVideoView.addGestureRecognizer(tapGesture)
         updateCallCapStatus()
-        videoViewHeight.constant = CGFloat(setup.isVideoEnabled() ? videoViewSetupHeightContant:0)
-        videoSetupView.alpha = setup.isVideoEnabled() ? 1:0
-        videoViewHiddenHelpLabel.alpha = setup.isVideoEnabled() ? 0:1
-        videoViewhiddenHelpLabelHeight.constant = CGFloat(setup.isVideoEnabled() ? 0:videoViewSetupHelpLabelHeightContant)
+        videoViewHeight.constant = CGFloat(globalVideoSetting.isVideoEnabled() ? videoViewSetupHeightContant:0)
+        videoSetupView.alpha = globalVideoSetting.isVideoEnabled() ? 1:0
+        videoViewHiddenHelpLabel.alpha = globalVideoSetting.isVideoEnabled() ? 0:1
+        videoViewhiddenHelpLabelHeight.constant = CGFloat(globalVideoSetting.isVideoEnabled() ? 0:videoViewSetupHelpLabelHeightContant)
         view.removeConstraint(videoSetupBackroundViewBottom)
-        videoSetupBackroundViewBottom =  NSLayoutConstraint.init(item: videoSetupBackoundView, attribute: .bottom, relatedBy: .equal, toItem: setup.isVideoEnabled() ? videoSetupView:loudSpeakerLabel, attribute: .bottom, multiplier: 1, constant: setup.isVideoEnabled() ? 0:-(videoSetupBackoundViewTop.constant))
+        videoSetupBackroundViewBottom =  NSLayoutConstraint.init(item: videoSetupBackoundView, attribute: .bottom, relatedBy: .equal, toItem: globalVideoSetting.isVideoEnabled() ? videoSetupView:loudSpeakerLabel, attribute: .bottom, multiplier: 1, constant: globalVideoSetting.isVideoEnabled() ? 0:-(videoSetupBackoundViewTop.constant))
         view.addConstraint(videoSetupBackroundViewBottom)
         
         view.layoutIfNeeded()
@@ -146,20 +134,20 @@ class VideoAudioSetupViewController: BaseViewController {
         updateLoudspeakerStatus()
         
     }
-    // MARK: - hand checkbox change
+    // MARK: hand checkbox change
     @IBAction func loudSpeakerSwitchChange(_ sender: Any) {
         let speakerSwitch = sender as! UISwitch
-        setup.isLoudSpeaker = speakerSwitch.isOn
+        globalVideoSetting.isLoudSpeaker = speakerSwitch.isOn
     }
     
     func handleCapGestureEvent(sender:UITapGestureRecognizer) {
         if let view = sender.view {
             if view == audioView {
-                setup.setVideoEnabled(false)
+                globalVideoSetting.setVideoEnabled(false)
                 updateVideoView(true)
             }
             else if view == audioVideoView {
-                setup.setVideoEnabled(true)
+                globalVideoSetting.setVideoEnabled(true)
                 updateVideoView(false)
             }
             
@@ -170,16 +158,16 @@ class VideoAudioSetupViewController: BaseViewController {
     func handleCameraGestureEvent(sender:UITapGestureRecognizer) {
         if let view = sender.view {
             if view == frontCameraView {
-                setup.facingMode = .user
-                setup.isSelfViewShow = true
+                globalVideoSetting.facingMode = .user
+                globalVideoSetting.isSelfViewShow = true
             }
             else if view == selfViewCloseView {
                 // Ture is sending Video stream to remote,false is not.Default is true
-                setup.isSelfViewShow = false
+                globalVideoSetting.isSelfViewShow = false
             }
             else {
-                setup.facingMode = .environment
-                setup.isSelfViewShow = true
+                globalVideoSetting.facingMode = .environment
+                globalVideoSetting.isSelfViewShow = true
             }
             
             updateCameraStatus()
@@ -188,7 +176,7 @@ class VideoAudioSetupViewController: BaseViewController {
     
     
     func updateCallCapStatus() {
-        if !setup.isVideoEnabled() {
+        if !globalVideoSetting.isVideoEnabled() {
             audioImage.image = checkImage
             audioVideoImage.image = uncheckImage
         } else {
@@ -199,42 +187,42 @@ class VideoAudioSetupViewController: BaseViewController {
     
     func updateCameraStatus(_ animation:Bool = true) {
         if animation {
-            updateSelfSetupView(!setup.isSelfViewShow)
+            updateSelfSetupView(!globalVideoSetting.isSelfViewShow)
         }
         else {
-            selfViewHiddenHelpLabelHeight.constant = CGFloat(setup.isSelfViewShow ? 0:selfViewSetupHelpLabelHeightContant)
-            selfViewHiddenHelpLabel.alpha = setup.isSelfViewShow ? 0:1
-            cameraSetupView.alpha = setup.isSelfViewShow ? 1:0
-            selfViewSetupHeight.constant = CGFloat(setup.isSelfViewShow ? selfViewSetupHeightContant:0)
+            selfViewHiddenHelpLabelHeight.constant = CGFloat(globalVideoSetting.isSelfViewShow ? 0:selfViewSetupHelpLabelHeightContant)
+            selfViewHiddenHelpLabel.alpha = globalVideoSetting.isSelfViewShow ? 0:1
+            cameraSetupView.alpha = globalVideoSetting.isSelfViewShow ? 1:0
+            selfViewSetupHeight.constant = CGFloat(globalVideoSetting.isSelfViewShow ? selfViewSetupHeightContant:0)
         }
-        if !setup.isSelfViewShow {
+        if !globalVideoSetting.isSelfViewShow {
             frontImage.image = uncheckImage
             backImage.image = uncheckImage
             selfViewCloseImage.image = checkImage
             //note:stopPreview stream will not sent to remote side
-            SparkContext.sharedInstance.spark?.phone.stopPreview()
+            sparkSDK?.phone.stopPreview()
         }
-        else if setup.facingMode == .user {
+        else if globalVideoSetting.facingMode == .user {
             frontImage.image = checkImage
             backImage.image = uncheckImage
             selfViewCloseImage.image = uncheckImage
             //note:when change the facing mode ,please stop previous preview stream
-            SparkContext.sharedInstance.spark?.phone.stopPreview()
-            SparkContext.sharedInstance.spark?.phone.startPreview(view: self.preview)
+            sparkSDK?.phone.stopPreview()
+            sparkSDK?.phone.startPreview(view: self.preview)
         }
         else {
             frontImage.image = uncheckImage
             backImage.image = checkImage
             selfViewCloseImage.image = uncheckImage
             //note:when change the facing mode ,please stop previous preview stream
-            SparkContext.sharedInstance.spark?.phone.stopPreview()
-            SparkContext.sharedInstance.spark?.phone.startPreview(view: self.preview)
+            sparkSDK?.phone.stopPreview()
+            sparkSDK?.phone.startPreview(view: self.preview)
             
         }
     }
     
     func updateLoudspeakerStatus() {
-        loudSpeakerSwitch.isOn = setup.isLoudSpeaker
+        loudSpeakerSwitch.isOn = globalVideoSetting.isLoudSpeaker
     }
     
     func updateVideoView(_ isHidden:Bool) {

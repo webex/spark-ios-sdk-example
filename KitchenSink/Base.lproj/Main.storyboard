@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="faV-VB-5KG">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="faV-VB-5KG">
     <device id="retina5_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
         <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -299,7 +299,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="loginWithSpark:" destination="N9A-hc-BzI" eventType="touchUpInside" id="4Ki-wy-rR0"/>
+                                    <action selector="sparkLoginBtnClicked:" destination="N9A-hc-BzI" eventType="touchUpInside" id="IHN-86-S68"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -386,7 +386,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="loginWithSpark:" destination="qQy-xq-8hj" eventType="touchUpInside" id="K0j-eF-eL8"/>
+                                    <action selector="jwtLoginBtnClicked:" destination="qQy-xq-8hj" eventType="touchUpInside" id="0K9-Ms-Gw5"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="powered by SparkSDK v0.9.1" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uBv-vA-C2b">
@@ -470,7 +470,7 @@
         <!--Home-->
         <scene sceneID="idG-Ny-R4H">
             <objects>
-                <tableViewController storyboardIdentifier="HomeTableTableViewController" id="1qa-UI-Em1" userLabel="Home" customClass="HomeTableTableViewController" customModule="KitchenSink" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="HomeTableViewController" id="1qa-UI-Em1" userLabel="Home" customClass="HomeTableViewController" customModule="KitchenSink" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" dataMode="static" style="grouped" separatorStyle="none" rowHeight="50" sectionHeaderHeight="1" sectionFooterHeight="1" id="GqC-zS-oyL">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -682,7 +682,7 @@
                                                     <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="20"/>
                                                     <state key="normal" title="Logout"/>
                                                     <connections>
-                                                        <action selector="logoutButtonTouchUpinside:" destination="1qa-UI-Em1" eventType="touchUpInside" id="KhW-RZ-PUI"/>
+                                                        <action selector="logoutButtonClicked" destination="1qa-UI-Em1" eventType="touchUpInside" id="fdd-ce-jXJ"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -1141,7 +1141,7 @@
                                 <state key="normal" backgroundImage="CallActiveNormal"/>
                                 <state key="highlighted" backgroundImage="CallActivePressed"/>
                                 <connections>
-                                    <action selector="dialAddress:" destination="gDT-0P-iFu" eventType="touchUpInside" id="JdT-UW-rcG"/>
+                                    <action selector="dialBtnClicked:" destination="gDT-0P-iFu" eventType="touchUpInside" id="KuG-y1-HaP"/>
                                 </connections>
                             </button>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Address for dial" textAlignment="center" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="npP-0J-wOP">
@@ -1490,7 +1490,7 @@
         <!--SDK feedback-->
         <scene sceneID="53h-tc-TQN">
             <objects>
-                <viewController storyboardIdentifier="CallFeedbackViewController" id="nrf-jw-L5r" userLabel="SDK feedback" customClass="CallFeedbackViewController" customModule="KitchenSink" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="CallFeedbackViewController" id="nrf-jw-L5r" userLabel="SDK feedback" customClass="CallRateViewController" customModule="KitchenSink" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="gqS-UT-guH"/>
                         <viewControllerLayoutGuide type="bottom" id="cD3-La-ROI"/>
@@ -1551,7 +1551,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="sendFeedback:" destination="nrf-jw-L5r" eventType="touchUpInside" id="R5w-Df-win"/>
+                                    <action selector="sendFeedbackBtnClicked:" destination="nrf-jw-L5r" eventType="touchUpInside" id="j6G-mv-hEO"/>
                                 </connections>
                             </button>
                             <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CAy-Ej-ve4">
@@ -1668,7 +1668,7 @@
         <!--Incoming call-->
         <scene sceneID="w3S-pS-3Ii">
             <objects>
-                <viewController storyboardIdentifier="IncomingCallViewController" id="qan-1z-vHI" userLabel="Incoming call" customClass="IncomingCallViewController" customModule="KitchenSink" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="WaitingCallViewController" id="qan-1z-vHI" userLabel="Incoming call" customClass="WaitingCallViewController" customModule="KitchenSink" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Hkw-us-cKW"/>
                         <viewControllerLayoutGuide type="bottom" id="Mrm-y0-Ozy"/>

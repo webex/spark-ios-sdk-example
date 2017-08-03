@@ -19,7 +19,6 @@
 // THE SOFTWARE.
 
 import UIKit
-import SparkSDK
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

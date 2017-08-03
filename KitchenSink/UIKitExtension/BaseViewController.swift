@@ -40,7 +40,7 @@ class BaseNavigationViewController: UINavigationController,UIGestureRecognizerDe
     }
     
     func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
-        if self.topViewController is HomeTableTableViewController || self.topViewController is VideoCallViewController{
+        if self.topViewController is HomeTableViewController || self.topViewController is VideoCallViewController{
             self.interactivePopGestureRecognizer?.isEnabled = false
             return
         }

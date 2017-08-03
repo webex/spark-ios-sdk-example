@@ -23,31 +23,28 @@ import SparkSDK
 
 class StartViewController: BaseViewController {
     
+    // MARK: - UI outlets variables
     @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var demoAppHelpLabel: UILabel!
     @IBOutlet weak var sparkIdHelpLabel: UILabel!
     @IBOutlet weak var jwtHelpLabel: UILabel!
-    
-    private var animationsCompletion: Bool = true
-    
     @IBOutlet var labelFrontScaleCollection: [UILabel]!
     @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var buttonFrontScaleCollection: [UIButton]!
-    
     @IBOutlet weak var imageTopToSuperView: NSLayoutConstraint!
-    
     @IBOutlet weak var sparkIDButton: UIButton!
     @IBOutlet weak var JWTButton: UIButton!
-    
     @IBOutlet weak var buttonHeight: NSLayoutConstraint!
+    private var animationsCompletion: Bool = true
+    
     
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        updateStatusLabel()
-        setupHelpLabels()
+        self.updateStatusLabel()
+        self.setupHelpLabels()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -71,7 +68,7 @@ class StartViewController: BaseViewController {
         }
     }
     
-    // MARK: - UIView
+    // MARK: - UI Implementation
     override func initView() {
         for label in labelFrontScaleCollection {
             label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)

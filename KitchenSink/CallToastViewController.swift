@@ -23,60 +23,123 @@ import SparkSDK
 
 class CallToastViewController: BaseViewController {
     
+    //MARK: - UI outlets variables
     @IBOutlet private weak var avatarImage: UIImageView!
     @IBOutlet private weak var nameLabel: UILabel!
-    @IBOutlet weak var previewRenderView: MediaRenderView!
-    
     @IBOutlet weak var avatarViewHeight: NSLayoutConstraint!
-    
     @IBOutlet var labelFontScaleCollection: [UILabel]!
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
-    
     @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
+    @IBOutlet weak var previewRenderView: MediaRenderView!
     
-    weak var incomingCallDelegate: IncomingCallDelegate?
+    /// answerBtn clicked block 
+    var answerBtnClickedBlock : (()->())?
     
+    /// rejectBtn clicked block
+    var rejectBtnClickedBlock : (()->())?
+    
+    /// incomingCall represent for current incoming call
+    var incomingCall: Call?
     
     
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        nameLabel.text = SparkContext.callerEmail
-        fetchUserProfile()
+        if let incomingCall = self.incomingCall{
+            for member in incomingCall.memberships {
+                if member.isInitiator == true {
+                     nameLabel.text = member.email ?? "Unknow"
+                }
+            }
+        }
+        sparkFetchUserProfile()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        //call callback init
-        sparkCallBackInit()
+        
+        /*
+          Callback when this *call* is disconnected (hangup, cancelled, get declined or other self 
+          device pickup the call).
+        */
+        checkCallStatus()
     }
     
-    // MARK: - Call answer/reject
+    // MARK: - SparkSDK Fetch People Info 
+    private func sparkFetchUserProfile() {
+        // check the user is logically authorized.
+        if sparkSDK?.authenticator.authorized == true {
+            
+            var callerEmailString = ""
+            
+            if let incomingCall = self.incomingCall{
+                for member in incomingCall.memberships {
+                    if member.isInitiator == true {
+                        callerEmailString = member.email ?? "Unkown"
+                    }
+                }
+            }
+            
+            if (callerEmailString != "Unkown") {
+                /* 
+                  Person list is empty with SIP email address
+                  Lists people in the authenticated user's organization.
+                 */
+                sparkSDK?.people.list(email: EmailAddress.fromString(callerEmailString), max: 1) { response in
+                    
+                    // Check Response Status
+                    switch response.result {
+                    case .success(let value):
+                        // Request Success Processing
+                        var persons: [Person] = []
+                        persons = value
+                        if let person = persons.first {
+                            self.upDateUI(person: person)
+                        }
+                    case .failure(let error):
+                        // Request Fail Processing
+                        print("ERROR: \(error)")
+                    }
+                }
+            } else {
+                print("could not parse email address \(callerEmailString) for retrieving user profile")
+            }
+        }
+    }
+
+    // MARK: - Call answer/reject Blocks
     
     @IBAction private func answerButtonPressed(_ sender: AnyObject) {
-        incomingCallDelegate?.didAnswerIncomingCall()
+        if(self.answerBtnClickedBlock != nil){
+            self.answerBtnClickedBlock!()
+        }
         dismissView()
     }
     
     @IBAction private func declineButtonPressed(_ sender: AnyObject) {
-        incomingCallDelegate?.didDeclineIncomingCall()
+        if(self.rejectBtnClickedBlock != nil){
+            self.rejectBtnClickedBlock!()
+        }
         dismissView()
     }
     
-    // MARK: - CallObserver
-    func sparkCallBackInit() {
-        if let call = SparkContext.sharedInstance.call {
-            // Callback when this *call* is disconnected (hangup, cancelled, get declined or other self device pickup the call).
+    // MARK: - Check call Status Function
+    func checkCallStatus() {
+        /*
+          Callback when this *call* is disconnected (hangup, cancelled, get declined or other self
+          device pickup the call).
+         */
+        if let call = self.incomingCall {
             call.onDisconnected = { [weak self] disconnectionType in
                 if let strongSelf = self {
                     strongSelf.dismissView()
                 }
-                
             }
         }
     }
-    // MARK: - UI views
+    
+    // MARK: - UI Views Implementation
     override func initView() {
         for label in labelFontScaleCollection {
             label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
@@ -91,6 +154,23 @@ class CallToastViewController: BaseViewController {
         avatarImage.layer.cornerRadius = avatarViewHeight.constant/2
         
     }
+    
+    private func upDateUI(person: Person){
+        if let incomingCall = self.incomingCall{
+            for member in incomingCall.memberships {
+                if member.isInitiator == true {
+                    nameLabel.text = member.email ?? "Unknow"
+                }
+            }
+        }
+        if let displayName = person.displayName {
+            self.nameLabel.text = displayName
+        }
+        if let avatarUrl = person.avatar {
+            self.fetchAvatarImage(avatarUrl)
+        }
+    }
+    
     private func fetchAvatarImage(_ avatarUrl: String) {
         Utils.downloadAvatarImage(avatarUrl, completionHandler: { [weak self] avatarImage in
             if let strongSelf = self {
@@ -113,26 +193,5 @@ class CallToastViewController: BaseViewController {
     
     private func dismissView() {
         dismiss(animated: true, completion: nil)
-    }
-    
-    // MARK: - People API
-    
-    private func fetchUserProfile() {
-        // check the user is logically authorized.
-        if SparkContext.sharedInstance.spark?.authenticator.authorized == true {
-            Utils.fetchUserProfile(SparkContext.callerEmail) { [weak self] (person:Person?) in
-                if person != nil {
-                    if let strongSelf = self {
-                        strongSelf.nameLabel.text = SparkContext.callerEmail
-                        if let displayName = person!.displayName {
-                            strongSelf.nameLabel.text = displayName
-                        }
-                        if let avatarUrl = person!.avatar {
-                            strongSelf.fetchAvatarImage(avatarUrl)
-                        }
-                    }
-                }
-            }
-        }
     }
 }

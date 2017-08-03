@@ -22,11 +22,14 @@ import UIKit
 import SparkSDK
 
 
-/// VideoAudioSetup store the user configuration in demo app
+/// VideoAudioSetting store the user configuration in demo app
+
+/// globalVideoSetting is for saving video/audio settings
 /// - note: this configuration just saved in memory.
-class VideoAudioSetup {
-    
-    static let sharedInstance = VideoAudioSetup()
+let globalVideoSetting : VideoAudioSetting = VideoAudioSetting()
+
+class VideoAudioSetting {
+
     /// Switch of Video/Audio call or Audio call.Default is Video/Audio call
     fileprivate var videoEnabled = true
     /// Ture is sending Video stream to remote,false is not.Default is true
@@ -42,20 +45,20 @@ class VideoAudioSetup {
     /// Switch Front camera or Back camera.Defalut is front.
     var facingMode:Phone.FacingMode {
         get {
-           return SparkContext.sharedInstance.spark?.phone.defaultFacingMode ?? .user
+           return sparkSDK?.phone.defaultFacingMode ?? .user
         }
         set(newValue) {
-            SparkContext.sharedInstance.spark?.phone.defaultFacingMode = newValue
+            sparkSDK?.phone.defaultFacingMode = newValue
         }
     }
     
     /// True as using loud speaker, False as not. The default is using loud speaker.
     var isLoudSpeaker:Bool {
         get {
-            return SparkContext.sharedInstance.spark?.phone.defaultLoudSpeaker ?? true
+            return sparkSDK?.phone.defaultLoudSpeaker ?? true
         }
         set(newValue){
-            SparkContext.sharedInstance.spark?.phone.defaultLoudSpeaker = newValue
+            sparkSDK?.phone.defaultLoudSpeaker = newValue
         }
     }
     

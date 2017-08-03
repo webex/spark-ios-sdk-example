@@ -22,13 +22,13 @@ import UIKit
 import SparkSDK
 import Cosmos
 
-class CallFeedbackViewController: BaseViewController, UITextViewDelegate {
+class CallRateViewController: BaseViewController, UITextViewDelegate {
     
+    // MARK: - UI outlets variables
     @IBOutlet weak var userCommentsTextView: UITextView!
     @IBOutlet weak var includeLogSwitch: UISwitch!
     @IBOutlet weak var callRateView: CosmosView!
     @IBOutlet weak var placeholderLabel: UILabel!
-    
     @IBOutlet var labelFontScaleCollection: [UILabel]!
     @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
@@ -36,10 +36,11 @@ class CallFeedbackViewController: BaseViewController, UITextViewDelegate {
     @IBOutlet weak var sendFeedBackButton: UIButton!
     @IBOutlet weak var cancelButton: UIButton!
     @IBOutlet weak var buttonHeight: NSLayoutConstraint!
-    
     @IBOutlet weak var titleTopToSuperViewConstraint: NSLayoutConstraint!
     private var topToSuperView: CGFloat = 0
-    var dissmissBlock: (()->())? = nil
+
+    /// finishedCall represent for the call just ended
+    var finishedCall: Call?
     
     
     // MARK: - Life cycle
@@ -48,16 +49,25 @@ class CallFeedbackViewController: BaseViewController, UITextViewDelegate {
         let tap: UITapGestureRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(dissmissKeyboard))
         view.addGestureRecognizer(tap)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(CallFeedbackViewController.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(CallFeedbackViewController.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(CallRateViewController.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(CallRateViewController.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
         topToSuperView = titleTopToSuperViewConstraint.constant
-        
     }
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
+    // MARK: - SparkSDK Call sendFeedback
+    @IBAction func sendFeedbackBtnClicked(_ sender: AnyObject) {
+        /*
+           Sends feedback for this call to Cisco Spark team.
+        */
+        self.finishedCall?.sendFeedbackWith(rating: Int(callRateView.rating), comments: userCommentsTextView.text!, includeLogs: includeLogSwitch.isOn)
         
+        dismiss(animated: true)
+        {
+             self.navigationController?.popViewController(animated: true)
+        }
+    }
+    
+    // MARK: - UI Implementation
     override func initView() {
         
         for label in labelFontScaleCollection {
@@ -73,9 +83,6 @@ class CallFeedbackViewController: BaseViewController, UITextViewDelegate {
             widthConstraint.constant *= Utils.WIDTH_SCALE
         }
         userCommentsTextView.font = UIFont.textViewLightFont(ofSize: (userCommentsTextView.font?.pointSize)! * Utils.HEIGHT_SCALE)
-        
-        
-        
         userCommentsTextView.layer.borderColor = UIColor.gray.cgColor
         userCommentsTextView.layer.borderWidth = 1.0
         userCommentsTextView.layer.cornerRadius = 8
@@ -91,18 +98,14 @@ class CallFeedbackViewController: BaseViewController, UITextViewDelegate {
         
     }
     
-    // MARK: - Call sendFeedback
-    /// Sends feedback for this call to Cisco Spark team.
-    @IBAction func sendFeedback(_ sender: AnyObject) {
-        SparkContext.sharedInstance.call?.sendFeedbackWith(rating: Int(callRateView.rating), comments: userCommentsTextView.text!, includeLogs: includeLogSwitch.isOn)
-        
+    @IBAction func cancel(_ sender: AnyObject) {
         dismiss(animated: true)
         {
-            self.dissmissBlock?()
+            self.navigationController?.popViewController(animated: true)
         }
     }
-    
-    // MARK: - UITextViewDelegate
+
+    // MARK: UITextViewDelegate
     func textViewDidChange(_ textView: UITextView) {
         if !textView.text.isEmpty {
             placeholderLabel.isHidden = true
@@ -112,20 +115,13 @@ class CallFeedbackViewController: BaseViewController, UITextViewDelegate {
         }
     }
     
-    // MARK: - UI views
-    @IBAction func cancel(_ sender: AnyObject) {
-        dismiss(animated: true)
-        {
-            self.dissmissBlock?()
-        }
-    }
-
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         self.view.endEditing(true)
         return false
     }
     
-    // MARK: - Keyboard show/hide
+    
+    // MARK: Keyboard show/hide
     func keyboardWillShow(notification:NSNotification) {
         guard titleTopToSuperViewConstraint.constant != 0 else {
             return
@@ -159,5 +155,9 @@ class CallFeedbackViewController: BaseViewController, UITextViewDelegate {
                 }
             }
         }
+    }
+    // MARK: Other Functions
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }

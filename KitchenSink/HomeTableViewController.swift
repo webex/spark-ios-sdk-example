@@ -21,43 +21,50 @@
 import UIKit
 import SparkSDK
 
-class HomeTableTableViewController: BaseTableViewController {
+class HomeTableViewController: BaseTableViewController {
     
+    // MARK: - UI outlets variables
     @IBOutlet weak var statusLabel: UILabel!
     fileprivate var registerState = "connecting"
     @IBOutlet weak var buttonHeight: NSLayoutConstraint!
     @IBOutlet weak var footerView: UIView!
-    
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var labelFontScaleCollection: [UILabel]!
     @IBOutlet var buttonFontScaleCollection: [UIButton]!
+    
+    
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        registerPhone()
-        updateStatusLabel()
+        self.sparkRegisterPhone()
+        self.updateStatusLabel()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: true)
-        getUserInfo()
+        self.sparkGetUserInfo()
     }
     
-    // MARK: - Phone register
+    // MARK: - SparkPhone register | SparkUser get Info
     
-    func registerPhone() {
-        // Registers this phone to Cisco Spark cloud on behalf of the authenticated user.
-        // It also creates the websocket and connects to Cisco Spark cloud.
-        // - note: make sure register device before calling
-        SparkContext.sharedInstance.spark?.phone.register() { [weak self] error in
+    func sparkRegisterPhone() {
+        /*  
+           Registers this phone to Cisco Spark cloud on behalf of the authenticated user.
+           It also creates the websocket and connects to Cisco Spark cloud.
+           - note: make sure register device before calling
+         */
+        sparkSDK?.phone.register() { [weak self] error in
             if let strongSelf = self {
                 if error != nil {
+                    //register phone fail codes here...
                     strongSelf.registerState = "fail"
                     strongSelf.showPhoneRegisterFailAlert()
+                    
                 } else {
+                    //register phone success codes here...
                     strongSelf.registerState = "ok"
                     strongSelf.updateStatusLabel()
 
@@ -66,45 +73,48 @@ class HomeTableTableViewController: BaseTableViewController {
         }
     }
     
-    func getUserInfo() {
-        // Retrieves the details for the authenticated user.
-        SparkContext.sharedInstance.spark?.people.getMe() {[weak self] response in
+    func sparkGetUserInfo() {
+        /*
+            Retrieves the details for the authenticated user.
+        */
+        sparkSDK?.people.getMe() {[weak self] response in
             if let strongSelf = self {
                 switch response.result {
                 case .success(let person):
-                    SparkContext.sharedInstance.selfInfo = person
+                    loggedInUser = person
                     strongSelf.updateStatusLabel()
                 case .failure:
-                    SparkContext.sharedInstance.selfInfo = nil
+                    loggedInUser = nil
                     strongSelf.updateStatusLabel()
                 }
             }
         }
     }
     
-    // MARK: - UITableViewController
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.section == 0 && indexPath.row == 1 {
-            return 80 * Utils.HEIGHT_SCALE
+    /// deauthorize sparkSDK when logging out
+    @IBAction func logoutButtonClicked() {
+        guard sparkSDK != nil else {
+            _ = navigationController?.popToRootViewController(animated: true)
+            return
         }
-        else if indexPath.section == 0 && indexPath.row == 0 {
-            return 80 * Utils.HEIGHT_SCALE
-        }
-        else if indexPath.section == 1 {
-            return 75 * Utils.HEIGHT_SCALE
-        }
-        return super.tableView(tableView, heightForRowAt: indexPath) * Utils.HEIGHT_SCALE
-    }
-    
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
         
-        if indexPath.section == 1 && indexPath.row == 4 {
-            logout()
+        /*
+           Removes this *phone* from Cisco Spark cloud on behalf of the authenticated user.
+           It also disconnects the websocket from Cisco Spark cloud.
+           Subsequent invocations of this method behave as a no-op.
+         */
+        sparkSDK!.phone.deregister() { ret in
+            // Deauthorizes the current user and clears any persistent state with regards to the current user.
+            // If the *phone* is registered, it should be deregistered before calling this method.
+            sparkSDK?.authenticator.deauthorize()
+            loggedInUser = nil
+            sparkSDK = nil
         }
+        self.navigationController?.popToRootViewController(animated: true)
     }
     
-    // MARK: - UI views
+    
+    // MARK: - UI Implementation
     
     override func initView() {
         for label in labelFontScaleCollection {
@@ -132,10 +142,29 @@ class HomeTableTableViewController: BaseTableViewController {
         
     }
     
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.section == 0 && indexPath.row == 1 {
+            return 80 * Utils.HEIGHT_SCALE
+        }
+        else if indexPath.section == 0 && indexPath.row == 0 {
+            return 80 * Utils.HEIGHT_SCALE
+        }
+        else if indexPath.section == 1 {
+            return 75 * Utils.HEIGHT_SCALE
+        }
+        return super.tableView(tableView, heightForRowAt: indexPath) * Utils.HEIGHT_SCALE
+    }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        if indexPath.section == 1 && indexPath.row == 4 {
+            self.logoutButtonClicked()
+        }
+    }
     
     fileprivate func updateStatusLabel() {
-        statusLabel.text = "login as \(SparkContext.sharedInstance.selfInfo?.displayName ?? "NONE")"
+        statusLabel.text = "login as \(loggedInUser?.displayName ?? "NONE")"
         statusLabel.text = statusLabel.text! + "\nRegistration to Cisco cloud : " + registerState
     }
     
@@ -144,16 +173,4 @@ class HomeTableTableViewController: BaseTableViewController {
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }
-    
-    
-    @IBAction func logoutButtonTouchUpinside(_ sender: Any) {
-        logout()
-    }
-    
-    private func logout() {
-        SparkContext.sharedInstance.deinitSpark()
-        _ = navigationController?.popToRootViewController(animated: true)
-        
-    }
-    
 }

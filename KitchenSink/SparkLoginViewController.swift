@@ -24,43 +24,69 @@ import Toast_Swift
 
 class SparkLoginViewController: BaseViewController {
     
+    // MARK: - UI outlets variables
     @IBOutlet weak var loginButton: UIButton!
     @IBOutlet weak var statusLabel: UILabel!
-    private var oauthenticator: OAuthAuthenticator!
-    
     @IBOutlet var labelFontScaleCollection: [UILabel]!
-    
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
-    
     @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var buttonFontScaleCollection: [UIButton]!
     @IBOutlet weak var loginButtonHeight: NSLayoutConstraint!
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // An [OAuth](https://oauth.net/2/) based authentication strategy
-        // is to be used to authenticate a user on Cisco Spark.
-        SparkContext.initSparkForSparkIdLogin()
-        oauthenticator = SparkContext.sharedInstance.spark?.authenticator as! OAuthAuthenticator
-    }
     
     // MARK: - Life cycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        /* 
+         An [OAuth](https://oauth.net/2/) based authentication strategy
+         is to be used to authenticate a user on Cisco Spark.
+        */
+        let authenticator = OAuthAuthenticator(clientId: SparkEnvirmonment.ClientId, clientSecret: SparkEnvirmonment.ClientSecret, scope: SparkEnvirmonment.Scope, redirectUri: SparkEnvirmonment.RedirectUri)
+        sparkSDK = Spark(authenticator: authenticator)
+        sparkSDK?.logger = KSLogger() //Register a console logger into SDK
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         statusLabel.text = "Powered by SparkSDK v" + Spark.version
     }
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        // Returns True if the user is logically authorized.
-        // This may not mean the user has a valid
-        // access token yet, but the authentication strategy should be able to obtain one without
-        // further user interaction.
-        if oauthenticator.authorized {
-            showApplicationHome()
+
+    
+    // MARK: - SparkSDK sparkID Login/Auth handling
+    @IBAction func sparkLoginBtnClicked(_ sender: AnyObject) {
+        /*
+          Brings up a web-based authorization view controller and directs the user through the OAuth process.
+          note: parentViewController must contain a navigation Controller,
+          so that the OAuth view controller can push on it. 
+         */
+        (sparkSDK?.authenticator as! OAuthAuthenticator).authorize(parentViewController: self) { [weak self] success in
+            if success {
+                // Spark Login Success codes here...
+                if let strongSelf = self {
+                    strongSelf.loginSuccessProcess()
+                }
+            }
+            else {
+                // Spark Login Fail codes here...
+                if let strongSelf = self {
+                    strongSelf.loginFailureProcess()
+                }
+            }
         }
     }
-    // MARK: - UIView 
+    
+    private func loginSuccessProcess() {
+        let viewController = storyboard?.instantiateViewController(withIdentifier: "HomeTableViewController") as! HomeTableViewController
+        navigationController?.pushViewController(viewController, animated: true)
+    }
+    
+    fileprivate func loginFailureProcess() {
+        let alert = UIAlertController(title: "Alert", message: "Spark login failed", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
+    
+    // MARK: - UI Implementation
     override func initView() {
         for label in labelFontScaleCollection {
             label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
@@ -79,33 +105,5 @@ class SparkLoginViewController: BaseViewController {
         loginButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueNormal(), background: nil), for: .normal)
         loginButton.setBackgroundImage(UIImage.imageWithColor(UIColor.buttonBlueHightlight(), background: nil), for: .highlighted)
         loginButton.layer.cornerRadius = loginButtonHeight.constant/2
-    }
-    // MARK: - Login/Auth handling
-    @IBAction func loginWithSpark(_ sender: AnyObject) {
-        // Brings up a web-based authorization view controller and directs the user through the OAuth process.
-        // note: parentViewController must contain a navigation Controller,
-        // so that the OAuth view controller can push on it.
-        oauthenticator.authorize(parentViewController: self) { [weak self] success in
-            if success {
-                print("loginWithSpark success")
-            }
-            else {
-                if let strongSelf = self {
-                    strongSelf.showLoginFailAlert()
-                }
-                
-            }
-        }
-    }
-    
-    private func showApplicationHome() {
-        let viewController = storyboard?.instantiateViewController(withIdentifier: "HomeTableTableViewController") as! HomeTableTableViewController
-        navigationController?.pushViewController(viewController, animated: true)
-    }
-    
-    fileprivate func showLoginFailAlert() {
-        let alert = UIAlertController(title: "Alert", message: "Spark login failed", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        present(alert, animated: true, completion: nil)
     }
 }

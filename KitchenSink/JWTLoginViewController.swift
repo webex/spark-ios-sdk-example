@@ -24,22 +24,21 @@ import Toast_Swift
 
 class JWTLoginViewController: BaseViewController {
     
-    
+    // MARK: - UI outlets variables
     @IBOutlet weak var jwtTextField: UITextField!
     @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var jwtLoginButton: UIButton!
-    private var jwtAuthStrategy: JWTAuthenticator!
     @IBOutlet weak var waitingView: UIActivityIndicatorView!
-    
     @IBOutlet var textFieldFontScaleCollection: [UITextField]!
     @IBOutlet var labelFontScaleCollection: [UILabel]!
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var buttonFontScaleCollection: [UIButton]!
-
     @IBOutlet weak var imageTopToSuperView: NSLayoutConstraint!
     private var topToSuperView: CGFloat = 0
     @IBOutlet weak var buttonHeightConstraint: NSLayoutConstraint!
+    
+    
     // MARK: - Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,14 +49,77 @@ class JWTLoginViewController: BaseViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        // A [JSON Web Token](https://jwt.io/introduction) (JWT) based authentication strategy
-        // is to be used to authenticate a guest user on Cisco Spark.
-        SparkContext.initSparkForJWTLogin()
-        jwtAuthStrategy = SparkContext.sharedInstance.spark?.authenticator as! JWTAuthenticator!
-        hideWaitingView()
-        jwtTextField.becomeFirstResponder()
+        // UI SetUP
+        self.hideWaitingView()
+        self.jwtTextField.becomeFirstResponder()
     }
-    // MARK: - View style and context init
+    
+    // MARK: - SparkSDK JWT Login/Auth handling
+    @IBAction func jwtLoginBtnClicked(_ sender: UIButton) {
+        guard let jwtString = jwtTextField.text else {
+            return
+        }
+        self.jwtTextField.resignFirstResponder()
+        showWaitingView()
+        
+        /*
+         A [JSON Web Token](https://jwt.io/introduction) (JWT) based authentication strategy
+         is to be used to authenticate a guest user on Cisco Spark.
+         */
+        let jwtAuthStrategy = JWTAuthenticator()
+        jwtAuthStrategy.authorizedWith(jwt: jwtString)
+        if jwtAuthStrategy.authorized == true {
+            
+            sparkSDK = Spark(authenticator: jwtAuthStrategy)
+            sparkSDK?.logger = KSLogger() //Register a console logger into SDK
+            
+            sparkSDK?.people.getMe() { response in
+                self.hideWaitingView()
+                
+                switch response.result {
+                case .success(let person):
+                    // JWT Login Success codes here...
+                    self.loginSuccessProcess(person: person)
+                    
+                case .failure(let error):
+                    // JWT Login Fail codes here...
+                    self.loginFailureProcess(error: error)
+                }
+                
+            }
+        } else {
+            hideWaitingView()
+            showLoginError()
+        }
+    }
+    
+    private func loginSuccessProcess(person: Person){
+        loggedInUser = person
+        
+        let emailAddress = (person.emails ?? []).first
+        let emailString = emailAddress == nil ? "NONE" : emailAddress!.toString()
+        let alert = UIAlertController(title: "Logged in", message: "Logged in as \(person.displayName ?? "NONE") with id \n\(emailString)", preferredStyle: .alert)
+        
+        let okAction = UIAlertAction(title: "OK", style: .cancel) { action in
+            let viewController = self.storyboard?.instantiateViewController(withIdentifier: "HomeTableViewController") as! HomeTableViewController
+            self.navigationController?.pushViewController(viewController, animated: true)
+        }
+        
+        alert.addAction(okAction)
+        
+        self.present(alert, animated: true)
+    }
+    
+    private func loginFailureProcess(error: Error){
+        loggedInUser = nil
+        let alert = UIAlertController(title: "Could Not Get Personal Info", message: "Unable to retrieve information about the user logged in using the JWT: Please make sure your JWT is correct. \(error)", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .cancel)
+        alert.addAction(okAction)
+        
+        self.present(alert, animated: true)
+    }
+    
+    // MARK: - UI Implementation
     override func initView()
     {
         for label in labelFontScaleCollection {
@@ -86,57 +148,10 @@ class JWTLoginViewController: BaseViewController {
     }
     
     
-    // MARK: - JWT Text Field & Button Enable/Disable
+    /// - JWT Text Field & Button Enable/Disable
     @IBAction func jwtTextFieldChanged(_ sender: UITextField) {
         jwtLoginButton.isEnabled = !((jwtTextField.text?.isEmpty) ?? false)
         jwtLoginButton.alpha = (jwtLoginButton.isEnabled) ? 1.0 : 0.5
-    }
-
-    // MARK: - Login/Auth handling
-    @IBAction func loginWithSpark(_ sender: UIButton) {
-        guard let jwt = jwtTextField.text else {
-            return
-        }
-        self.jwtTextField.resignFirstResponder()
-        showWaitingView()
-
-        if !jwtAuthStrategy.authorized {
-            jwtAuthStrategy.authorizedWith(jwt: jwt)
-        }
-
-        if jwtAuthStrategy.authorized == true {
-            SparkContext.sharedInstance.spark?.people.getMe() { response in
-                self.hideWaitingView()
-                
-                switch response.result {
-                case .success(let person):
-                    SparkContext.sharedInstance.selfInfo = person
-                    let emailAddress = (person.emails ?? []).first
-                    let emailString = emailAddress == nil ? "NONE" : emailAddress!.toString()
-                    let alert = UIAlertController(title: "Logged in", message: "Logged in as \(person.displayName ?? "NONE") with id \n\(emailString)", preferredStyle: .alert)
-                    let okAction = UIAlertAction(title: "OK", style: .cancel) { action in
-                        self.showApplicationHome()
-                    }
-                    alert.addAction(okAction)
-                    self.present(alert, animated: true)
-                    
-                case .failure(let error):
-                    SparkContext.sharedInstance.selfInfo = nil
-                    let alert = UIAlertController(title: "Could Not Get Personal Info", message: "Unable to retrieve information about the user logged in using the JWT: Please make sure your JWT is correct. \(error)", preferredStyle: .alert)
-                    let okAction = UIAlertAction(title: "OK", style: .cancel)
-                    alert.addAction(okAction)
-                    self.present(alert, animated: true)
-                }
-            }
-        } else {
-            hideWaitingView()
-            showLoginError()
-        }
-    }
-    
-    private func showApplicationHome() {
-        let viewController = storyboard?.instantiateViewController(withIdentifier: "HomeTableTableViewController") as! HomeTableTableViewController
-        navigationController?.pushViewController(viewController, animated: true)
     }
     
     private func showLoginError() {
@@ -168,7 +183,6 @@ class JWTLoginViewController: BaseViewController {
         jwtTextFieldChanged(jwtTextField)
     }
     
-    // MARK: - Keyboard show/hide
     func keyboardWillShow(notification:NSNotification) {
         guard imageTopToSuperView.constant != 0 else {
             return

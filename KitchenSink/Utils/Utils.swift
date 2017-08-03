@@ -25,32 +25,6 @@ class Utils {
     static let HEIGHT_SCALE: CGFloat = UIScreen.main.bounds.height / 736.0
     static let WIDTH_SCALE: CGFloat = UIScreen.main.bounds.width / 414.0
     
-    ///Fetch Spark user with email address
-    static func fetchUserProfile(_ emailString: String, completionHandler: @escaping (Person?) -> Void) {
-        if let emailAddress = EmailAddress.fromString(emailString) {
-            // Person list is empty with SIP email address
-            // Lists people in the authenticated user's organization.
-            SparkContext.sharedInstance.spark?.people.list(email: emailAddress, max: 1) { response in
-                var persons: [Person] = []
-                
-                switch response.result {
-                case .success(let value):
-                    persons = value
-                case .failure(let error):
-                    print("ERROR: \(error)")
-                }
-                
-                if let person = persons.first {
-                    completionHandler(person)
-                }
-                
-            }
-        } else {
-            print("could not parse email address \(emailString) for retrieving user profile")
-            completionHandler(nil)
-        }
-    }
-    
     static func getDataFromUrl(_ urlString:String, completion: @escaping ((_ data: Data?, _ response: URLResponse?, _ error: Error? ) -> Void)) {
         let url = URL(string: urlString)
         let task = URLSession.shared.dataTask(with: url!) {(data, response, error) in
