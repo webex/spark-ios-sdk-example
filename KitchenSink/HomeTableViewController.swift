@@ -45,10 +45,12 @@ class HomeTableViewController: BaseTableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: true)
-        self.sparkGetUserInfo()
+        
+        /* Fetch the details for the current authenticated user. */
+        self.sparkGetLoggedInUserInfo()
     }
     
-    // MARK: - SparkPhone register | SparkUser get Info
+    // MARK: - SparkSDK: SparkPhone register | SparkUser get Info
     
     func sparkRegisterPhone() {
         /*  
@@ -73,10 +75,8 @@ class HomeTableViewController: BaseTableViewController {
         }
     }
     
-    func sparkGetUserInfo() {
-        /*
-            Retrieves the details for the authenticated user.
-        */
+    func sparkGetLoggedInUserInfo() {
+        /* Retrieves the details for the authenticated user. */
         sparkSDK?.people.getMe() {[weak self] response in
             if let strongSelf = self {
                 switch response.result {

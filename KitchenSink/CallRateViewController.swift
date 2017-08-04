@@ -46,20 +46,14 @@ class CallRateViewController: BaseViewController, UITextViewDelegate {
     // MARK: - Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(dissmissKeyboard))
-        view.addGestureRecognizer(tap)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(CallRateViewController.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(CallRateViewController.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
-        topToSuperView = titleTopToSuperViewConstraint.constant
     }
     
-    // MARK: - SparkSDK Call sendFeedback
+    // MARK: - SparkSDK: sendFeedback for a call
     @IBAction func sendFeedbackBtnClicked(_ sender: AnyObject) {
-        /*
-           Sends feedback for this call to Cisco Spark team.
-        */
+        
+        /* Sends feedback for this call to Cisco Spark team. */
         self.finishedCall?.sendFeedbackWith(rating: Int(callRateView.rating), comments: userCommentsTextView.text!, includeLogs: includeLogSwitch.isOn)
+        
         
         dismiss(animated: true)
         {
@@ -69,6 +63,14 @@ class CallRateViewController: BaseViewController, UITextViewDelegate {
     
     // MARK: - UI Implementation
     override func initView() {
+        
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(dissmissKeyboard))
+        view.addGestureRecognizer(tap)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(CallRateViewController.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(CallRateViewController.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        topToSuperView = titleTopToSuperViewConstraint.constant
+        
         
         for label in labelFontScaleCollection {
             label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)

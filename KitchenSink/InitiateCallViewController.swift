@@ -42,9 +42,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(dissmissKeyboard))
-        view.addGestureRecognizer(tap)
-        setupView()
+        self.setupView()
     }
     
     
@@ -65,27 +63,16 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     
     fileprivate func presentVideoCallView(_ remoteAddr: String) {
         if let videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController! {
-            videoCallViewController.remoteAddress = remoteAddr
+            videoCallViewController.videoCallRole = VideoCallRole.CallPoster(remoteAddr)
             navigationController?.pushViewController(videoCallViewController, animated: true)
         }
     }
     
-    // MARK: - SparkSDK search people
-    func updateSearchResults(for searchController: UISearchController) {
-        let searchString = searchController.searchBar.text!
-        
-        if searchString.characters.count < 3 {
-            searchResult?.removeAll()
-            tableView.reloadData()
-            return
-        }
-        
-        indicatorView.startAnimating()
-        self.sparkPersonInfoWithEmail(searchStr: searchString)
-    }
+    // MARK: - SparkSDK: search people with Email/SearchString
+
     private func sparkPersonInfoWithEmail(searchStr: String){
         if let email = EmailAddress.fromString(searchStr) {
-            // Lists people with email address in the authenticated user's organization.
+            /* Lists people with email address in the authenticated user's organization. */
             sparkSDK?.people.list(email: email, max: 10) {
                 (response: ServiceResponse<[Person]>) in
                 
@@ -101,7 +88,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
                 }
             }
         } else {
-            // Lists people with display name in the authenticated user's organization.
+            /* Lists people with display name in the authenticated user's organization. */
             sparkSDK?.people.list(displayName: searchStr, max: 10) {
                 (response: ServiceResponse<[Person]>) in
                 self.indicatorView.stopAnimating()
@@ -117,6 +104,19 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
             }
         }
     }
+    // MARK: search bar result updating delegate
+    func updateSearchResults(for searchController: UISearchController) {
+        let searchString = searchController.searchBar.text!
+        
+        if searchString.characters.count < 3 {
+            searchResult?.removeAll()
+            tableView.reloadData()
+            return
+        }
+        
+        indicatorView.startAnimating()
+        self.sparkPersonInfoWithEmail(searchStr: searchString)
+    }
     
     // MARK: - UI Implementation
     override func initView() {
@@ -131,6 +131,8 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         }
     }
     fileprivate func setupView() {
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(dissmissKeyboard))
+        view.addGestureRecognizer(tap)
         historyTableView.dataSource = self
         historyTableView.delegate = self
         tableView.dataSource = self

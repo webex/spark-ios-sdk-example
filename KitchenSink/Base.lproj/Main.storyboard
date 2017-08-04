@@ -1941,7 +1941,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="hangup:" destination="ar0-sN-dqx" eventType="touchUpInside" id="tz3-ga-Et2"/>
+                                    <action selector="hangUpBtnClicked:" destination="ar0-sN-dqx" eventType="touchUpInside" id="scl-Es-q2w"/>
                                 </connections>
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="t06-2w-hsZ">

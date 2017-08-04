@@ -35,25 +35,21 @@ class SparkLoginViewController: BaseViewController {
     
     
     // MARK: - Life cycle
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        /* 
-         An [OAuth](https://oauth.net/2/) based authentication strategy
-         is to be used to authenticate a user on Cisco Spark.
-        */
-        let authenticator = OAuthAuthenticator(clientId: SparkEnvirmonment.ClientId, clientSecret: SparkEnvirmonment.ClientSecret, scope: SparkEnvirmonment.Scope, redirectUri: SparkEnvirmonment.RedirectUri)
-        sparkSDK = Spark(authenticator: authenticator)
-        sparkSDK?.logger = KSLogger() //Register a console logger into SDK
-    }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         statusLabel.text = "Powered by SparkSDK v" + Spark.version
     }
 
     
-    // MARK: - SparkSDK sparkID Login/Auth handling
+    // MARK: - SparkSDK: sparkID Login
     @IBAction func sparkLoginBtnClicked(_ sender: AnyObject) {
+        /*
+         An [OAuth](https://oauth.net/2/) based authentication strategy
+         is to be used to authenticate a user on Cisco Spark.
+         */
+        let authenticator = OAuthAuthenticator(clientId: SparkEnvirmonment.ClientId, clientSecret: SparkEnvirmonment.ClientSecret, scope: SparkEnvirmonment.Scope, redirectUri: SparkEnvirmonment.RedirectUri)
+        sparkSDK = Spark(authenticator: authenticator)
+        sparkSDK?.logger = KSLogger() //Register a console logger into SDK
         /*
           Brings up a web-based authorization view controller and directs the user through the OAuth process.
           note: parentViewController must contain a navigation Controller,
@@ -61,13 +57,13 @@ class SparkLoginViewController: BaseViewController {
          */
         (sparkSDK?.authenticator as! OAuthAuthenticator).authorize(parentViewController: self) { [weak self] success in
             if success {
-                // Spark Login Success codes here...
+                /* Spark Login Success codes here... */
                 if let strongSelf = self {
                     strongSelf.loginSuccessProcess()
                 }
             }
             else {
-                // Spark Login Fail codes here...
+                /* Spark Login Fail codes here... */
                 if let strongSelf = self {
                     strongSelf.loginFailureProcess()
                 }

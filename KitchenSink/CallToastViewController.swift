@@ -46,14 +46,7 @@ class CallToastViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let incomingCall = self.incomingCall{
-            for member in incomingCall.memberships {
-                if member.isInitiator == true {
-                     nameLabel.text = member.email ?? "Unknow"
-                }
-            }
-        }
-        sparkFetchUserProfile()
+        self.sparkFetchUserProfile()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -63,10 +56,10 @@ class CallToastViewController: BaseViewController {
           Callback when this *call* is disconnected (hangup, cancelled, get declined or other self 
           device pickup the call).
         */
-        checkCallStatus()
+        self.checkCallStatus()
     }
     
-    // MARK: - SparkSDK Fetch People Info 
+    // MARK: - SparkSDK: fetch person info with a incoming call
     private func sparkFetchUserProfile() {
         // check the user is logically authorized.
         if sparkSDK?.authenticator.authorized == true {
@@ -108,27 +101,11 @@ class CallToastViewController: BaseViewController {
         }
     }
 
-    // MARK: - Call answer/reject Blocks
-    
-    @IBAction private func answerButtonPressed(_ sender: AnyObject) {
-        if(self.answerBtnClickedBlock != nil){
-            self.answerBtnClickedBlock!()
-        }
-        dismissView()
-    }
-    
-    @IBAction private func declineButtonPressed(_ sender: AnyObject) {
-        if(self.rejectBtnClickedBlock != nil){
-            self.rejectBtnClickedBlock!()
-        }
-        dismissView()
-    }
-    
-    // MARK: - Check call Status Function
+    // MARK: SparkSDK: Check call Status Function
     func checkCallStatus() {
         /*
-          Callback when this *call* is disconnected (hangup, cancelled, get declined or other self
-          device pickup the call).
+         Callback when this *call* is disconnected (hangup, cancelled, get declined or other self
+         device pickup the call).
          */
         if let call = self.incomingCall {
             call.onDisconnected = { [weak self] disconnectionType in
@@ -139,8 +116,17 @@ class CallToastViewController: BaseViewController {
         }
     }
     
-    // MARK: - UI Views Implementation
+    // MARK: - UI Implementation
     override func initView() {
+        
+        if let incomingCall = self.incomingCall{
+            for member in incomingCall.memberships {
+                if member.isInitiator == true {
+                    nameLabel.text = member.email ?? "Unknow"
+                }
+            }
+        }
+
         for label in labelFontScaleCollection {
             label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
         }
@@ -171,6 +157,22 @@ class CallToastViewController: BaseViewController {
         }
     }
     
+    // MARK: ToasingView wake up answer/reject Blocks
+    
+    @IBAction private func answerButtonPressed(_ sender: AnyObject) {
+        if(self.answerBtnClickedBlock != nil){
+            self.answerBtnClickedBlock!()
+        }
+        dismissView()
+    }
+    
+    @IBAction private func declineButtonPressed(_ sender: AnyObject) {
+        if(self.rejectBtnClickedBlock != nil){
+            self.rejectBtnClickedBlock!()
+        }
+        dismissView()
+    }
+    
     private func fetchAvatarImage(_ avatarUrl: String) {
         Utils.downloadAvatarImage(avatarUrl, completionHandler: { [weak self] avatarImage in
             if let strongSelf = self {
@@ -190,6 +192,8 @@ class CallToastViewController: BaseViewController {
             }
         })
     }
+    
+    
     
     private func dismissView() {
         dismiss(animated: true, completion: nil)

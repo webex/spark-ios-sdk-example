@@ -45,8 +45,9 @@ class WaitingCallViewController: BaseViewController {
     // MARK: - Life cycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        //call callback init
-        sparkCallBackInit()
+        
+        /* register phone callback functions for incoming call */
+        self.sparkCallBackInit()
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -57,12 +58,11 @@ class WaitingCallViewController: BaseViewController {
         stopWaitingAnimation()
     }
     
-    // MARK: - SparkSDK Phone code for Call reception
+    // MARK: - SparkSDK: register callback code for Call reception
     func sparkCallBackInit() {
         if let phone = sparkSDK?.phone {
-            /* 
-              Callback when call is incoming.
-             */
+            
+            /*  Callback when call is incoming. */
             phone.onIncoming = { [weak self] call in
                 ///codes after receive cll here...
                 if let strongSelf = self {
@@ -89,6 +89,7 @@ class WaitingCallViewController: BaseViewController {
                     }
                 }
             }
+            callToastViewController.incomingCall = self.receivedCall
             present(callToastViewController, animated: true, completion: nil)
         }
     }
@@ -97,7 +98,7 @@ class WaitingCallViewController: BaseViewController {
                 
         if let videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController! {
             videoCallViewController.currentCall = self.receivedCall
-            videoCallViewController.remoteAddress = (self.receivedCall?.from?.email)!
+            videoCallViewController.videoCallRole = VideoCallRole.CallReceiver((self.receivedCall?.from?.email)!)
             navigationController?.pushViewController(videoCallViewController, animated: true)
         }
     }

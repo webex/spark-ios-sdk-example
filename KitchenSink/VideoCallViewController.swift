@@ -22,6 +22,11 @@ import UIKit
 import SparkSDK
 import Toast_Swift
 
+enum VideoCallRole {
+    case CallPoster(String)
+    case CallReceiver(String)
+}
+
 class VideoCallViewController: BaseViewController {
     
     // MARK: - UI Outlets variables
@@ -54,7 +59,6 @@ class VideoCallViewController: BaseViewController {
     private let avatarImageView = UIImageView()
     private var avatarImageViewHeightConstraint: NSLayoutConstraint!
     private let remoteDisplayNameLabel = UILabel()
-    private var callRateVC: CallRateViewController?
     private let fullScreenImage = UIImage.fontAwesomeIcon(name: .expand, textColor: UIColor.white, size: CGSize.init(width: 44, height: 44))
     private let normalScreenImage = UIImage.fontAwesomeIcon(name: .compress, textColor: UIColor.white, size: CGSize.init(width: 44, height: 44))
     private let uncheckImage = UIImage.fontAwesomeIcon(name: .squareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
@@ -90,6 +94,8 @@ class VideoCallViewController: BaseViewController {
         return .portrait
     }
     
+    /// videoCallRole represent if the call is posting call or reciving call
+    var videoCallRole :VideoCallRole = VideoCallRole.CallReceiver("")
     
     /// MediaRenderView is an OpenGL backed UIView
     @IBOutlet private weak var selfView: MediaRenderView!
@@ -99,28 +105,28 @@ class VideoCallViewController: BaseViewController {
     
     /// currentCall represent current processing call instance
     var currentCall: Call?
-    var remoteAddress: String = ""
     
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if(self.currentCall == nil){
-            didDialWithRemoteAddress(remoteAddress)
-        }else{
-            didAnswerIncomingCall()
+        switch videoCallRole {
+        case .CallReceiver(let remoteAddress):
+            self.didAnswerIncomingCall()
+            self.setupAvatarView(remoteAddress)
+        case .CallPoster(let remoteAddress):
+            self.didDialWithRemoteAddress(remoteAddress)
+            self.setupAvatarView(remoteAddress)
         }
-   
-        setupAvatarView(remoteAddress)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        updateUIStatus()
+        self.updateUIStatus()
         
-        //call callback init
-        sparkCallBackInit()
+        /* SparkSDK: register callback functions for "Callstate" changing */
+        self.sparkCallStatesProcess()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -131,52 +137,28 @@ class VideoCallViewController: BaseViewController {
     }
     
     override func viewDidLayoutSubviews() {
-        updateAvatarContainerView()
+        self.updateAvatarContainerView()
     }
     
-    
-    // MARK: - SparkSDK fetch Person Info
-    private func sparkPersonWithEmailString(emailStr: String){
-        if let emailAddress = EmailAddress.fromString(emailStr) {
-            // Person list is empty with SIP email address
-            // Lists people in the authenticated user's organization.
-            sparkSDK?.people.list(email: emailAddress, max: 1) { response in
-                var persons: [Person] = []
-                
-                switch response.result {
-                case .success(let value):
-                    persons = value
-                    if let person = persons.first {
-                        self.saveCallPersonHistory(person: person)
-                    }
-                case .failure(let error):
-                    print("ERROR: \(error)")
-                }
-            }
-        } else {
-            print("could not parse email address \(emailStr) for retrieving user profile")
-        }
-    }
-    
-    // MARK: - SparkSDK Phone Setting
+    // MARK: - SparkSDK: Dail/Answer/Hangup phone call
     func didDialWithRemoteAddress(_ remoteAddr: String) {
         if remoteAddr.isEmpty {
             return
         }
         
-        // audioVideo as making a Video call,audioOnly as making Voice only call.The default is audio call.
+        /* audioVideo as making a Video call,audioOnly as making Voice only call.The default is audio call.*/
         var mediaOption = MediaOption.audioOnly()
         if globalVideoSetting.isVideoEnabled() {
             mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
         }
         self.callStatus = .initiated
-        // Makes a call to an intended recipient on behalf of the authenticated user.
+        /* Makes a call to an intended recipient on behalf of the authenticated user.*/
         sparkSDK?.phone.dial(remoteAddr, option: mediaOption) { [weak self] result in
             if let strongSelf = self {
                 switch result {
                 case .success(let call):
                     strongSelf.currentCall = call
-                    strongSelf.sparkCallBackInit()
+                    strongSelf.sparkCallStatesProcess()
                 case .failure(let error):
                     _ = strongSelf.navigationController?.popViewController(animated: true)
                     print("Dial call error: \(error)")
@@ -198,12 +180,12 @@ class VideoCallViewController: BaseViewController {
         }
         
         if !globalVideoSetting.isSelfViewShow {
-            sendingVideoSwitch.isOn = false
-            showSelfView(sendingVideoSwitch.isOn)
+            self.sendingVideoSwitch.isOn = false
+            self.showSelfView(sendingVideoSwitch.isOn)
         }
         
         if !globalVideoSetting.isLoudSpeaker {
-            loudSpeakerSwitch.isOn = false
+            self.loudSpeakerSwitch.isOn = false
         }
         /* 
           Answers this call.
@@ -222,24 +204,8 @@ class VideoCallViewController: BaseViewController {
         }
         
     }
-    
-    private func isFacingModeUser(_ mode: Phone.FacingMode) -> Bool {
-        return mode == .user
-    }
-    
-    private func isCallConnected() -> Bool {
-        return callStatus == .connected
-    }
-    
-    private func isCallDisconnected() -> Bool {
-        return callStatus == .disconnected
-    }
-    
-    
-    // MARK: - Call variables control
-    
-    @IBAction private func hangup(_ sender: AnyObject) {
-        // Disconnects this call.
+    func didHangUpCall(){
+        /* Disconnect a call. */
         self.currentCall?.hangup() { [weak self] error in
             if let strongSelf = self {
                 if error != nil {
@@ -252,15 +218,114 @@ class VideoCallViewController: BaseViewController {
         }
     }
     
+    // MARK: - SparkSDK call state change processing code here...
+    func sparkCallStatesProcess() {
+        if let call = self.currentCall {
+            /* Callback when remote participant(s) is ringing. */
+            call.onRinging = { [weak self] in
+                if let strongSelf = self {
+                    strongSelf.callStatus = .ringing
+                    strongSelf.updateUIStatus()
+                }
+            }
+            /* Callback when remote participant(s) answered and this *call* is connected. */
+            call.onConnected = { [weak self] in
+                if let strongSelf = self {
+                    strongSelf.callStatus = .connected
+                    strongSelf.updateUIStatus()
+                    if globalVideoSetting.isVideoEnabled() && !globalVideoSetting.isSelfViewShow {
+                        strongSelf.toggleSendingVideo(strongSelf.sendingVideoSwitch)
+                    }
+                }
+                
+            }
+            /* Callback when this *call* is disconnected (hangup, cancelled, get declined or other self device pickup the call). */
+            call.onDisconnected = {[weak self] disconnectionType in
+                if let strongSelf = self {
+                    strongSelf.callStatus = .disconnected
+                    strongSelf.updateUIStatus()
+                    strongSelf.navigationTitle = "Disconnected"
+                    strongSelf.showDisconnectionType(disconnectionType)
+                    strongSelf.presentCallRateVC()
+                }
+            }
+            /* Callback when the media types of this *call* have changed. */
+            call.onMediaChanged = {[weak self] mediaChangeType in
+                if let strongSelf = self {
+                    print("remoteMediaDidChange Entering")
+                    strongSelf.updateAvatarViewVisibility()
+                    switch mediaChangeType {
+                        
+                    /* Local/Remote video rendering view size has changed */
+                    case .localVideoViewSize,.remoteVideoViewSize:
+                        break
+                    /* This might be triggered when the remote party muted or unmuted the audio. */
+                    case .remoteSendingAudio(let isSending):
+                        strongSelf.receivingAudioSwitch.isOn = isSending
+                        
+                    /* This might be triggered when the remote party muted or unmuted the video. */
+                    case .remoteSendingVideo(let isSending):
+                        strongSelf.receivingVideoSwitch.isOn = isSending
+                        
+                    /* This might be triggered when the local party muted or unmuted the video. */
+                    case .sendingAudio(let isSending):
+                        strongSelf.sendingAudioSwitch.isOn = isSending
+                        
+                    /* This might be triggered when the local party muted or unmuted the aideo. */
+                    case .sendingVideo(let isSending):
+                        strongSelf.sendingVideoSwitch.isOn = isSending
+                        
+                    /* Camera FacingMode on local device has switched. */
+                    case .cameraSwitched:
+                        strongSelf.updateCheckBoxStatus()
+                        
+                    /* Whether loud speaker on local device is on or not has switched. */
+                    case .spearkerSwitched:
+                        strongSelf.loudSpeakerSwitch.isOn = call.isSpeaker
+                    default:
+                        break
+                    }
+                    print("remoteMediaDidChange out")
+                }
+            }
+        }
+    }
+    
+    // MARK: - SparkSDK fetch Person Info
+    private func sparkPersonWithEmailString(emailStr: String){
+        if let emailAddress = EmailAddress.fromString(emailStr) {
+            /*
+             Person list is empty with SIP email address
+             Lists people in the authenticated user's organization.
+            */
+            sparkSDK?.people.list(email: emailAddress, max: 1) { response in
+                var persons: [Person] = []
+                
+                switch response.result {
+                case .success(let value):
+                    persons = value
+                    if let person = persons.first {
+                        self.saveCallPersonHistory(person: person)
+                    }
+                case .failure(let error):
+                    print("ERROR: \(error)")
+                }
+            }
+        } else {
+            print("could not parse email address \(emailStr) for retrieving user profile")
+        }
+    }
+    
+    // MARK: Xib file IBActions
     @IBAction private func toggleLoudSpeaker(_ sender: AnyObject) {
         // True if the loud speaker is selected as the audio output device for this *call*. Otherwise, false.
-         self.currentCall?.isSpeaker = loudSpeakerSwitch.isOn
+        self.currentCall?.isSpeaker = loudSpeakerSwitch.isOn
     }
     
     @IBAction private func toggleSendingVideo(_ sender: AnyObject) {
         // True if the local party of this *call* is sending video. Otherwise, false.
-         self.currentCall?.sendingVideo = sendingVideoSwitch.isOn
-        showSelfView(sendingVideoSwitch.isOn)
+        self.currentCall?.sendingVideo = sendingVideoSwitch.isOn
+        self.showSelfView(sendingVideoSwitch.isOn)
     }
     
     @IBAction private func toggleSendingAudio(_ sender: AnyObject) {
@@ -271,7 +336,7 @@ class VideoCallViewController: BaseViewController {
     @IBAction private func toggleReceivingVideo(_ sender: AnyObject) {
         // True if the local party of this *call* is receiving video. Otherwise, false.
         self.currentCall?.receivingVideo = receivingVideoSwitch.isOn
-        updateAvatarViewVisibility()
+        self.updateAvatarViewVisibility()
     }
     
     @IBAction private func toggleReceivingAudio(_ sender: AnyObject) {
@@ -281,15 +346,19 @@ class VideoCallViewController: BaseViewController {
     @IBAction func fullScreenButtonTouchUpInside(_ sender: Any) {
         isFullScreen = !isFullScreen
         if isFullScreen {
-            fullScreenPortrait(UIScreen.main.bounds.height)
+            self.fullScreenPortrait(UIScreen.main.bounds.height)
         }
         else {
-            normalSizePortrait()
+            self.normalSizePortrait()
             
         }
     }
     @IBAction func pressDialpadButton(_ sender: AnyObject) {
-        hideDialpadView(!dialpadView.isHidden)
+        self.hideDialpadView(!dialpadView.isHidden)
+    }
+    
+    @IBAction private func hangUpBtnClicked(_ sender: AnyObject) {
+        self.didHangUpCall()
     }
     
     // MARK: - UI Implementation
@@ -309,128 +378,60 @@ class VideoCallViewController: BaseViewController {
         
         //checkbox init
         var tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:)))
-        frontCameraView.addGestureRecognizer(tapGesture)
+        self.frontCameraView.addGestureRecognizer(tapGesture)
         
         tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:)))
-        backCameraView.addGestureRecognizer(tapGesture)
+        self.backCameraView.addGestureRecognizer(tapGesture)
         
-    }
-    
-    // MARK: UPdate UI depends on Call state
-    /// Init all call back func.
-    func sparkCallBackInit() {
-        if let call = self.currentCall {
-            // Callback when remote participant(s) is ringing.
-            call.onRinging = { [weak self] in
-                if let strongSelf = self {
-                    strongSelf.callStatus = .ringing
-                    strongSelf.updateUIStatus()
-                }
-            }
-            // Callback when remote participant(s) answered and this *call* is connected.
-            call.onConnected = { [weak self] in
-                if let strongSelf = self {
-                    strongSelf.callStatus = .connected
-                    strongSelf.updateUIStatus()
-                    if globalVideoSetting.isVideoEnabled() && !globalVideoSetting.isSelfViewShow {
-                        strongSelf.toggleSendingVideo(strongSelf.sendingVideoSwitch)
-                    }
-                }
-                
-            }
-            // Callback when this *call* is disconnected (hangup, cancelled, get declined or other self device pickup the call).
-            call.onDisconnected = {[weak self] disconnectionType in
-                if let strongSelf = self {
-                    strongSelf.callStatus = .disconnected
-                    strongSelf.updateUIStatus()
-                    strongSelf.navigationTitle = "Disconnected"
-                    strongSelf.showDisconnectionType(disconnectionType)
-                    strongSelf.presentCallRateVC()
-                }
-            }
-            // Callback when the media types of this *call* have changed.
-            call.onMediaChanged = {[weak self] mediaChangeType in
-                if let strongSelf = self {
-                    print("remoteMediaDidChange Entering")
-                    strongSelf.updateAvatarViewVisibility()
-                    switch mediaChangeType {
-                    //Local/Remote video rendering view size has changed
-                    case .localVideoViewSize,.remoteVideoViewSize:
-                        break
-                    // This might be triggered when the remote party muted or unmuted the audio.
-                    case .remoteSendingAudio(let isSending):
-                        strongSelf.receivingAudioSwitch.isOn = isSending
-                    // This might be triggered when the remote party muted or unmuted the video.
-                    case .remoteSendingVideo(let isSending):
-                        strongSelf.receivingVideoSwitch.isOn = isSending
-                    // This might be triggered when the local party muted or unmuted the video.
-                    case .sendingAudio(let isSending):
-                        strongSelf.sendingAudioSwitch.isOn = isSending
-                    // This might be triggered when the local party muted or unmuted the aideo.
-                    case .sendingVideo(let isSending):
-                        strongSelf.sendingVideoSwitch.isOn = isSending
-                    // Camera FacingMode on local device has switched.
-                    case .cameraSwitched:
-                        strongSelf.updateCheckBoxStatus()
-                    // Whether loud speaker on local device is on or not has switched.
-                    case .spearkerSwitched:
-                        strongSelf.loudSpeakerSwitch.isOn = call.isSpeaker
-                    default:
-                        break
-                    }
-                    print("remoteMediaDidChange out")
-                }
-            }
-        }
     }
     
     func updateCheckBoxStatus() {
         guard globalVideoSetting.isVideoEnabled() != false else {
-            backCameraImage.image = uncheckImage
-            frontCameraImage.image = uncheckImage
+            self.backCameraImage.image = uncheckImage
+            self.frontCameraImage.image = uncheckImage
             return
         }
         
         if let isFacingMode =  self.currentCall?.facingMode {
             if isFacingMode == .user {
-                backCameraImage.image = uncheckImage
-                frontCameraImage.image = checkImage
+                self.backCameraImage.image = uncheckImage
+                self.frontCameraImage.image = checkImage
             }
             else {
-                backCameraImage.image = checkImage
-                frontCameraImage.image = uncheckImage
+                self.backCameraImage.image = checkImage
+                self.frontCameraImage.image = uncheckImage
             }
         }
         else if globalVideoSetting.facingMode == .user {
-            backCameraImage.image = uncheckImage
-            frontCameraImage.image = checkImage
+            self.backCameraImage.image = uncheckImage
+            self.frontCameraImage.image = checkImage
         }
         else {
-            backCameraImage.image = checkImage
-            frontCameraImage.image = uncheckImage
+            self.backCameraImage.image = checkImage
+            self.frontCameraImage.image = uncheckImage
         }
     }
     
     
     private func setupAvatarView(_ remoteAddr: String) {
-        avatarImageView.image = UIImage(named: "DefaultAvatar")
-        avatarImageView.layer.masksToBounds = true
-        avatarImageView.translatesAutoresizingMaskIntoConstraints = false
+        self.avatarImageView.image = UIImage(named: "DefaultAvatar")
+        self.avatarImageView.layer.masksToBounds = true
+        self.avatarImageView.translatesAutoresizingMaskIntoConstraints = false
         
-        remoteDisplayNameLabel.text = remoteAddr
-        remoteDisplayNameLabel.font = UIFont.labelLightFont(ofSize: 17 * Utils.HEIGHT_SCALE)
-        remoteDisplayNameLabel.textColor = UIColor.white
-        remoteDisplayNameLabel.textAlignment = NSTextAlignment.center
-        remoteDisplayNameLabel.translatesAutoresizingMaskIntoConstraints = false
+        self.remoteDisplayNameLabel.text = remoteAddr
+        self.remoteDisplayNameLabel.font = UIFont.labelLightFont(ofSize: 17 * Utils.HEIGHT_SCALE)
+        self.remoteDisplayNameLabel.textColor = UIColor.white
+        self.remoteDisplayNameLabel.textAlignment = NSTextAlignment.center
+        self.remoteDisplayNameLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        avatarContainerView.addSubview(avatarImageView)
-        avatarContainerView.addSubview(remoteDisplayNameLabel)
+        self.avatarContainerView.addSubview(avatarImageView)
+        self.avatarContainerView.addSubview(remoteDisplayNameLabel)
         
         
         let avatarImageViewCenterXConstraint = NSLayoutConstraint.init(item: avatarImageView, attribute: .centerX, relatedBy: .equal, toItem: avatarContainerView, attribute: .centerX, multiplier: 1, constant: 0)
         let avatarImageViewCenterYConstraint = NSLayoutConstraint.init(item: avatarImageView, attribute: .centerY, relatedBy: .equal, toItem: avatarContainerView, attribute: .centerY, multiplier: 1, constant: -(remoteViewHeight.constant/3/4))
         
-        avatarImageViewHeightConstraint = NSLayoutConstraint.init(item: avatarImageView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1, constant: remoteViewHeight.constant/3)
+        self.avatarImageViewHeightConstraint = NSLayoutConstraint.init(item: avatarImageView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1, constant: remoteViewHeight.constant/3)
         let avatarImageViewWidthConstraint = NSLayoutConstraint.init(item: avatarImageView, attribute: .width, relatedBy: .equal, toItem: avatarImageView, attribute: .height, multiplier: 1, constant: 0)
         
         let remoteDisplayNameLabelLeadingConstraint = NSLayoutConstraint.init(item: remoteDisplayNameLabel, attribute: .leading, relatedBy: .equal, toItem: avatarContainerView, attribute: .leading, multiplier: 1, constant: 0)
@@ -438,15 +439,15 @@ class VideoCallViewController: BaseViewController {
         let remoteDisplayNameLabelHeightConstraint = NSLayoutConstraint.init(item: remoteDisplayNameLabel, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1, constant: 21 * Utils.HEIGHT_SCALE)
         let remoteDisplayNameLabelTopConstraint = NSLayoutConstraint.init(item: remoteDisplayNameLabel, attribute: .top, relatedBy: .equal, toItem: avatarImageView, attribute: .bottom, multiplier: 1, constant: 15 * Utils.HEIGHT_SCALE)
         
-        remoteDisplayNameLabel.addConstraint(remoteDisplayNameLabelHeightConstraint)
+        self.remoteDisplayNameLabel.addConstraint(remoteDisplayNameLabelHeightConstraint)
         
-        avatarContainerView.addConstraint(avatarImageViewCenterXConstraint)
-        avatarContainerView.addConstraint(avatarImageViewCenterYConstraint)
-        avatarContainerView.addConstraint(remoteDisplayNameLabelLeadingConstraint)
-        avatarContainerView.addConstraint(remoteDisplayNameLabelTrailingConstraint)
-        avatarContainerView.addConstraint(remoteDisplayNameLabelTopConstraint)
-        avatarImageView.addConstraint(avatarImageViewHeightConstraint)
-        avatarImageView.addConstraint(avatarImageViewWidthConstraint)
+        self.avatarContainerView.addConstraint(avatarImageViewCenterXConstraint)
+        self.avatarContainerView.addConstraint(avatarImageViewCenterYConstraint)
+        self.avatarContainerView.addConstraint(remoteDisplayNameLabelLeadingConstraint)
+        self.avatarContainerView.addConstraint(remoteDisplayNameLabelTrailingConstraint)
+        self.avatarContainerView.addConstraint(remoteDisplayNameLabelTopConstraint)
+        self.avatarImageView.addConstraint(avatarImageViewHeightConstraint)
+        self.avatarImageView.addConstraint(avatarImageViewWidthConstraint)
         
         view.setNeedsUpdateConstraints()
         
@@ -490,14 +491,14 @@ class VideoCallViewController: BaseViewController {
             return
         }
         if !isCallConnected() {
-            showAvatarContainerView(true)
+            self.showAvatarContainerView(true)
             return
         }
         
         if !(self.currentCall!.receivingVideo) || !(self.currentCall!.remoteSendingVideo) {
-            showAvatarContainerView(true)
+            self.showAvatarContainerView(true)
         } else {
-            showAvatarContainerView(false)
+            self.showAvatarContainerView(false)
         }
     }
     
@@ -553,77 +554,74 @@ class VideoCallViewController: BaseViewController {
             disconnectionTypeString = "error: \(error)"
         }
         
-        disconnectionTypeLabel.text = disconnectionTypeLabel.text! + disconnectionTypeString
-        disconnectionTypeLabel.isHidden = false
+        self.disconnectionTypeLabel.text = disconnectionTypeLabel.text! + disconnectionTypeString
+        self.disconnectionTypeLabel.isHidden = false
     }
     
     private func updateSwitches() {
-        updateCheckBoxStatus()
-        loudSpeakerSwitch.isOn = self.currentCall?.isSpeaker ?? globalVideoSetting.isLoudSpeaker
-        sendingVideoSwitch.isOn = self.currentCall?.sendingVideo ?? globalVideoSetting.isSelfViewShow
-        sendingAudioSwitch.isOn = self.currentCall?.sendingAudio ?? true
-        receivingVideoSwitch.isOn = self.currentCall?.receivingVideo ?? true
-        receivingAudioSwitch.isOn = self.currentCall?.receivingAudio ?? true
+        self.updateCheckBoxStatus()
+        self.loudSpeakerSwitch.isOn = self.currentCall?.isSpeaker ?? globalVideoSetting.isLoudSpeaker
+        self.sendingVideoSwitch.isOn = self.currentCall?.sendingVideo ?? globalVideoSetting.isSelfViewShow
+        self.sendingAudioSwitch.isOn = self.currentCall?.sendingAudio ?? true
+        self.receivingVideoSwitch.isOn = self.currentCall?.receivingVideo ?? true
+        self.receivingAudioSwitch.isOn = self.currentCall?.receivingAudio ?? true
         
         if !globalVideoSetting.isVideoEnabled() {
-            frontCameraView.isUserInteractionEnabled = false
-            backCameraView.isUserInteractionEnabled = false
-            sendingVideoSwitch.isOn = false
-            receivingVideoSwitch.isOn = false
-            sendingVideoSwitch.isEnabled = false
-            receivingVideoSwitch.isEnabled = false
+            self.frontCameraView.isUserInteractionEnabled = false
+            self.backCameraView.isUserInteractionEnabled = false
+            self.sendingVideoSwitch.isOn = false
+            self.receivingVideoSwitch.isOn = false
+            self.sendingVideoSwitch.isEnabled = false
+            self.receivingVideoSwitch.isEnabled = false
         }
         else {
-            frontCameraView.isUserInteractionEnabled = true
-            backCameraView.isUserInteractionEnabled = true
+            self.frontCameraView.isUserInteractionEnabled = true
+            self.backCameraView.isUserInteractionEnabled = true
         }
     }
     
     private func updateSelfViewVisibility() {
-        showSelfView(self.currentCall?.sendingVideo ?? false)
+        self.showSelfView(self.currentCall?.sendingVideo ?? false)
     }
     
     
     private func hideCallView() {
-        showSelfView(false)
-        showCallControllView(false)
+        self.showSelfView(false)
+        self.showCallControllView(false)
     }
     
     private func showSelfView(_ shown: Bool) {
-        selfView.isHidden = !shown
+        self.selfView.isHidden = !shown
     }
     
     private func showCallControllView(_ shown: Bool) {
-        if isCallDisconnected() {
-            switchContainerView.isHidden = true
-            hangupButton.isHidden = true
+        if self.isCallDisconnected() {
+            self.switchContainerView.isHidden = true
+            self.hangupButton.isHidden = true
         } else {
-            switchContainerView.isHidden = !shown
-            hangupButton.isHidden = !shown
-            hideDialpadButton(!shown)
+            self.switchContainerView.isHidden = !shown
+            self.hangupButton.isHidden = !shown
+            self.hideDialpadButton(!shown)
         }
     }
     
     private func showAvatarContainerView(_ shown: Bool) {
-        avatarContainerView.isHidden = !shown
+        self.avatarContainerView.isHidden = !shown
     }
     
     private func hideDialpadView(_ hidden: Bool) {
-        dialpadView.isHidden = hidden
+        self.dialpadView.isHidden = hidden
     }
     
     private func hideDialpadButton(_ hidden: Bool) {
-        dialpadButton.isHidden = hidden
+        self.dialpadButton.isHidden = hidden
         if hidden {
-            hideDialpadView(true)
+            self.hideDialpadView(true)
         }
     }
     
     private func presentCallRateVC() {
-        guard callRateVC == nil else {
-            return
-        }
-        callRateVC = storyboard?.instantiateViewController(withIdentifier: "CallFeedbackViewController") as? CallRateViewController
+        let callRateVC = storyboard?.instantiateViewController(withIdentifier: "CallFeedbackViewController") as? CallRateViewController
         callRateVC?.modalPresentationStyle = .fullScreen
         callRateVC?.modalTransitionStyle = .coverVertical
         
@@ -649,10 +647,10 @@ class VideoCallViewController: BaseViewController {
     }
 
     override func goBack() {
-        if isCallDisconnected() {
+        if self.isCallDisconnected() {
             _ = navigationController?.popViewController(animated: true)
         } else {
-            showEndCallAlert()
+            self.showEndCallAlert()
         }
     }
     
@@ -670,37 +668,49 @@ class VideoCallViewController: BaseViewController {
                     self.currentCall?.facingMode = .environment
                 }
             }
-            updateCheckBoxStatus()
+            self.updateCheckBoxStatus()
         }
+    }
+    
+    private func isFacingModeUser(_ mode: Phone.FacingMode) -> Bool {
+        return mode == .user
+    }
+    
+    private func isCallConnected() -> Bool {
+        return callStatus == .connected
+    }
+    
+    private func isCallDisconnected() -> Bool {
+        return callStatus == .disconnected
     }
     
     // MARK: - Orientation manage
     
     private func fullScreenLandscape(_ height:CGFloat) {
-        remoteViewHeight.constant = height
-        selfViewWidth.constant = 100 * Utils.HEIGHT_SCALE
-        selfViewHeight.constant = 70 * Utils.WIDTH_SCALE
-        hideControlView(true)
-        fullScreenButton.isHidden = true
+        self.remoteViewHeight.constant = height
+        self.selfViewWidth.constant = 100 * Utils.HEIGHT_SCALE
+        self.selfViewHeight.constant = 70 * Utils.WIDTH_SCALE
+        self.hideControlView(true)
+        self.fullScreenButton.isHidden = true
         self.addMoveReconizerOnSelfView()
     }
     private func fullScreenPortrait(_ height:CGFloat) {
-        remoteViewHeight.constant = height
-        selfViewWidth.constant = 70 * Utils.WIDTH_SCALE
-        selfViewHeight.constant = 100 * Utils.HEIGHT_SCALE
-        hideControlView(true)
-        fullScreenButton.isHidden = false
-        fullScreenButton.setBackgroundImage(normalScreenImage, for: .normal)
+        self.remoteViewHeight.constant = height
+        self.selfViewWidth.constant = 70 * Utils.WIDTH_SCALE
+        self.selfViewHeight.constant = 100 * Utils.HEIGHT_SCALE
+        self.hideControlView(true)
+        self.fullScreenButton.isHidden = false
+        self.fullScreenButton.setBackgroundImage(normalScreenImage, for: .normal)
         self.addMoveReconizerOnSelfView()
     }
     
     private func normalSizePortrait() {
-        remoteViewHeight.constant = 210 * Utils.HEIGHT_SCALE
-        selfViewWidth.constant = 70 * Utils.WIDTH_SCALE
-        selfViewHeight.constant = 100 * Utils.HEIGHT_SCALE
-        hideControlView(false)
-        fullScreenButton.isHidden = false
-        fullScreenButton.setBackgroundImage(fullScreenImage, for: .normal)
+        self.remoteViewHeight.constant = 210 * Utils.HEIGHT_SCALE
+        self.selfViewWidth.constant = 70 * Utils.WIDTH_SCALE
+        self.selfViewHeight.constant = 100 * Utils.HEIGHT_SCALE
+        self.hideControlView(false)
+        self.fullScreenButton.isHidden = false
+        self.fullScreenButton.setBackgroundImage(fullScreenImage, for: .normal)
         if let reconizer = self.longPressRec{
             selfView.removeGestureRecognizer(reconizer)
             self.longPressRec = nil
@@ -708,9 +718,9 @@ class VideoCallViewController: BaseViewController {
         
     }
     private func hideControlView(_ isHidden: Bool) {
-        fullScreenButton.isHidden = UIDevice.current.orientation.isLandscape
-        disconnectionTypeLabel.isHidden = (isHidden == false ? !isCallDisconnected():isHidden)
-        showCallControllView(!isHidden)
+        self.fullScreenButton.isHidden = UIDevice.current.orientation.isLandscape
+        self.disconnectionTypeLabel.isHidden = (isHidden == false ? !isCallDisconnected():isHidden)
+        self.showCallControllView(!isHidden)
         navigationController?.isNavigationBarHidden = isHidden
     }
     
@@ -718,15 +728,15 @@ class VideoCallViewController: BaseViewController {
         if(self.longPressRec == nil){
             self.longPressRec = UILongPressGestureRecognizer(target: self, action: #selector(selfViewMoved))
             self.longPressRec?.minimumPressDuration = 0.05
-            selfView.addGestureRecognizer(self.longPressRec!)
+            self.selfView.addGestureRecognizer(self.longPressRec!)
         }
     }
     @objc func selfViewMoved(recognizer: UILongPressGestureRecognizer){
         let point = recognizer.location(in: self.view)
         if(recognizer.state == .began){
-            selfView.center = point
+            self.selfView.center = point
         }else if(recognizer.state == .changed){
-            selfView.center = point
+            self.selfView.center = point
         }else if(recognizer.state == .ended){
             
         }
@@ -735,8 +745,8 @@ class VideoCallViewController: BaseViewController {
     // MARK: Landscape
     private func viewOrientationChange(_ isLandscape:Bool,with size:CGSize) {
         if isLandscape {
-            fullScreenLandscape(size.height)
-            isFullScreen = true
+            self.fullScreenLandscape(size.height)
+            self.isFullScreen = true
         }
         else if isFullScreen {
             fullScreenPortrait(size.height)
@@ -747,21 +757,20 @@ class VideoCallViewController: BaseViewController {
     }
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        viewOrientationChange(UIDevice.current.orientation.isLandscape,with:size)
-        updateAvatarContainerView()
+        self.viewOrientationChange(UIDevice.current.orientation.isLandscape,with:size)
+        self.updateAvatarContainerView()
     }
     private func updateAvatarContainerView() {
-        avatarImageViewHeightConstraint.constant = remoteViewHeight.constant/3
-        avatarImageView.layer.cornerRadius = avatarImageViewHeightConstraint.constant/2
+        self.avatarImageViewHeightConstraint.constant = remoteViewHeight.constant/3
+        self.avatarImageView.layer.cornerRadius = avatarImageViewHeightConstraint.constant/2
     }
     // MARK: - other Functions
     deinit {
-        self.callRateVC = nil
         guard currentCall != nil else {
             return
         }
         // NOTE: Disconnects this call,Otherwise error will occur and completionHandler will be dispatched.
-        currentCall?.hangup() { error in
+        self.currentCall?.hangup() { error in
             
         }
         self.currentCall = nil

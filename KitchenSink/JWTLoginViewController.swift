@@ -40,13 +40,6 @@ class JWTLoginViewController: BaseViewController {
     
     
     // MARK: - Life cycle
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
-        topToSuperView = imageTopToSuperView.constant
-    }
-    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         // UI SetUP
@@ -54,7 +47,7 @@ class JWTLoginViewController: BaseViewController {
         self.jwtTextField.becomeFirstResponder()
     }
     
-    // MARK: - SparkSDK JWT Login/Auth handling
+    // MARK: - SparkSDK: JWT Login
     @IBAction func jwtLoginBtnClicked(_ sender: UIButton) {
         guard let jwtString = jwtTextField.text else {
             return
@@ -78,11 +71,11 @@ class JWTLoginViewController: BaseViewController {
                 
                 switch response.result {
                 case .success(let person):
-                    // JWT Login Success codes here...
+                    /* JWT Login Success codes here... */
                     self.loginSuccessProcess(person: person)
                     
                 case .failure(let error):
-                    // JWT Login Fail codes here...
+                    /* JWT Login Fail codes here... */
                     self.loginFailureProcess(error: error)
                 }
                 
@@ -122,6 +115,10 @@ class JWTLoginViewController: BaseViewController {
     // MARK: - UI Implementation
     override func initView()
     {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        topToSuperView = imageTopToSuperView.constant
+        
         for label in labelFontScaleCollection {
             label.font = UIFont.labelLightFont(ofSize: label.font.pointSize * Utils.HEIGHT_SCALE)
         }
