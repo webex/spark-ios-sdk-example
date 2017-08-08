@@ -41,28 +41,29 @@ class CallToastViewController: BaseViewController {
     /// incomingCall represent for current incoming call
     var incomingCall: Call?
     
+    /// saparkSDK reperesent for the SparkSDK API instance
+    var sparkSDK: Spark?
     
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.sparkFetchUserProfile()
+        self.sparkFetchUserProfiles()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         /*
-          Callback when this *call* is disconnected (hangup, cancelled, get declined or other self 
-          device pickup the call).
+         Callback when this *call* is disconnected (hangup, cancelled, get declined or other self device pickup the call).
         */
         self.checkCallStatus()
     }
     
     // MARK: - SparkSDK: fetch person info with a incoming call
-    private func sparkFetchUserProfile() {
+    private func sparkFetchUserProfiles() {
         // check the user is logically authorized.
-        if sparkSDK?.authenticator.authorized == true {
+        if self.sparkSDK?.authenticator.authorized == true {
             
             var callerEmailString = ""
             
@@ -76,10 +77,10 @@ class CallToastViewController: BaseViewController {
             
             if (callerEmailString != "Unkown") {
                 /* 
-                  Person list is empty with SIP email address
-                  Lists people in the authenticated user's organization.
+                 Person list is empty with SIP email address
+                 Lists people in the authenticated user's organization.
                  */
-                sparkSDK?.people.list(email: EmailAddress.fromString(callerEmailString), max: 1) { response in
+                self.sparkSDK?.people.list(email: EmailAddress.fromString(callerEmailString), max: 1) { response in
                     
                     // Check Response Status
                     switch response.result {
@@ -103,7 +104,7 @@ class CallToastViewController: BaseViewController {
 
     // MARK: SparkSDK: Check call Status Function
     func checkCallStatus() {
-        /*
+        /* 
          Callback when this *call* is disconnected (hangup, cancelled, get declined or other self
          device pickup the call).
          */

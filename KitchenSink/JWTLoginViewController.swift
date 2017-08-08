@@ -38,13 +38,29 @@ class JWTLoginViewController: BaseViewController {
     private var topToSuperView: CGFloat = 0
     @IBOutlet weak var buttonHeightConstraint: NSLayoutConstraint!
     
+    /// saparkSDK reperesent for the SparkSDK API instance
+    var sparkSDK: Spark?
+    
     
     // MARK: - Life cycle
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        // UI SetUP
-        self.hideWaitingView()
-        self.jwtTextField.becomeFirstResponder()
+        
+        /*
+         Check wether sparkSDK is already authorized, sparkSDk saves authorization info in device key-chain
+         -note: if user didn't logged out or didn't deauthorize, "jwtAuthStrategy.authorized" function will return true
+         -note: if sparkSDK is authorized, directly jump to login success process
+         */
+        let jwtAuthStrategy = JWTAuthenticator()
+        if jwtAuthStrategy.authorized == true {
+            /* JWT Login success process codes here....*/
+            self.sparkSDK = Spark(authenticator: jwtAuthStrategy)
+            self.sparkSDK?.logger = KSLogger() //Register a console logger into SDK
+            self.loginSuccessProcess()
+        }else{
+            /* JWT Login failure process codes here....*/
+            self.jwtTextField.becomeFirstResponder()
+        }
     }
     
     // MARK: - SparkSDK: JWT Login
@@ -53,7 +69,6 @@ class JWTLoginViewController: BaseViewController {
             return
         }
         self.jwtTextField.resignFirstResponder()
-        showWaitingView()
         
         /*
          A [JSON Web Token](https://jwt.io/introduction) (JWT) based authentication strategy
@@ -62,49 +77,24 @@ class JWTLoginViewController: BaseViewController {
         let jwtAuthStrategy = JWTAuthenticator()
         jwtAuthStrategy.authorizedWith(jwt: jwtString)
         if jwtAuthStrategy.authorized == true {
-            
-            sparkSDK = Spark(authenticator: jwtAuthStrategy)
-            sparkSDK?.logger = KSLogger() //Register a console logger into SDK
-            
-            sparkSDK?.people.getMe() { response in
-                self.hideWaitingView()
-                
-                switch response.result {
-                case .success(let person):
-                    /* JWT Login Success codes here... */
-                    self.loginSuccessProcess(person: person)
-                    
-                case .failure(let error):
-                    /* JWT Login Fail codes here... */
-                    self.loginFailureProcess(error: error)
-                }
-                
-            }
+            /* JWT Login success process codes here....*/
+            self.sparkSDK = Spark(authenticator: jwtAuthStrategy)
+            self.sparkSDK?.logger = KSLogger() //Register a console logger into SDK
+            self.loginSuccessProcess()
         } else {
-            hideWaitingView()
+            /* JWT Login failure process codes here....*/
             showLoginError()
         }
     }
     
-    private func loginSuccessProcess(person: Person){
-        loggedInUser = person
-        
-        let emailAddress = (person.emails ?? []).first
-        let emailString = emailAddress == nil ? "NONE" : emailAddress!.toString()
-        let alert = UIAlertController(title: "Logged in", message: "Logged in as \(person.displayName ?? "NONE") with id \n\(emailString)", preferredStyle: .alert)
-        
-        let okAction = UIAlertAction(title: "OK", style: .cancel) { action in
-            let viewController = self.storyboard?.instantiateViewController(withIdentifier: "HomeTableViewController") as! HomeTableViewController
-            self.navigationController?.pushViewController(viewController, animated: true)
-        }
-        
-        alert.addAction(okAction)
-        
-        self.present(alert, animated: true)
+    private func loginSuccessProcess(){
+        let homeViewController = self.storyboard?.instantiateViewController(withIdentifier: "HomeTableViewController") as! HomeTableViewController
+        homeViewController.sparkSDK = self.sparkSDK
+        self.navigationController?.pushViewController(homeViewController, animated: true)
     }
     
     private func loginFailureProcess(error: Error){
-        loggedInUser = nil
+
         let alert = UIAlertController(title: "Could Not Get Personal Info", message: "Unable to retrieve information about the user logged in using the JWT: Please make sure your JWT is correct. \(error)", preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .cancel)
         alert.addAction(okAction)

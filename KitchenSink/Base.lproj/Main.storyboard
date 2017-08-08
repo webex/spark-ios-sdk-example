@@ -480,7 +480,16 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DLg-Xz-RE7">
+                                    <rect key="frame" x="20" y="73" width="374" height="17"/>
+                                    <fontDescription key="fontDescription" type="system" weight="light" pointSize="14"/>
+                                    <color key="textColor" red="0.41568627450000001" green="0.41960784309999999" blue="0.42352941179999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OwD-xg-0HI">
                                     <rect key="frame" x="20" y="93" width="374" height="17"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="17" id="gmn-4j-rsH"/>
+                                    </constraints>
                                     <fontDescription key="fontDescription" type="system" weight="light" pointSize="14"/>
                                     <color key="textColor" red="0.41568627450000001" green="0.41960784309999999" blue="0.42352941179999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     <nil key="highlightedColor"/>
@@ -488,9 +497,12 @@
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <constraints>
-                                <constraint firstAttribute="bottom" secondItem="DLg-Xz-RE7" secondAttribute="bottom" id="Zyt-2k-7zr"/>
+                                <constraint firstItem="OwD-xg-0HI" firstAttribute="leading" secondItem="vhp-n5-maw" secondAttribute="leading" constant="20" id="CDH-Dn-gde"/>
+                                <constraint firstAttribute="bottom" secondItem="OwD-xg-0HI" secondAttribute="bottom" id="JL9-Ri-IFd"/>
+                                <constraint firstAttribute="bottom" secondItem="DLg-Xz-RE7" secondAttribute="bottom" constant="20" id="Zyt-2k-7zr"/>
                                 <constraint firstAttribute="trailing" secondItem="DLg-Xz-RE7" secondAttribute="trailing" constant="20" id="brK-7Z-LLk"/>
                                 <constraint firstItem="DLg-Xz-RE7" firstAttribute="leading" secondItem="vhp-n5-maw" secondAttribute="leading" constant="20" id="qZy-4j-spu"/>
+                                <constraint firstAttribute="trailing" secondItem="OwD-xg-0HI" secondAttribute="trailing" constant="20" id="vpQ-6z-MZR"/>
                             </constraints>
                         </view>
                         <sections>
@@ -558,7 +570,7 @@
                                                     <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="20"/>
                                                     <state key="normal" title="Video/Audio setup"/>
                                                     <connections>
-                                                        <segue destination="FPD-mq-SEs" kind="show" id="Rbg-Gd-nPZ"/>
+                                                        <segue destination="FPD-mq-SEs" kind="show" identifier="Video/AudioBtnClicked" id="Rbg-Gd-nPZ"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -570,7 +582,7 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <segue destination="FPD-mq-SEs" kind="show" id="ArJ-LB-jmq"/>
+                                            <segue destination="FPD-mq-SEs" kind="show" identifier="Video/AudioBtnClicked" id="ArJ-LB-jmq"/>
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="a6e-Dg-JRZ">
@@ -589,7 +601,7 @@
                                                     <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="20"/>
                                                     <state key="normal" title="Initiate call"/>
                                                     <connections>
-                                                        <segue destination="gDT-0P-iFu" kind="show" id="whO-eP-rOt"/>
+                                                        <segue destination="gDT-0P-iFu" kind="show" identifier="InitiateCallBtnClicked" id="whO-eP-rOt"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -600,7 +612,7 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <segue destination="gDT-0P-iFu" kind="show" id="bra-Lu-H6t"/>
+                                            <segue destination="gDT-0P-iFu" kind="show" identifier="InitiateCallBtnClicked" id="bra-Lu-H6t"/>
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="Gx5-YT-yMv">
@@ -619,7 +631,7 @@
                                                     <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="20"/>
                                                     <state key="normal" title="Waiting call"/>
                                                     <connections>
-                                                        <segue destination="qan-1z-vHI" kind="show" id="o97-n6-3bs"/>
+                                                        <segue destination="qan-1z-vHI" kind="show" identifier="WaitingCallBtnClicked" id="o97-n6-3bs"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -633,7 +645,7 @@
                                             <accessibilityTraits key="traits" notEnabled="YES"/>
                                         </accessibility>
                                         <connections>
-                                            <segue destination="qan-1z-vHI" kind="show" id="1xm-cu-AJ1"/>
+                                            <segue destination="qan-1z-vHI" kind="show" identifier="WaitingCallBtnClicked" id="1xm-cu-AJ1"/>
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="x4T-G3-xxM">
@@ -706,6 +718,7 @@
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="buttonHeight" destination="3bw-qj-By9" id="Rlb-H3-fxc"/>
+                        <outlet property="cloudConnectionStateLabel" destination="OwD-xg-0HI" id="GbI-m0-N39"/>
                         <outlet property="footerView" destination="vhp-n5-maw" id="hLw-c8-66f"/>
                         <outlet property="statusLabel" destination="DLg-Xz-RE7" id="B0i-FK-P4h"/>
                         <outletCollection property="heightScaleCollection" destination="Nbr-pe-lc1" collectionClass="NSMutableArray" id="DVR-VS-moM"/>
@@ -736,6 +749,7 @@
                         <outletCollection property="labelFontScaleCollection" destination="DLg-Xz-RE7" collectionClass="NSMutableArray" id="Hcz-H0-HbU"/>
                         <outletCollection property="widthScaleCollection" destination="brK-7Z-LLk" collectionClass="NSMutableArray" id="TBS-e7-I3y"/>
                         <outletCollection property="widthScaleCollection" destination="qZy-4j-spu" collectionClass="NSMutableArray" id="GPy-cq-AOz"/>
+                        <outletCollection property="labelFontScaleCollection" destination="OwD-xg-0HI" collectionClass="NSMutableArray" id="fpw-KN-JWi"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="P7K-KN-MwF" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -2330,9 +2344,9 @@
         <image name="Wallpaper" width="833" height="468"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="Rbg-Gd-nPZ"/>
-        <segue reference="o97-n6-3bs"/>
         <segue reference="whO-eP-rOt"/>
         <segue reference="bcn-z4-zYB"/>
+        <segue reference="o97-n6-3bs"/>
+        <segue reference="ArJ-LB-jmq"/>
     </inferredMetricsTieBreakers>
 </document>

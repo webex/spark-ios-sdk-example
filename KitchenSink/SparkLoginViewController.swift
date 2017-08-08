@@ -33,13 +33,35 @@ class SparkLoginViewController: BaseViewController {
     @IBOutlet var buttonFontScaleCollection: [UIButton]!
     @IBOutlet weak var loginButtonHeight: NSLayoutConstraint!
     
+    /// saparkSDK reperesent for the SparkSDK API instance
+    var sparkSDK: Spark?
     
     // MARK: - Life cycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         statusLabel.text = "Powered by SparkSDK v" + Spark.version
     }
-
+    override func viewDidAppear(_ animated: Bool) {
+        /*
+         An [OAuth](https://oauth.net/2/) based authentication strategy
+         is to be used to authenticate a user on Cisco Spark.
+         */
+        let authenticator = OAuthAuthenticator(clientId: SparkEnvirmonment.ClientId, clientSecret: SparkEnvirmonment.ClientSecret, scope: SparkEnvirmonment.Scope, redirectUri: SparkEnvirmonment.RedirectUri)
+        self.sparkSDK = Spark(authenticator: authenticator)
+        self.sparkSDK?.logger = KSLogger() //Register a console logger into SDK
+        
+        
+        /*
+         Check wether sparkSDK is already authorized, sparkSDk saves authorization info in device key-chain
+         -note: if user didn't logged out or didn't deauthorize, "self.sparkSDK.authenticator" function will return true
+         -note: if sparkSDK is authorized, directly jump to login success process
+         */
+        if (self.sparkSDK?.authenticator as! OAuthAuthenticator).authorized{
+            self.loginSuccessProcess()
+            return
+        }
+    }
+    
     
     // MARK: - SparkSDK: sparkID Login
     @IBAction func sparkLoginBtnClicked(_ sender: AnyObject) {
@@ -48,14 +70,14 @@ class SparkLoginViewController: BaseViewController {
          is to be used to authenticate a user on Cisco Spark.
          */
         let authenticator = OAuthAuthenticator(clientId: SparkEnvirmonment.ClientId, clientSecret: SparkEnvirmonment.ClientSecret, scope: SparkEnvirmonment.Scope, redirectUri: SparkEnvirmonment.RedirectUri)
-        sparkSDK = Spark(authenticator: authenticator)
-        sparkSDK?.logger = KSLogger() //Register a console logger into SDK
+        self.sparkSDK = Spark(authenticator: authenticator)
+        self.sparkSDK?.logger = KSLogger() //Register a console logger into SDK
+        
         /*
-          Brings up a web-based authorization view controller and directs the user through the OAuth process.
-          note: parentViewController must contain a navigation Controller,
-          so that the OAuth view controller can push on it. 
+         Brings up a web-based authorization view controller and directs the user through the OAuth process.
+         -note: parentViewController must contain a navigation Controller,so that the OAuth view controller can push on it. 
          */
-        (sparkSDK?.authenticator as! OAuthAuthenticator).authorize(parentViewController: self) { [weak self] success in
+        (self.sparkSDK?.authenticator as! OAuthAuthenticator).authorize(parentViewController: self) { [weak self] success in
             if success {
                 /* Spark Login Success codes here... */
                 if let strongSelf = self {
@@ -72,8 +94,9 @@ class SparkLoginViewController: BaseViewController {
     }
     
     private func loginSuccessProcess() {
-        let viewController = storyboard?.instantiateViewController(withIdentifier: "HomeTableViewController") as! HomeTableViewController
-        navigationController?.pushViewController(viewController, animated: true)
+        let homeViewController = storyboard?.instantiateViewController(withIdentifier: "HomeTableViewController") as! HomeTableViewController
+        homeViewController.sparkSDK = self.sparkSDK
+        navigationController?.pushViewController(homeViewController, animated: true)
     }
     
     fileprivate func loginFailureProcess() {

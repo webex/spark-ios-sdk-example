@@ -103,6 +103,9 @@ class VideoCallViewController: BaseViewController {
     /// MediaRenderView is an OpenGL backed UIView
     @IBOutlet private weak var remoteView: MediaRenderView!
     
+    /// saparkSDK reperesent for the SparkSDK API instance
+    var sparkSDK: Spark?
+    
     /// currentCall represent current processing call instance
     var currentCall: Call?
     
@@ -146,14 +149,19 @@ class VideoCallViewController: BaseViewController {
             return
         }
         
-        /* audioVideo as making a Video call,audioOnly as making Voice only call.The default is audio call.*/
+        /* 
+         audioVideo as making a Video call,audioOnly as making Voice only call.The default is audio call.
+         */
         var mediaOption = MediaOption.audioOnly()
+        if(globalVideoSetting.sparkSDK == nil){
+            globalVideoSetting.sparkSDK = self.sparkSDK
+        }
         if globalVideoSetting.isVideoEnabled() {
             mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
         }
         self.callStatus = .initiated
         /* Makes a call to an intended recipient on behalf of the authenticated user.*/
-        sparkSDK?.phone.dial(remoteAddr, option: mediaOption) { [weak self] result in
+        self.sparkSDK?.phone.dial(remoteAddr, option: mediaOption) { [weak self] result in
             if let strongSelf = self {
                 switch result {
                 case .success(let call):
@@ -188,9 +196,9 @@ class VideoCallViewController: BaseViewController {
             self.loudSpeakerSwitch.isOn = false
         }
         /* 
-          Answers this call.
-          This can only be invoked when this call is incoming and in rining status.
-          Otherwise error will occur and onError callback will be dispatched.
+        Answers this call.
+        This can only be invoked when this call is incoming and in rining status.
+        Otherwise error will occur and onError callback will be dispatched.
          */
         self.currentCall?.answer(option: mediaOption) { [weak self] error in
             if let strongSelf = self {
@@ -298,7 +306,7 @@ class VideoCallViewController: BaseViewController {
              Person list is empty with SIP email address
              Lists people in the authenticated user's organization.
             */
-            sparkSDK?.people.list(email: emailAddress, max: 1) { response in
+            self.sparkSDK?.people.list(email: emailAddress, max: 1) { response in
                 var persons: [Person] = []
                 
                 switch response.result {

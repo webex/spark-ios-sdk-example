@@ -66,6 +66,9 @@ class VideoAudioSetupViewController: BaseViewController {
         }
     }
     
+    /// saparkSDK reperesent for the SparkSDK API instance
+    var sparkSDK: Spark?
+    
     // MARK: - Life cycle
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -115,6 +118,9 @@ class VideoAudioSetupViewController: BaseViewController {
         tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:)))
         audioVideoView.addGestureRecognizer(tapGesture)
         updateCallCapStatus()
+        if(globalVideoSetting.sparkSDK == nil){
+            globalVideoSetting.sparkSDK = self.sparkSDK
+        }
         videoViewHeight.constant = CGFloat(globalVideoSetting.isVideoEnabled() ? videoViewSetupHeightContant:0)
         videoSetupView.alpha = globalVideoSetting.isVideoEnabled() ? 1:0
         videoViewHiddenHelpLabel.alpha = globalVideoSetting.isVideoEnabled() ? 0:1
@@ -338,6 +344,7 @@ class VideoAudioSetupViewController: BaseViewController {
     
     func gotoInitiateCallView() {
         if let initiateCallViewController = storyboard?.instantiateViewController(withIdentifier: "InitiateCallViewController") as? InitiateCallViewController! {
+            initiateCallViewController.sparkSDK = self.sparkSDK
             navigationController?.pushViewController(initiateCallViewController, animated: true)
         }
         

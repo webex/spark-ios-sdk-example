@@ -37,6 +37,8 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     fileprivate var dialEmail: String?
     fileprivate var segmentedControl: UISegmentedControl?
     
+    /// saparkSDK reperesent for the SparkSDK API instance
+    var sparkSDK: Spark?
     
     // MARK: - Life cycle
     
@@ -64,16 +66,17 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     fileprivate func presentVideoCallView(_ remoteAddr: String) {
         if let videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController! {
             videoCallViewController.videoCallRole = VideoCallRole.CallPoster(remoteAddr)
+            videoCallViewController.sparkSDK = self.sparkSDK
             navigationController?.pushViewController(videoCallViewController, animated: true)
         }
     }
     
     // MARK: - SparkSDK: search people with Email/SearchString
 
-    private func sparkPersonInfoWithEmail(searchStr: String){
+    private func sparkFetchPersonProfilesWithEmail(searchStr: String){
         if let email = EmailAddress.fromString(searchStr) {
             /* Lists people with email address in the authenticated user's organization. */
-            sparkSDK?.people.list(email: email, max: 10) {
+            self.sparkSDK?.people.list(email: email, max: 10) {
                 (response: ServiceResponse<[Person]>) in
                 
                 self.indicatorView.stopAnimating()
@@ -89,7 +92,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
             }
         } else {
             /* Lists people with display name in the authenticated user's organization. */
-            sparkSDK?.people.list(displayName: searchStr, max: 10) {
+            self.sparkSDK?.people.list(displayName: searchStr, max: 10) {
                 (response: ServiceResponse<[Person]>) in
                 self.indicatorView.stopAnimating()
                 switch response.result {
@@ -115,7 +118,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         }
         
         indicatorView.startAnimating()
-        self.sparkPersonInfoWithEmail(searchStr: searchString)
+        self.sparkFetchPersonProfilesWithEmail(searchStr: searchString)
     }
     
     // MARK: - UI Implementation

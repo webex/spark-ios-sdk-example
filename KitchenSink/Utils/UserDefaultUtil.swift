@@ -28,14 +28,14 @@ public class UserDefaultsUtil {
     private static let CALL_VIDEO_ENABLE_KEY = "KSCallVideoEnable"
     private static let CALL_SELF_VIEW_ENABLE_KEY = "KSCallSelfViewEnable"
     static let userDefault = UserDefaults.standard
-    
+    static var userId : String?
     /// Call history person array.
     /// See addPersonHistory to add a call history.
     /// - note: if person's has no email address,discard it.
     static var callPersonHistory: [Person] {
         get {
             var resutlArray: [Person] = []
-            if let selfId = loggedInUser?.id {
+            if let selfId = UserDefaultsUtil.userId {
                 let key = CALL_PERSON_HISTORY_KEY + selfId
                 if let array = userDefault.array(forKey: key) {
                     for onePerson in array {
@@ -64,7 +64,7 @@ public class UserDefaultsUtil {
             return
         }
         var resultArray: [Any] = Array.init()
-        if let selfId = loggedInUser?.id {
+        if let selfId = UserDefaultsUtil.userId {
             let key = CALL_PERSON_HISTORY_KEY + selfId
             if var array = userDefault.array(forKey: key) {
                 

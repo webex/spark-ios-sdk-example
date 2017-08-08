@@ -30,12 +30,15 @@ class WaitingCallViewController: BaseViewController {
     @IBOutlet weak var animationLabel: UILabel!
     override var navigationTitle: String? {
         get {
-            return loggedInUser?.displayName
+            return "Wait Call"
         }
         set(newValue) {
             title = newValue
         }
     }
+
+    /// saparkSDK reperesent for the SparkSDK API instance
+    var sparkSDK: Spark?
     
     /// receivedCall represent the call currently received
     private var receivedCall: Call?
@@ -60,7 +63,7 @@ class WaitingCallViewController: BaseViewController {
     
     // MARK: - SparkSDK: register callback code for Call reception
     func sparkCallBackInit() {
-        if let phone = sparkSDK?.phone {
+        if let phone = self.sparkSDK?.phone {
             
             /*  Callback when call is incoming. */
             phone.onIncoming = { [weak self] call in
@@ -90,6 +93,7 @@ class WaitingCallViewController: BaseViewController {
                 }
             }
             callToastViewController.incomingCall = self.receivedCall
+            callToastViewController.sparkSDK = self.sparkSDK
             present(callToastViewController, animated: true, completion: nil)
         }
     }
@@ -99,6 +103,7 @@ class WaitingCallViewController: BaseViewController {
         if let videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController! {
             videoCallViewController.currentCall = self.receivedCall
             videoCallViewController.videoCallRole = VideoCallRole.CallReceiver((self.receivedCall?.from?.email)!)
+            videoCallViewController.sparkSDK = self.sparkSDK
             navigationController?.pushViewController(videoCallViewController, animated: true)
         }
     }
