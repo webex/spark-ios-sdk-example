@@ -24,7 +24,7 @@ Here are the steps to setup Xcode project using [CocoaPods](http://cocoapods.org
 The "// MARK: " labels in source code have distinguished the SDK calling and UI views paragraphes.  
 Below is code snippets of the SDK calling in the demo.
 
-1. Setup SDK with app infomation, and authorize access to Spark service in SparkContext.swift
+1. Setup SDK with app infomation, and authorize access to Spark service
    ```swift
    class SparkEnvirmonment {
     static let ClientId = "your client ID"
@@ -36,13 +36,21 @@ Below is code snippets of the SDK calling in the demo.
 
 1. Register the device to send and receive calls.
     ```swift
-    SparkContext.sharedInstance.spark?.phone.register() { [weak self] success in
-            if let strongSelf = self {
-                if success {
-                    .....
-                }
+    var sparkSDK: Spark?
+    /*  
+    Register phone to Cisco cloud on behalf of the authenticated user.
+    It also creates the websocket and connects to Cisco Spark cloud.
+    - note: make sure register phone before calling
+    */
+    sparkSDK?.phone.register() { [weak self] error in
+        if let strongSelf = self {
+            if error != nil {
+                //success...
+            } else {
+                //fail...
             }
         }
+    }
     ```
             
 1. Spark calling API
@@ -51,19 +59,23 @@ Below is code snippets of the SDK calling in the demo.
     // Self video view and Remote video view
     @IBOutlet weak var selfView: MediaRenderView!
     @IBOutlet weak var remoteView: MediaRenderView!
+
+    var sparkSDK: Spark?
+    // currentCall represents current dailing/received call instance
+    var currentCall: Call?
     
     // Make an outgoing call.
     // audioVideo as making a Video call,audioOnly as making Voice only call.The default is audio call.
         var mediaOption = MediaOption.audioOnly()
-        if VideoAudioSetup.sharedInstance.isVideoEnabled() {
+        if globalVideoSetting.isVideoEnabled() {
             mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
         }
         // Makes a call to an intended recipient on behalf of the authenticated user.
-        SparkContext.sharedInstance.spark?.phone.dial(remoteAddr, option: mediaOption) { [weak self] result in
+        sparkSDK?.phone.dial(remoteAddr, option: mediaOption) { [weak self] result in
             if let strongSelf = self {
                 switch result {
                 case .success(let call):
-                    SparkContext.sharedInstance.call = call
+                    self.currentCall = call
                     // Callback when remote participant(s) is ringing.
                     call.onRinging = { [weak self] in
                         if let strongSelf = self {
@@ -120,31 +132,36 @@ Below is code snippets of the SDK calling in the demo.
             }
         }
         
-    // Recive a call
-    if let phone = SparkContext.sharedInstance.spark?.phone {
+    // Receive a call
+    if let phone = self.spark?.phone {
             // Callback when call is incoming.
             phone.onIncoming = { [weak self] call in
                 if let strongSelf = self {
-                    SparkContext.sharedInstance.call = call
+                    self.currentCall = call
                     //...
                 }
             }
     }
-    // Answers this call.
-    // This can only be invoked when this call is incoming and in rining status.
-    // Otherwise error will occur and onError callback will be dispatched.
-    SparkContext.sharedInstance.call?.answer(option: MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)) {
-        [weak self] error in
-        if let strongSelf = self {
-           if error != nil {
-              //...
-        }
-    }
     
-    // Rejects this call. 
-    // This can only be invoked when this call is incoming and in rining status.
-    // Otherwise error will occur and onError callback will be dispatched.
-    SparkContext.sharedInstance.call?.reject() { error in
+    /* 
+     Answers this call.
+     This can only be invoked when this call is incoming and in rining status.
+     Otherwise error will occur and onError callback will be dispatched.
+     */
+     self.currentCall?.answer(option: mediaOption) { [weak self] error in
+         if let strongSelf = self {
+             if error != nil {
+                    //...
+             }
+         }
+     }
+    
+    /* 
+     Rejects this call. 
+     This can only be invoked when this call is incoming and in rining status.
+     Otherwise error will occur and onError callback will be dispatched. 
+    */
+    self.currentCall?.reject() { error in
             if error != nil {
                 //...
             }
