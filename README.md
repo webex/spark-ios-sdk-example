@@ -27,10 +27,10 @@ Below is code snippets of the SDK calling in the demo.
 1. Setup SDK with app infomation, and authorize access to Spark service
    ```swift
    class SparkEnvirmonment {
-    static let ClientId = "your client ID"
-    static let ClientSecret = ProcessInfo().environment["CLIENTSECRET"] ?? "your secret"
-    static let Scope = "spark:all"
-    static let RedirectUri = "KitchenSink://response"
+       static let ClientId = "your client ID"
+       static let ClientSecret = ProcessInfo().environment["CLIENTSECRET"] ?? "your secret"
+       static let Scope = "spark:all"
+       static let RedirectUri = "KitchenSink://response"
     }
     ```
 
