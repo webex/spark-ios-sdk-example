@@ -28,12 +28,14 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     @IBOutlet weak var dialAddressTextField: UITextField!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var historyTableView: UITableView!
+    @IBOutlet weak var spaceTableView: UITableView!
     @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var textFieldScaleCollection: [UITextField]!
     fileprivate let searchController = UISearchController(searchResultsController: nil)
     fileprivate var searchResult: [Person]?
     fileprivate var historyResult: [Person]?
+    fileprivate var spaceResult: [Room]?
     fileprivate var dialEmail: String?
     fileprivate var segmentedControl: UISegmentedControl?
     
@@ -63,9 +65,21 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         self.presentVideoCallView(emailAddress)
     }
     
+    func dialRoomWithRoomId(_ roomId: String, _ roomName: String){
+        self.presentRoomVideoCallView(roomId,roomName)
+    }
+    
     fileprivate func presentVideoCallView(_ remoteAddr: String) {
         if let videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController! {
             videoCallViewController.videoCallRole = VideoCallRole.CallPoster(remoteAddr)
+            videoCallViewController.sparkSDK = self.sparkSDK
+            navigationController?.pushViewController(videoCallViewController, animated: true)
+        }
+    }
+    
+    fileprivate func presentRoomVideoCallView(_ roomId: String, _ roomName: String) {
+        if let videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController! {
+            videoCallViewController.videoCallRole = VideoCallRole.RoomCallPoster(roomId, roomName)
             videoCallViewController.sparkSDK = self.sparkSDK
             navigationController?.pushViewController(videoCallViewController, animated: true)
         }
@@ -107,18 +121,21 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
             }
         }
     }
-    // MARK: search bar result updating delegate
-    func updateSearchResults(for searchController: UISearchController) {
-        let searchString = searchController.searchBar.text!
-        
-        if searchString.characters.count < 3 {
-            searchResult?.removeAll()
-            tableView.reloadData()
-            return
-        }
-        
-        indicatorView.startAnimating()
-        self.sparkFetchPersonProfilesWithEmail(searchStr: searchString)
+    
+    // MARK: - SparkSDK: list Space
+    private func sparkListRoom(){
+        self.indicatorView.startAnimating()
+        self.sparkSDK?.rooms.list(type: RoomType.group ,completionHandler: { (response: ServiceResponse<[Room]>) in
+            self.indicatorView.stopAnimating()
+            switch response.result {
+            case .success(let value):
+                self.spaceResult = value
+                
+            case .failure:
+                self.searchResult = nil
+            }
+            self.spaceTableView.reloadData()
+        })
     }
     
     // MARK: - UI Implementation
@@ -140,6 +157,8 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         historyTableView.delegate = self
         tableView.dataSource = self
         tableView.delegate = self
+        spaceTableView.dataSource = self
+        spaceTableView.delegate = self
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
         searchController.hidesNavigationBarDuringPresentation = false
@@ -149,7 +168,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         view.bringSubview(toFront: indicatorView)
         dialAddressTextField.layer.borderColor = UIColor.gray.cgColor
         
-        let itemArray = [UIImage.fontAwesomeIcon(name: .history, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .search, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .phone, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29))]
+        let itemArray = [UIImage.fontAwesomeIcon(name: .history, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .search, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .phone, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .group, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29))]
         segmentedControl = UISegmentedControl.init(items: itemArray)
         segmentedControl?.frame = CGRect.init(x: 0, y: 0, width: 150, height: 29)
         segmentedControl?.tintColor = UIColor.titleGreyColor()
@@ -173,14 +192,22 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
             hideHistoryView(false)
             hideDialAddressView(true)
             hideSearchView(true)
+            hideSpaceView(true)
         case 1:
             hideDialAddressView(true)
             hideSearchView(false)
             hideHistoryView(true)
+            hideSpaceView(true)
         case 2:
             hideHistoryView(true)
             hideSearchView(true)
             hideDialAddressView(false)
+            hideSpaceView(true)
+        case 3:
+            hideHistoryView(true)
+            hideSearchView(true)
+            hideDialAddressView(true)
+            hideSpaceView(false)
         default:
             break;
         }
@@ -205,6 +232,14 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         }
     }
     
+    fileprivate func hideSpaceView( _ hidden: Bool){
+        spaceTableView.isHidden = hidden
+        
+        if !hidden {
+            self.sparkListRoom()
+        }
+    }
+    
     fileprivate func hideDialAddressView(_ hidden: Bool) {
         dialAddressTextField.isHidden = hidden
         if !hidden {
@@ -224,6 +259,20 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         present(alert, animated: true, completion: nil)
     }
 
+    // MARK: search bar result updating delegate
+    func updateSearchResults(for searchController: UISearchController) {
+        let searchString = searchController.searchBar.text!
+        
+        if searchString.characters.count < 3 {
+            searchResult?.removeAll()
+            tableView.reloadData()
+            return
+        }
+        
+        indicatorView.startAnimating()
+        self.sparkFetchPersonProfilesWithEmail(searchStr: searchString)
+    }
+    
     // MARK: UITableViewDataSource
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100 * Utils.HEIGHT_SCALE
@@ -234,6 +283,8 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
             return searchResult!.count
         } else if tableView == self.historyTableView {
             return historyResult?.count ?? 0
+        } else if  tableView == self.spaceTableView{
+            return spaceResult?.count ?? 0
         }
         else {
             return 0
@@ -241,27 +292,47 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "PersonCell", for: indexPath) as! PersonTableViewCell
-        let dataSource: [Person]?
+
+        if(tableView == self.tableView || tableView == self.historyTableView){
+            let cell = tableView.dequeueReusableCell(withIdentifier: "PersonCell", for: indexPath) as! PersonTableViewCell
         
-        if tableView == self.tableView {
-            dataSource = searchResult
+            let dataSource: [Person]?
+            
+            if tableView == self.tableView {
+                dataSource = searchResult
+            }
+            else {
+                dataSource = historyResult
+            }
+            
+            let person = dataSource?[indexPath.row]
+            let email = person?.emails?.first
+            cell.address = email?.toString()
+            cell.initiateCallViewController = self
+            
+            Utils.downloadAvatarImage(person?.avatar, completionHandler: {
+                cell.avatarImageView.image = $0
+            })
+            cell.nameLabel.text = person?.displayName
+            
+            return cell
+        }else{
+             let cell = tableView.dequeueReusableCell(withIdentifier: "SpaceCell", for: indexPath) as! SpaceTableViewCell
+            
+            let dataSource: [Room]?
+            
+            dataSource = spaceResult
+            
+            let room = dataSource?[indexPath.row]
+            let roomName = room?.title
+            let roomId = room?.id
+            cell.roomId = roomId
+            cell.roomName = roomName
+            cell.initiateCallViewController = self
+            cell.spaceNameLabel.text = roomName
+            
+            return cell
         }
-        else {
-            dataSource = historyResult
-        }
-        
-        let person = dataSource?[indexPath.row]
-        let email = person?.emails?.first
-        cell.address = email?.toString()
-        cell.initiateCallViewController = self
-        
-        Utils.downloadAvatarImage(person?.avatar, completionHandler: {
-            cell.avatarImageView.image = $0
-        })
-        cell.nameLabel.text = person?.displayName
-        
-        return cell
     }
     // MARK: other functions
     deinit {

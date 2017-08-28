@@ -25,6 +25,7 @@ import Toast_Swift
 enum VideoCallRole {
     case CallPoster(String)
     case CallReceiver(String)
+    case RoomCallPoster(String, String)
 }
 
 class VideoCallViewController: BaseViewController {
@@ -54,6 +55,8 @@ class VideoCallViewController: BaseViewController {
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var labelFontScaleCollection: [UILabel]!
+    private var slideInView: UIView?
+    private var slideInMsgLabel: UILabel?
     private var callStatus:CallStatus = .initiated
     private var isFullScreen: Bool = false
     private let avatarImageView = UIImageView()
@@ -118,16 +121,20 @@ class VideoCallViewController: BaseViewController {
         case .CallReceiver(let remoteAddress):
             self.didAnswerIncomingCall()
             self.setupAvatarView(remoteAddress)
+            self.sparkPersonWithEmailString(emailStr: remoteAddress)
         case .CallPoster(let remoteAddress):
             self.didDialWithRemoteAddress(remoteAddress)
             self.setupAvatarView(remoteAddress)
+            self.sparkPersonWithEmailString(emailStr: remoteAddress)
+        case .RoomCallPoster(let roomId, let roomName):
+            self.didDialWithRemoteAddress(roomId)
+            self.setupAvatarView(roomName)
         }
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.updateUIStatus()
-        
         /* SparkSDK: register callback functions for "Callstate" changing */
         self.sparkCallStatesProcess()
     }
@@ -236,6 +243,7 @@ class VideoCallViewController: BaseViewController {
                     strongSelf.updateUIStatus()
                 }
             }
+            
             /* Callback when remote participant(s) answered and this *call* is connected. */
             call.onConnected = { [weak self] in
                 if let strongSelf = self {
@@ -247,6 +255,8 @@ class VideoCallViewController: BaseViewController {
                 }
                 
             }
+            
+        
             /* Callback when this *call* is disconnected (hangup, cancelled, get declined or other self device pickup the call). */
             call.onDisconnected = {[weak self] disconnectionType in
                 if let strongSelf = self {
@@ -257,6 +267,27 @@ class VideoCallViewController: BaseViewController {
                     strongSelf.presentCallRateVC()
                 }
             }
+            
+            /* Callback when remote participant(s) join/left/decline connected. */
+            call.onCallMembershipChanged = { [weak self] memberShipChangeType  in
+                if let strongSelf = self {
+                    switch memberShipChangeType {
+                        /* This might be triggered when membership joined the call */
+                    case .joined(let memberShip):
+                        strongSelf.slideInStateView(slideInMsg: memberShip.email! + " joined")
+                        break
+                        /* This might be triggered when membership left the call */
+                    case .left(let memberShip):
+                        strongSelf.slideInStateView(slideInMsg: memberShip.email! + " left")
+                        /* This might be triggered when membership declined the call */
+                    case .declined(let memberShip):
+                        strongSelf.slideInStateView(slideInMsg: memberShip.email! + " declined")
+                    default:
+                        break
+                    }
+                }
+            }
+            
             /* Callback when the media types of this *call* have changed. */
             call.onMediaChanged = {[weak self] mediaChangeType in
                 if let strongSelf = self {
@@ -459,7 +490,7 @@ class VideoCallViewController: BaseViewController {
         
         view.setNeedsUpdateConstraints()
         
-        self.sparkPersonWithEmailString(emailStr: remoteAddr)
+        self.slideInViewSetUp()
     }
     
     private func saveCallPersonHistory(person: Person){
@@ -692,12 +723,46 @@ class VideoCallViewController: BaseViewController {
         return callStatus == .disconnected
     }
     
+    // MARK: Slide In View SetUp
+    private func slideInViewSetUp(){
+        if(self.slideInView == nil){
+            self.slideInView = UIView(frame: CGRect(x:0,y:-64,width:(UIApplication.shared.keyWindow?.bounds.width)!,height: 64))
+            self.slideInView?.backgroundColor = UIColor.buttonBlueNormal()
+            UIApplication.shared.keyWindow?.addSubview(self.slideInView!)
+            
+            self.slideInMsgLabel = UILabel(frame: CGRect(x: 0, y: 20, width: (UIApplication.shared.keyWindow?.bounds.width)!, height: 40))
+            self.slideInMsgLabel?.text = ""
+            self.slideInMsgLabel?.font = UIFont.navigationBoldFont(ofSize: 18)
+            self.slideInMsgLabel?.textColor = UIColor.white
+            self.slideInMsgLabel?.textAlignment = .center
+            self.slideInView?.isHidden = true
+            self.slideInView?.addSubview(self.slideInMsgLabel!)
+            
+        }
+    }
+    private func slideInStateView(slideInMsg: String){
+        self.slideInView?.isHidden = false
+        self.slideInMsgLabel?.text = slideInMsg
+        UIView.animate(withDuration: 0.25, animations: {
+            self.slideInView?.transform = CGAffineTransform.init(translationX: 0, y: 64)
+        }) { (_) in
+            UIView.animate(withDuration: 0.25, delay: 1.5, options: .curveEaseInOut, animations: {
+                self.slideInView?.transform = CGAffineTransform.init(translationX: 0, y: 0)
+            }, completion: { (_) in
+                self.slideInView?.isHidden = true
+            })
+        }
+    }
+    
     // MARK: - Orientation manage
     
     private func fullScreenLandscape(_ height:CGFloat) {
         self.remoteViewHeight.constant = height
         self.selfViewWidth.constant = 100 * Utils.HEIGHT_SCALE
         self.selfViewHeight.constant = 70 * Utils.WIDTH_SCALE
+        self.slideInView?.frame = CGRect(x:0,y:-64,width:(UIApplication.shared.keyWindow?.bounds.height)!,height: 64)
+        self.slideInMsgLabel?.frame = CGRect(x: 0, y: 20, width: (UIApplication.shared.keyWindow?.bounds.height)!, height: 40)
+        self.slideInView?.center = CGPoint(x: (UIApplication.shared.keyWindow?.bounds.midY)!, y: -32.0)
         self.hideControlView(true)
         self.fullScreenButton.isHidden = true
         self.addMoveReconizerOnSelfView()
@@ -706,6 +771,8 @@ class VideoCallViewController: BaseViewController {
         self.remoteViewHeight.constant = height
         self.selfViewWidth.constant = 70 * Utils.WIDTH_SCALE
         self.selfViewHeight.constant = 100 * Utils.HEIGHT_SCALE
+        self.slideInView?.frame = CGRect(x:0,y:-64,width:(UIApplication.shared.keyWindow?.bounds.height)!,height: 64)
+        self.slideInMsgLabel?.frame = CGRect(x: 0, y: 20, width: (UIApplication.shared.keyWindow?.bounds.height)!, height: 40)
         self.hideControlView(true)
         self.fullScreenButton.isHidden = false
         self.fullScreenButton.setBackgroundImage(normalScreenImage, for: .normal)
@@ -716,6 +783,8 @@ class VideoCallViewController: BaseViewController {
         self.remoteViewHeight.constant = 210 * Utils.HEIGHT_SCALE
         self.selfViewWidth.constant = 70 * Utils.WIDTH_SCALE
         self.selfViewHeight.constant = 100 * Utils.HEIGHT_SCALE
+        self.slideInView?.frame = CGRect(x:0,y:-64,width:(UIApplication.shared.keyWindow?.bounds.width)!,height: 64)
+        self.slideInMsgLabel?.frame = CGRect(x: 0, y: 20, width: (UIApplication.shared.keyWindow?.bounds.width)!, height: 40)
         self.hideControlView(false)
         self.fullScreenButton.isHidden = false
         self.fullScreenButton.setBackgroundImage(fullScreenImage, for: .normal)
