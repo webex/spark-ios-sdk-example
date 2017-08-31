@@ -220,6 +220,7 @@ class VideoCallViewController: BaseViewController {
         
     }
     func didHangUpCall(){
+        self.slideInView?.removeFromSuperview()
         /* Disconnect a call. */
         self.currentCall?.hangup() { [weak self] error in
             if let strongSelf = self {
@@ -741,6 +742,7 @@ class VideoCallViewController: BaseViewController {
         }
     }
     private func slideInStateView(slideInMsg: String){
+
         self.slideInView?.isHidden = false
         self.slideInMsgLabel?.text = slideInMsg
         UIView.animate(withDuration: 0.25, animations: {
