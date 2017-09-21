@@ -2216,7 +2216,7 @@
                                 </connections>
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bSF-HP-UZK" userLabel="SelfView" customClass="MediaRenderView">
-                                <rect key="frame" x="319" y="40" width="75" height="100"/>
+                                <rect key="frame" x="336" y="24" width="75" height="100"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="75" id="8ym-Oj-LAL"/>
@@ -2300,6 +2300,14 @@
                                     <outlet property="delegate" destination="ar0-sN-dqx" id="xA7-4Y-eya"/>
                                 </connections>
                             </collectionView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2ju-lD-ABm" userLabel="ScreenShareView" customClass="MediaRenderView">
+                                <rect key="frame" x="336" y="126" width="75" height="100"/>
+                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="75" id="GRN-UW-l0c"/>
+                                    <constraint firstAttribute="height" constant="100" id="PYw-s6-nhQ"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
@@ -2316,14 +2324,16 @@
                             <constraint firstItem="cKo-1e-kCg" firstAttribute="leading" secondItem="JH3-U9-AKp" secondAttribute="leading" id="PM1-dU-o8Z"/>
                             <constraint firstItem="cKo-1e-kCg" firstAttribute="top" secondItem="0Ug-RN-Dfo" secondAttribute="bottom" id="TWE-mi-XsJ"/>
                             <constraint firstItem="5Ub-Sz-A7i" firstAttribute="centerX" secondItem="JH3-U9-AKp" secondAttribute="centerX" id="ThJ-B8-k5q"/>
+                            <constraint firstItem="2ju-lD-ABm" firstAttribute="top" secondItem="0Ug-RN-Dfo" secondAttribute="bottom" constant="106" id="Ujg-U6-RL5"/>
                             <constraint firstItem="nQU-6Q-z16" firstAttribute="top" secondItem="cKo-1e-kCg" secondAttribute="top" id="YuK-9u-rqd"/>
                             <constraint firstAttribute="bottom" secondItem="gx2-2n-6OH" secondAttribute="bottom" constant="10" id="aRI-ZR-ZgU"/>
-                            <constraint firstItem="bSF-HP-UZK" firstAttribute="top" secondItem="0Ug-RN-Dfo" secondAttribute="bottom" constant="20" id="byx-BS-TQY"/>
+                            <constraint firstItem="bSF-HP-UZK" firstAttribute="top" secondItem="0Ug-RN-Dfo" secondAttribute="bottom" constant="4" id="byx-BS-TQY"/>
                             <constraint firstAttribute="trailing" secondItem="cKo-1e-kCg" secondAttribute="trailing" id="eHo-q1-qAd"/>
                             <constraint firstItem="t06-2w-hsZ" firstAttribute="top" secondItem="0Ug-RN-Dfo" secondAttribute="bottom" constant="228" id="mNG-N3-yH7"/>
-                            <constraint firstAttribute="trailing" secondItem="bSF-HP-UZK" secondAttribute="trailing" constant="20" id="nCF-9a-t8f"/>
+                            <constraint firstAttribute="trailing" secondItem="bSF-HP-UZK" secondAttribute="trailing" constant="3" id="nCF-9a-t8f"/>
                             <constraint firstItem="gx2-2n-6OH" firstAttribute="top" secondItem="5Ub-Sz-A7i" secondAttribute="bottom" constant="20" id="tu7-v4-pER"/>
                             <constraint firstItem="gx2-2n-6OH" firstAttribute="centerY" secondItem="IQi-c4-ebh" secondAttribute="centerY" id="uas-Vq-PdK"/>
+                            <constraint firstAttribute="trailing" secondItem="2ju-lD-ABm" secondAttribute="trailing" constant="3" id="vFn-Dq-oVz"/>
                             <constraint firstItem="IQi-c4-ebh" firstAttribute="leading" secondItem="JH3-U9-AKp" secondAttribute="leading" constant="60" id="wzi-qb-1ms"/>
                             <constraint firstItem="0mx-qC-3cN" firstAttribute="centerX" secondItem="JH3-U9-AKp" secondAttribute="centerX" id="y8j-bz-cDp"/>
                         </constraints>
@@ -2345,6 +2355,9 @@
                         <outlet property="receivingVideoSwitch" destination="tam-9e-xHg" id="pf0-R7-oMN"/>
                         <outlet property="remoteView" destination="cKo-1e-kCg" id="wvv-pe-eSu"/>
                         <outlet property="remoteViewHeight" destination="7O2-fK-RYe" id="kj0-Il-cRh"/>
+                        <outlet property="screenShareView" destination="2ju-lD-ABm" id="R4t-3i-TYv"/>
+                        <outlet property="screenShareViewHeight" destination="PYw-s6-nhQ" id="9nb-8c-h4E"/>
+                        <outlet property="screenShareViewWidth" destination="GRN-UW-l0c" id="XDE-8o-tdq"/>
                         <outlet property="selfView" destination="bSF-HP-UZK" id="394-6K-Ygh"/>
                         <outlet property="selfViewHeight" destination="ge9-LM-Gku" id="H69-hY-VO5"/>
                         <outlet property="selfViewWidth" destination="8ym-Oj-LAL" id="05o-2T-4sc"/>

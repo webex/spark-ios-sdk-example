@@ -50,6 +50,8 @@ class VideoCallViewController: BaseViewController {
     @IBOutlet private weak var remoteViewHeight: NSLayoutConstraint!
     @IBOutlet private weak var selfViewWidth: NSLayoutConstraint!
     @IBOutlet private weak var selfViewHeight: NSLayoutConstraint!
+    @IBOutlet weak var screenShareViewWidth: NSLayoutConstraint!
+    @IBOutlet weak var screenShareViewHeight: NSLayoutConstraint!
     @IBOutlet var dialpadViewWidth: NSLayoutConstraint!
     @IBOutlet var dialpadViewHeight: NSLayoutConstraint!
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
@@ -66,7 +68,8 @@ class VideoCallViewController: BaseViewController {
     private let normalScreenImage = UIImage.fontAwesomeIcon(name: .compress, textColor: UIColor.white, size: CGSize.init(width: 44, height: 44))
     private let uncheckImage = UIImage.fontAwesomeIcon(name: .squareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
     private let checkImage = UIImage.fontAwesomeIcon(name: .checkSquareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
-    private var longPressRec : UILongPressGestureRecognizer?
+    private var longPressRec1 : UILongPressGestureRecognizer?
+    private var longPressRec2 : UILongPressGestureRecognizer?
     override var navigationTitle: String? {
         get {
             return "Call status:\(self.title ?? "Unkonw")"
@@ -105,6 +108,9 @@ class VideoCallViewController: BaseViewController {
     
     /// MediaRenderView is an OpenGL backed UIView
     @IBOutlet private weak var remoteView: MediaRenderView!
+    
+    @IBOutlet weak var screenShareView: MediaRenderView!
+    
     
     /// saparkSDK reperesent for the SparkSDK API instance
     var sparkSDK: Spark?
@@ -164,7 +170,7 @@ class VideoCallViewController: BaseViewController {
             globalVideoSetting.sparkSDK = self.sparkSDK
         }
         if globalVideoSetting.isVideoEnabled() {
-            mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
+            mediaOption = MediaOption.mediaAndScreenShare(media: (self.self.selfView!, self.remoteView!), screenShare: self.screenShareView!)
         }
         self.callStatus = .initiated
         /* Makes a call to an intended recipient on behalf of the authenticated user.*/
@@ -191,7 +197,7 @@ class VideoCallViewController: BaseViewController {
         
         var mediaOption = MediaOption.audioOnly()
         if globalVideoSetting.isVideoEnabled() {
-            mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
+            mediaOption = MediaOption.mediaAndScreenShare(media: (self.self.selfView!, self.remoteView!), screenShare: self.screenShareView!)
         }
         
         if !globalVideoSetting.isSelfViewShow {
@@ -322,6 +328,16 @@ class VideoCallViewController: BaseViewController {
                     /* Whether loud speaker on local device is on or not has switched. */
                     case .spearkerSwitched:
                         strongSelf.loudSpeakerSwitch.isOn = call.isSpeaker
+                        
+                    /* Whether Screen share is blocked by local*/
+                    case .receivingScreenShare(let isReceiving):
+                        self?.showScreenShareView(isReceiving)
+                        break
+                        
+                    /* Whether Remote began to send Screen share */
+                    case .remoteSendingScreenShare(let startedSending):
+                        self?.showScreenShareView(startedSending)
+                        break
                     default:
                         break
                     }
@@ -412,7 +428,6 @@ class VideoCallViewController: BaseViewController {
         for widthConstraint in widthScaleCollection {
             widthConstraint.constant *= Utils.WIDTH_SCALE
         }
-        
         
         fullScreenButton.setBackgroundImage(fullScreenImage, for: .normal)
         
@@ -552,7 +567,7 @@ class VideoCallViewController: BaseViewController {
             self.hideDialpadButton(false)
             self.hideDialpadView(true)
             self.updateSelfViewVisibility()
-            
+            self.showScreenShareView(false)
             if self.isCallDisconnected() {
                 self.hideCallView()
             }
@@ -632,6 +647,10 @@ class VideoCallViewController: BaseViewController {
     
     private func showSelfView(_ shown: Bool) {
         self.selfView.isHidden = !shown
+    }
+    
+    private func showScreenShareView( _ shown: Bool){
+        self.screenShareView.isHidden = !shown
     }
     
     private func showCallControllView(_ shown: Bool) {
@@ -762,37 +781,47 @@ class VideoCallViewController: BaseViewController {
         self.remoteViewHeight.constant = height
         self.selfViewWidth.constant = 100 * Utils.HEIGHT_SCALE
         self.selfViewHeight.constant = 70 * Utils.WIDTH_SCALE
+        self.screenShareViewWidth.constant = 100 * Utils.HEIGHT_SCALE
+        self.screenShareViewHeight.constant = 70 * Utils.WIDTH_SCALE
         self.slideInView?.frame = CGRect(x:0,y:-64,width:(UIApplication.shared.keyWindow?.bounds.height)!,height: 64)
         self.slideInMsgLabel?.frame = CGRect(x: 0, y: 20, width: (UIApplication.shared.keyWindow?.bounds.height)!, height: 40)
         self.slideInView?.center = CGPoint(x: (UIApplication.shared.keyWindow?.bounds.midY)!, y: -32.0)
         self.hideControlView(true)
         self.fullScreenButton.isHidden = true
-        self.addMoveReconizerOnSelfView()
+        self.addMoveReconizerOnSelfViewAndScreenShareView()
     }
     private func fullScreenPortrait(_ height:CGFloat) {
         self.remoteViewHeight.constant = height
         self.selfViewWidth.constant = 70 * Utils.WIDTH_SCALE
         self.selfViewHeight.constant = 100 * Utils.HEIGHT_SCALE
+        self.screenShareViewWidth.constant = 70 * Utils.HEIGHT_SCALE
+        self.screenShareViewHeight.constant = 100 * Utils.WIDTH_SCALE
         self.slideInView?.frame = CGRect(x:0,y:-64,width:(UIApplication.shared.keyWindow?.bounds.height)!,height: 64)
         self.slideInMsgLabel?.frame = CGRect(x: 0, y: 20, width: (UIApplication.shared.keyWindow?.bounds.height)!, height: 40)
         self.hideControlView(true)
         self.fullScreenButton.isHidden = false
         self.fullScreenButton.setBackgroundImage(normalScreenImage, for: .normal)
-        self.addMoveReconizerOnSelfView()
+        self.addMoveReconizerOnSelfViewAndScreenShareView()
     }
     
     private func normalSizePortrait() {
         self.remoteViewHeight.constant = 210 * Utils.HEIGHT_SCALE
         self.selfViewWidth.constant = 70 * Utils.WIDTH_SCALE
         self.selfViewHeight.constant = 100 * Utils.HEIGHT_SCALE
+        self.screenShareViewWidth.constant = 70 * Utils.HEIGHT_SCALE
+        self.screenShareViewHeight.constant = 100 * Utils.WIDTH_SCALE
         self.slideInView?.frame = CGRect(x:0,y:-64,width:(UIApplication.shared.keyWindow?.bounds.width)!,height: 64)
         self.slideInMsgLabel?.frame = CGRect(x: 0, y: 20, width: (UIApplication.shared.keyWindow?.bounds.width)!, height: 40)
         self.hideControlView(false)
         self.fullScreenButton.isHidden = false
         self.fullScreenButton.setBackgroundImage(fullScreenImage, for: .normal)
-        if let reconizer = self.longPressRec{
+        if let reconizer = self.longPressRec1{
             selfView.removeGestureRecognizer(reconizer)
-            self.longPressRec = nil
+            self.longPressRec1 = nil
+        }
+        if let reconizer = self.longPressRec2{
+            screenShareView.removeGestureRecognizer(reconizer)
+            self.longPressRec2 = nil
         }
         
     }
@@ -803,11 +832,17 @@ class VideoCallViewController: BaseViewController {
         navigationController?.isNavigationBarHidden = isHidden
     }
     
-    private func addMoveReconizerOnSelfView(){
-        if(self.longPressRec == nil){
-            self.longPressRec = UILongPressGestureRecognizer(target: self, action: #selector(selfViewMoved))
-            self.longPressRec?.minimumPressDuration = 0.05
-            self.selfView.addGestureRecognizer(self.longPressRec!)
+    private func addMoveReconizerOnSelfViewAndScreenShareView(){
+        if(self.longPressRec1 == nil){
+            self.longPressRec1 = UILongPressGestureRecognizer(target: self, action: #selector(selfViewMoved))
+            self.longPressRec1?.minimumPressDuration = 0.05
+            self.selfView.addGestureRecognizer(self.longPressRec1!)
+        }
+        
+        if(self.longPressRec2 == nil){
+            self.longPressRec2 = UILongPressGestureRecognizer(target: self, action: #selector(screenViewMoved))
+            self.longPressRec2?.minimumPressDuration = 0.05
+            self.screenShareView.addGestureRecognizer(self.longPressRec2!)
         }
     }
     @objc func selfViewMoved(recognizer: UILongPressGestureRecognizer){
@@ -816,6 +851,17 @@ class VideoCallViewController: BaseViewController {
             self.selfView.center = point
         }else if(recognizer.state == .changed){
             self.selfView.center = point
+        }else if(recognizer.state == .ended){
+            
+        }
+    }
+    
+    @objc func screenViewMoved(recognizer: UILongPressGestureRecognizer){
+        let point = recognizer.location(in: self.view)
+        if(recognizer.state == .began){
+            self.screenShareView.center = point
+        }else if(recognizer.state == .changed){
+            self.screenShareView.center = point
         }else if(recognizer.state == .ended){
             
         }
