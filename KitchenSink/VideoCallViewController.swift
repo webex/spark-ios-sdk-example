@@ -272,6 +272,7 @@ class VideoCallViewController: BaseViewController {
                     strongSelf.navigationTitle = "Disconnected"
                     strongSelf.showDisconnectionType(disconnectionType)
                     strongSelf.presentCallRateVC()
+                    strongSelf.slideInView?.removeFromSuperview()
                 }
             }
             
