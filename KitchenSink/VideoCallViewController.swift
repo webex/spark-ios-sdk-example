@@ -170,7 +170,7 @@ class VideoCallViewController: BaseViewController {
             globalVideoSetting.sparkSDK = self.sparkSDK
         }
         if globalVideoSetting.isVideoEnabled() {
-            mediaOption = MediaOption.mediaAndScreenShare(media: (self.self.selfView!, self.remoteView!), screenShare: self.screenShareView!)
+            mediaOption = MediaOption.mediaAndScreenShare(media: (self.self.selfView!, self.remoteView!))
         }
         self.callStatus = .initiated
         /* Makes a call to an intended recipient on behalf of the authenticated user.*/
@@ -180,6 +180,7 @@ class VideoCallViewController: BaseViewController {
                 case .success(let call):
                     strongSelf.currentCall = call
                     strongSelf.sparkCallStatesProcess()
+                    strongSelf.showScreenShareView(call.remoteSendingScreenShare)
                 case .failure(let error):
                     _ = strongSelf.navigationController?.popViewController(animated: true)
                     print("Dial call error: \(error)")
@@ -197,7 +198,7 @@ class VideoCallViewController: BaseViewController {
         
         var mediaOption = MediaOption.audioOnly()
         if globalVideoSetting.isVideoEnabled() {
-            mediaOption = MediaOption.mediaAndScreenShare(media: (self.self.selfView!, self.remoteView!), screenShare: self.screenShareView!)
+            mediaOption = MediaOption.mediaAndScreenShare(media: (self.self.selfView!, self.remoteView!))
         }
         
         if !globalVideoSetting.isSelfViewShow {
@@ -220,6 +221,9 @@ class VideoCallViewController: BaseViewController {
                     { bRet in
                         
                     }
+                }
+                else if strongSelf.currentCall?.remoteSendingScreenShare ?? false {
+                    strongSelf.currentCall?.screenShareRenderView = strongSelf.screenShareView
                 }
             }
         }
@@ -337,7 +341,14 @@ class VideoCallViewController: BaseViewController {
                         
                     /* Whether Remote began to send Screen share */
                     case .remoteSendingScreenShare(let startedSending):
+                        if startedSending {
+                         self?.currentCall?.screenShareRenderView = self?.screenShareView
+                        }
+                        else {
+                            self?.currentCall?.screenShareRenderView = nil
+                        }
                         self?.showScreenShareView(startedSending)
+                        
                         break
                     default:
                         break
@@ -377,6 +388,7 @@ class VideoCallViewController: BaseViewController {
     @IBAction private func toggleLoudSpeaker(_ sender: AnyObject) {
         // True if the loud speaker is selected as the audio output device for this *call*. Otherwise, false.
         self.currentCall?.isSpeaker = loudSpeakerSwitch.isOn
+        self.didDialWithRemoteAddress("sparksdktestuser1@tropo.com")
     }
     
     @IBAction private func toggleSendingVideo(_ sender: AnyObject) {
@@ -568,7 +580,7 @@ class VideoCallViewController: BaseViewController {
             self.hideDialpadButton(false)
             self.hideDialpadView(true)
             self.updateSelfViewVisibility()
-            self.showScreenShareView(false)
+            self.showScreenShareView(self.currentCall?.remoteSendingScreenShare ?? false)
             if self.isCallDisconnected() {
                 self.hideCallView()
             }
