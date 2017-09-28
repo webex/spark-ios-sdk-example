@@ -794,8 +794,8 @@ class VideoCallViewController: BaseViewController {
         self.remoteViewHeight.constant = height
         self.selfViewWidth.constant = 100 * Utils.HEIGHT_SCALE
         self.selfViewHeight.constant = 70 * Utils.WIDTH_SCALE
-        self.screenShareViewWidth.constant = 100 * Utils.HEIGHT_SCALE
-        self.screenShareViewHeight.constant = 70 * Utils.WIDTH_SCALE
+        self.screenShareViewWidth.constant = 150 * Utils.HEIGHT_SCALE
+        self.screenShareViewHeight.constant = 100 * Utils.WIDTH_SCALE
         self.slideInView?.frame = CGRect(x:0,y:-64,width:(UIApplication.shared.keyWindow?.bounds.height)!,height: 64)
         self.slideInMsgLabel?.frame = CGRect(x: 0, y: 20, width: (UIApplication.shared.keyWindow?.bounds.height)!, height: 40)
         self.slideInView?.center = CGPoint(x: (UIApplication.shared.keyWindow?.bounds.midY)!, y: -32.0)
@@ -807,7 +807,7 @@ class VideoCallViewController: BaseViewController {
         self.remoteViewHeight.constant = height
         self.selfViewWidth.constant = 70 * Utils.WIDTH_SCALE
         self.selfViewHeight.constant = 100 * Utils.HEIGHT_SCALE
-        self.screenShareViewWidth.constant = 70 * Utils.HEIGHT_SCALE
+        self.screenShareViewWidth.constant = 150 * Utils.HEIGHT_SCALE
         self.screenShareViewHeight.constant = 100 * Utils.WIDTH_SCALE
         self.slideInView?.frame = CGRect(x:0,y:-64,width:(UIApplication.shared.keyWindow?.bounds.height)!,height: 64)
         self.slideInMsgLabel?.frame = CGRect(x: 0, y: 20, width: (UIApplication.shared.keyWindow?.bounds.height)!, height: 40)
@@ -821,7 +821,7 @@ class VideoCallViewController: BaseViewController {
         self.remoteViewHeight.constant = 210 * Utils.HEIGHT_SCALE
         self.selfViewWidth.constant = 70 * Utils.WIDTH_SCALE
         self.selfViewHeight.constant = 100 * Utils.HEIGHT_SCALE
-        self.screenShareViewWidth.constant = 70 * Utils.HEIGHT_SCALE
+        self.screenShareViewWidth.constant = 150 * Utils.HEIGHT_SCALE
         self.screenShareViewHeight.constant = 100 * Utils.WIDTH_SCALE
         self.slideInView?.frame = CGRect(x:0,y:-64,width:(UIApplication.shared.keyWindow?.bounds.width)!,height: 64)
         self.slideInMsgLabel?.frame = CGRect(x: 0, y: 20, width: (UIApplication.shared.keyWindow?.bounds.width)!, height: 40)
