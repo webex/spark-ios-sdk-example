@@ -388,7 +388,6 @@ class VideoCallViewController: BaseViewController {
     @IBAction private func toggleLoudSpeaker(_ sender: AnyObject) {
         // True if the loud speaker is selected as the audio output device for this *call*. Otherwise, false.
         self.currentCall?.isSpeaker = loudSpeakerSwitch.isOn
-        self.didDialWithRemoteAddress("sparksdktestuser1@tropo.com")
     }
     
     @IBAction private func toggleSendingVideo(_ sender: AnyObject) {
