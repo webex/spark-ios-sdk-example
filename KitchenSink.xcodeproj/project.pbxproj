@@ -23,6 +23,7 @@
 		04D9882A1CEDAEBF00C18422 /* CallRateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D988291CEDAEBF00C18422 /* CallRateViewController.swift */; };
 		106A03191F3451CC00167542 /* SparkEnvirmonment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106A03171F3451CC00167542 /* SparkEnvirmonment.swift */; };
 		106A031A1F3451CC00167542 /* VideoAudioSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106A03181F3451CC00167542 /* VideoAudioSetting.swift */; };
+		10BFA40C1F4D2B9400602908 /* SpaceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BFA40B1F4D2B9400602908 /* SpaceTableViewCell.swift */; };
 		12A1611E1DA4EFA48208E5D8 /* Pods_KitchenSink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A779AB3A31B809D134C73D0C /* Pods_KitchenSink.framework */; };
 		5A82441E1DF9E5F900481A55 /* JWTLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A82441D1DF9E5F900481A55 /* JWTLoginViewController.swift */; };
 		C7710D1A1EC4432C000FA609 /* KSLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7710D191EC4432C000FA609 /* KSLogger.swift */; };
@@ -54,6 +55,7 @@
 		04D988291CEDAEBF00C18422 /* CallRateViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallRateViewController.swift; sourceTree = "<group>"; };
 		106A03171F3451CC00167542 /* SparkEnvirmonment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SparkEnvirmonment.swift; sourceTree = "<group>"; };
 		106A03181F3451CC00167542 /* VideoAudioSetting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoAudioSetting.swift; sourceTree = "<group>"; };
+		10BFA40B1F4D2B9400602908 /* SpaceTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpaceTableViewCell.swift; sourceTree = "<group>"; };
 		277E22BA829A2166B4679129 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		5A82441D1DF9E5F900481A55 /* JWTLoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JWTLoginViewController.swift; sourceTree = "<group>"; };
 		64CD6C6BBEEF5EBA5E4702E7 /* Pods-KitchenSink.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink.debug.xcconfig"; path = "Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink.debug.xcconfig"; sourceTree = "<group>"; };
@@ -214,6 +216,7 @@
 				C7D086E71E9B6FAA00FC662B /* KSLabel.swift */,
 				C7D086E91E9DE42000FC662B /* KSLargerHitAreaButton.swift */,
 				042A4A741D12532E002697D3 /* PersonTableViewCell.swift */,
+				10BFA40B1F4D2B9400602908 /* SpaceTableViewCell.swift */,
 			);
 			name = UIKitExtension;
 			sourceTree = "<group>";
@@ -346,7 +349,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -356,6 +359,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				10BFA40C1F4D2B9400602908 /* SpaceTableViewCell.swift in Sources */,
 				042A4A751D12532E002697D3 /* PersonTableViewCell.swift in Sources */,
 				C785D3171E9494CA00A5A648 /* UIKitExtension.swift in Sources */,
 				04D9882A1CEDAEBF00C18422 /* CallRateViewController.swift in Sources */,

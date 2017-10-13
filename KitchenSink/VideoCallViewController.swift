@@ -25,6 +25,7 @@ import Toast_Swift
 enum VideoCallRole {
     case CallPoster(String)
     case CallReceiver(String)
+    case RoomCallPoster(String, String)
 }
 
 class VideoCallViewController: BaseViewController {
@@ -49,11 +50,15 @@ class VideoCallViewController: BaseViewController {
     @IBOutlet private weak var remoteViewHeight: NSLayoutConstraint!
     @IBOutlet private weak var selfViewWidth: NSLayoutConstraint!
     @IBOutlet private weak var selfViewHeight: NSLayoutConstraint!
+    @IBOutlet weak var screenShareViewWidth: NSLayoutConstraint!
+    @IBOutlet weak var screenShareViewHeight: NSLayoutConstraint!
     @IBOutlet var dialpadViewWidth: NSLayoutConstraint!
     @IBOutlet var dialpadViewHeight: NSLayoutConstraint!
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var labelFontScaleCollection: [UILabel]!
+    private var slideInView: UIView?
+    private var slideInMsgLabel: UILabel?
     private var callStatus:CallStatus = .initiated
     private var isFullScreen: Bool = false
     private let avatarImageView = UIImageView()
@@ -63,7 +68,9 @@ class VideoCallViewController: BaseViewController {
     private let normalScreenImage = UIImage.fontAwesomeIcon(name: .compress, textColor: UIColor.white, size: CGSize.init(width: 44, height: 44))
     private let uncheckImage = UIImage.fontAwesomeIcon(name: .squareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
     private let checkImage = UIImage.fontAwesomeIcon(name: .checkSquareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
-    private var longPressRec : UILongPressGestureRecognizer?
+    private var longPressRec1 : UILongPressGestureRecognizer?
+    private var longPressRec2 : UILongPressGestureRecognizer?
+    private var first: Bool = true
     override var navigationTitle: String? {
         get {
             return "Call status:\(self.title ?? "Unkonw")"
@@ -103,6 +110,9 @@ class VideoCallViewController: BaseViewController {
     /// MediaRenderView is an OpenGL backed UIView
     @IBOutlet private weak var remoteView: MediaRenderView!
     
+    @IBOutlet weak var screenShareView: MediaRenderView!
+    
+    
     /// saparkSDK reperesent for the SparkSDK API instance
     var sparkSDK: Spark?
     
@@ -110,24 +120,26 @@ class VideoCallViewController: BaseViewController {
     var currentCall: Call?
     
     // MARK: - Life cycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        switch videoCallRole {
-        case .CallReceiver(let remoteAddress):
-            self.didAnswerIncomingCall()
-            self.setupAvatarView(remoteAddress)
-        case .CallPoster(let remoteAddress):
-            self.didDialWithRemoteAddress(remoteAddress)
-            self.setupAvatarView(remoteAddress)
-        }
-    }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.updateUIStatus()
         
+        if first {
+            switch videoCallRole {
+            case .CallReceiver(let remoteAddress):
+                self.didAnswerIncomingCall()
+                self.setupAvatarView(remoteAddress)
+                self.sparkPersonWithEmailString(emailStr: remoteAddress)
+            case .CallPoster(let remoteAddress):
+                self.didDialWithRemoteAddress(remoteAddress)
+                self.setupAvatarView(remoteAddress)
+                self.sparkPersonWithEmailString(emailStr: remoteAddress)
+            case .RoomCallPoster(let roomId, let roomName):
+                self.didDialWithRemoteAddress(roomId)
+                self.setupAvatarView(roomName)
+            }
+            first = false
+        }
+        self.updateUIStatus()
         /* SparkSDK: register callback functions for "Callstate" changing */
         self.sparkCallStatesProcess()
     }
@@ -149,7 +161,7 @@ class VideoCallViewController: BaseViewController {
             return
         }
         
-        /* 
+        /*
          audioVideo as making a Video call,audioOnly as making Voice only call.The default is audio call.
          */
         var mediaOption = MediaOption.audioOnly()
@@ -157,7 +169,7 @@ class VideoCallViewController: BaseViewController {
             globalVideoSetting.sparkSDK = self.sparkSDK
         }
         if globalVideoSetting.isVideoEnabled() {
-            mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
+            mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!))
         }
         self.callStatus = .initiated
         /* Makes a call to an intended recipient on behalf of the authenticated user.*/
@@ -167,6 +179,7 @@ class VideoCallViewController: BaseViewController {
                 case .success(let call):
                     strongSelf.currentCall = call
                     strongSelf.sparkCallStatesProcess()
+                    strongSelf.showScreenShareView(call.remoteSendingScreenShare)
                 case .failure(let error):
                     _ = strongSelf.navigationController?.popViewController(animated: true)
                     print("Dial call error: \(error)")
@@ -184,7 +197,7 @@ class VideoCallViewController: BaseViewController {
         
         var mediaOption = MediaOption.audioOnly()
         if globalVideoSetting.isVideoEnabled() {
-            mediaOption = MediaOption.audioVideo(local: self.selfView, remote: self.remoteView)
+            mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!))
         }
         
         if !globalVideoSetting.isSelfViewShow {
@@ -195,10 +208,10 @@ class VideoCallViewController: BaseViewController {
         if !globalVideoSetting.isLoudSpeaker {
             self.loudSpeakerSwitch.isOn = false
         }
-        /* 
-        Answers this call.
-        This can only be invoked when this call is incoming and in rining status.
-        Otherwise error will occur and onError callback will be dispatched.
+        /*
+         Answers this call.
+         This can only be invoked when this call is incoming and in rining status.
+         Otherwise error will occur and onError callback will be dispatched.
          */
         self.currentCall?.answer(option: mediaOption) { [weak self] error in
             if let strongSelf = self {
@@ -208,11 +221,15 @@ class VideoCallViewController: BaseViewController {
                         
                     }
                 }
+                else if strongSelf.currentCall?.remoteSendingScreenShare ?? false {
+                    strongSelf.currentCall?.screenShareRenderView = strongSelf.screenShareView
+                }
             }
         }
         
     }
     func didHangUpCall(){
+        self.slideInView?.removeFromSuperview()
         /* Disconnect a call. */
         self.currentCall?.hangup() { [weak self] error in
             if let strongSelf = self {
@@ -236,6 +253,7 @@ class VideoCallViewController: BaseViewController {
                     strongSelf.updateUIStatus()
                 }
             }
+            
             /* Callback when remote participant(s) answered and this *call* is connected. */
             call.onConnected = { [weak self] in
                 if let strongSelf = self {
@@ -244,9 +262,15 @@ class VideoCallViewController: BaseViewController {
                     if globalVideoSetting.isVideoEnabled() && !globalVideoSetting.isSelfViewShow {
                         strongSelf.toggleSendingVideo(strongSelf.sendingVideoSwitch)
                     }
+                    if self?.currentCall?.remoteSendingScreenShare ?? false {
+                        strongSelf.currentCall?.screenShareRenderView = self?.screenShareView
+                        strongSelf.showScreenShareView(true)
+                    }
                 }
                 
             }
+            
+            
             /* Callback when this *call* is disconnected (hangup, cancelled, get declined or other self device pickup the call). */
             call.onDisconnected = {[weak self] disconnectionType in
                 if let strongSelf = self {
@@ -255,8 +279,52 @@ class VideoCallViewController: BaseViewController {
                     strongSelf.navigationTitle = "Disconnected"
                     strongSelf.showDisconnectionType(disconnectionType)
                     strongSelf.presentCallRateVC()
+                    strongSelf.slideInView?.removeFromSuperview()
                 }
             }
+            
+            /* Callback when remote participant(s) join/left/decline connected. */
+            call.onCallMembershipChanged = { [weak self] memberShipChangeType  in
+                if let strongSelf = self {
+                    switch memberShipChangeType {
+                        /* This might be triggered when membership joined the call */
+                    case .joined(let memberShip):
+                        strongSelf.slideInStateView(slideInMsg: memberShip.email! + " joined")
+                        break
+                        /* This might be triggered when membership left the call */
+                    case .left(let memberShip):
+                        strongSelf.slideInStateView(slideInMsg: memberShip.email! + " left")
+                        /* This might be triggered when membership declined the call */
+                    case .declined(let memberShip):
+                        strongSelf.slideInStateView(slideInMsg: memberShip.email! + " declined")
+                    case .sendingAudio(let memberShip):
+                        if memberShip.sendingAudio {
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " unmute audio")
+                        }
+                        else {
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " mute audio")
+                        }
+                        break
+                    case .sendingVideo(let memberShip):
+                        if memberShip.sendingVideo {
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " unmute video")
+                        }
+                        else {
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " mute video")
+                        }
+                        break
+                    case .sendingScreenShare(let memberShip):
+                        if memberShip.sendingScreenShare {
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " share screen")
+                        }
+                        else {
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " stop share")
+                        }
+                        break
+                    }
+                }
+            }
+            
             /* Callback when the media types of this *call* have changed. */
             call.onMediaChanged = {[weak self] mediaChangeType in
                 if let strongSelf = self {
@@ -264,32 +332,49 @@ class VideoCallViewController: BaseViewController {
                     strongSelf.updateAvatarViewVisibility()
                     switch mediaChangeType {
                         
-                    /* Local/Remote video rendering view size has changed */
+                        /* Local/Remote video rendering view size has changed */
                     case .localVideoViewSize,.remoteVideoViewSize:
                         break
-                    /* This might be triggered when the remote party muted or unmuted the audio. */
+                        /* This might be triggered when the remote party muted or unmuted the audio. */
                     case .remoteSendingAudio(let isSending):
                         strongSelf.receivingAudioSwitch.isOn = isSending
                         
-                    /* This might be triggered when the remote party muted or unmuted the video. */
+                        /* This might be triggered when the remote party muted or unmuted the video. */
                     case .remoteSendingVideo(let isSending):
                         strongSelf.receivingVideoSwitch.isOn = isSending
                         
-                    /* This might be triggered when the local party muted or unmuted the video. */
+                        /* This might be triggered when the local party muted or unmuted the video. */
                     case .sendingAudio(let isSending):
                         strongSelf.sendingAudioSwitch.isOn = isSending
                         
-                    /* This might be triggered when the local party muted or unmuted the aideo. */
+                        /* This might be triggered when the local party muted or unmuted the aideo. */
                     case .sendingVideo(let isSending):
                         strongSelf.sendingVideoSwitch.isOn = isSending
                         
-                    /* Camera FacingMode on local device has switched. */
+                        /* Camera FacingMode on local device has switched. */
                     case .cameraSwitched:
                         strongSelf.updateCheckBoxStatus()
                         
-                    /* Whether loud speaker on local device is on or not has switched. */
+                        /* Whether loud speaker on local device is on or not has switched. */
                     case .spearkerSwitched:
                         strongSelf.loudSpeakerSwitch.isOn = call.isSpeaker
+                        
+                        /* Whether Screen share is blocked by local*/
+                    case .receivingScreenShare(let isReceiving):
+                        self?.showScreenShareView(isReceiving)
+                        break
+                        
+                        /* Whether Remote began to send Screen share */
+                    case .remoteSendingScreenShare(let startedSending):
+                        if startedSending {
+                            self?.currentCall?.screenShareRenderView = self?.screenShareView
+                        }
+                        else {
+                            self?.currentCall?.screenShareRenderView = nil
+                        }
+                        self?.showScreenShareView(startedSending)
+                        
+                        break
                     default:
                         break
                     }
@@ -305,7 +390,7 @@ class VideoCallViewController: BaseViewController {
             /*
              Person list is empty with SIP email address
              Lists people in the authenticated user's organization.
-            */
+             */
             self.sparkSDK?.people.list(email: emailAddress, max: 1) { response in
                 var persons: [Person] = []
                 
@@ -380,7 +465,6 @@ class VideoCallViewController: BaseViewController {
         for widthConstraint in widthScaleCollection {
             widthConstraint.constant *= Utils.WIDTH_SCALE
         }
-        
         
         fullScreenButton.setBackgroundImage(fullScreenImage, for: .normal)
         
@@ -459,7 +543,7 @@ class VideoCallViewController: BaseViewController {
         
         view.setNeedsUpdateConstraints()
         
-        self.sparkPersonWithEmailString(emailStr: remoteAddr)
+        self.slideInViewSetUp()
     }
     
     private func saveCallPersonHistory(person: Person){
@@ -473,7 +557,7 @@ class VideoCallViewController: BaseViewController {
             self.fetchAvatarImage(avatarUrl)
         }
     }
-
+    
     private func fetchAvatarImage(_ avatarUrl: String) {
         Utils.downloadAvatarImage(avatarUrl) { [weak self] avatarImage in
             if let strongSelf = self {
@@ -520,7 +604,7 @@ class VideoCallViewController: BaseViewController {
             self.hideDialpadButton(false)
             self.hideDialpadView(true)
             self.updateSelfViewVisibility()
-            
+            self.showScreenShareView(self.currentCall?.remoteSendingScreenShare ?? false)
             if self.isCallDisconnected() {
                 self.hideCallView()
             }
@@ -602,6 +686,10 @@ class VideoCallViewController: BaseViewController {
         self.selfView.isHidden = !shown
     }
     
+    private func showScreenShareView( _ shown: Bool){
+        self.screenShareView.isHidden = !shown
+    }
+    
     private func showCallControllView(_ shown: Bool) {
         if self.isCallDisconnected() {
             self.switchContainerView.isHidden = true
@@ -653,7 +741,7 @@ class VideoCallViewController: BaseViewController {
         alert.addAction(UIAlertAction(title: "End call", style: .default, handler: endCallHandler))
         present(alert, animated: true, completion: nil)
     }
-
+    
     override func goBack() {
         if self.isCallDisconnected() {
             _ = navigationController?.popViewController(animated: true)
@@ -692,36 +780,84 @@ class VideoCallViewController: BaseViewController {
         return callStatus == .disconnected
     }
     
+    // MARK: Slide In View SetUp
+    private func slideInViewSetUp(){
+        if(self.slideInView == nil){
+            self.slideInView = UIView(frame: CGRect(x:0,y:-64,width:(UIApplication.shared.keyWindow?.bounds.width)!,height: 64))
+            self.slideInView?.backgroundColor = UIColor.buttonBlueNormal()
+            UIApplication.shared.keyWindow?.addSubview(self.slideInView!)
+            
+            self.slideInMsgLabel = UILabel(frame: CGRect(x: 0, y: 20, width: (UIApplication.shared.keyWindow?.bounds.width)!, height: 40))
+            self.slideInMsgLabel?.text = ""
+            self.slideInMsgLabel?.font = UIFont.navigationBoldFont(ofSize: 18)
+            self.slideInMsgLabel?.textColor = UIColor.white
+            self.slideInMsgLabel?.textAlignment = .center
+            self.slideInView?.isHidden = true
+            self.slideInView?.addSubview(self.slideInMsgLabel!)
+            
+        }
+    }
+    private func slideInStateView(slideInMsg: String){
+        self.slideInView?.isHidden = false
+        self.slideInMsgLabel?.text = slideInMsg
+        UIView.animate(withDuration: 0.25, animations: {
+            self.slideInView?.transform = CGAffineTransform.init(translationX: 0, y: 64)
+        }) { (_) in
+            UIView.animate(withDuration: 0.25, delay: 1.5, options: .curveEaseInOut, animations: {
+                self.slideInView?.transform = CGAffineTransform.init(translationX: 0, y: 0)
+            }, completion: { (_) in
+                self.slideInView?.isHidden = true
+            })
+        }
+    }
+    
     // MARK: - Orientation manage
     
     private func fullScreenLandscape(_ height:CGFloat) {
         self.remoteViewHeight.constant = height
         self.selfViewWidth.constant = 100 * Utils.HEIGHT_SCALE
         self.selfViewHeight.constant = 70 * Utils.WIDTH_SCALE
+        self.screenShareViewWidth.constant = 150 * Utils.HEIGHT_SCALE
+        self.screenShareViewHeight.constant = 100 * Utils.WIDTH_SCALE
+        self.slideInView?.frame = CGRect(x:0,y:-64,width:(UIApplication.shared.keyWindow?.bounds.height)!,height: 64)
+        self.slideInMsgLabel?.frame = CGRect(x: 0, y: 20, width: (UIApplication.shared.keyWindow?.bounds.height)!, height: 40)
+        self.slideInView?.center = CGPoint(x: (UIApplication.shared.keyWindow?.bounds.midY)!, y: -32.0)
         self.hideControlView(true)
         self.fullScreenButton.isHidden = true
-        self.addMoveReconizerOnSelfView()
+        self.addMoveReconizerOnSelfViewAndScreenShareView()
     }
     private func fullScreenPortrait(_ height:CGFloat) {
         self.remoteViewHeight.constant = height
         self.selfViewWidth.constant = 70 * Utils.WIDTH_SCALE
         self.selfViewHeight.constant = 100 * Utils.HEIGHT_SCALE
+        self.screenShareViewWidth.constant = 150 * Utils.HEIGHT_SCALE
+        self.screenShareViewHeight.constant = 100 * Utils.WIDTH_SCALE
+        self.slideInView?.frame = CGRect(x:0,y:-64,width:(UIApplication.shared.keyWindow?.bounds.height)!,height: 64)
+        self.slideInMsgLabel?.frame = CGRect(x: 0, y: 20, width: (UIApplication.shared.keyWindow?.bounds.height)!, height: 40)
         self.hideControlView(true)
         self.fullScreenButton.isHidden = false
         self.fullScreenButton.setBackgroundImage(normalScreenImage, for: .normal)
-        self.addMoveReconizerOnSelfView()
+        self.addMoveReconizerOnSelfViewAndScreenShareView()
     }
     
     private func normalSizePortrait() {
         self.remoteViewHeight.constant = 210 * Utils.HEIGHT_SCALE
         self.selfViewWidth.constant = 70 * Utils.WIDTH_SCALE
         self.selfViewHeight.constant = 100 * Utils.HEIGHT_SCALE
+        self.screenShareViewWidth.constant = 150 * Utils.HEIGHT_SCALE
+        self.screenShareViewHeight.constant = 100 * Utils.WIDTH_SCALE
+        self.slideInView?.frame = CGRect(x:0,y:-64,width:(UIApplication.shared.keyWindow?.bounds.width)!,height: 64)
+        self.slideInMsgLabel?.frame = CGRect(x: 0, y: 20, width: (UIApplication.shared.keyWindow?.bounds.width)!, height: 40)
         self.hideControlView(false)
         self.fullScreenButton.isHidden = false
         self.fullScreenButton.setBackgroundImage(fullScreenImage, for: .normal)
-        if let reconizer = self.longPressRec{
+        if let reconizer = self.longPressRec1{
             selfView.removeGestureRecognizer(reconizer)
-            self.longPressRec = nil
+            self.longPressRec1 = nil
+        }
+        if let reconizer = self.longPressRec2{
+            screenShareView.removeGestureRecognizer(reconizer)
+            self.longPressRec2 = nil
         }
         
     }
@@ -732,11 +868,17 @@ class VideoCallViewController: BaseViewController {
         navigationController?.isNavigationBarHidden = isHidden
     }
     
-    private func addMoveReconizerOnSelfView(){
-        if(self.longPressRec == nil){
-            self.longPressRec = UILongPressGestureRecognizer(target: self, action: #selector(selfViewMoved))
-            self.longPressRec?.minimumPressDuration = 0.05
-            self.selfView.addGestureRecognizer(self.longPressRec!)
+    private func addMoveReconizerOnSelfViewAndScreenShareView(){
+        if(self.longPressRec1 == nil){
+            self.longPressRec1 = UILongPressGestureRecognizer(target: self, action: #selector(selfViewMoved))
+            self.longPressRec1?.minimumPressDuration = 0.05
+            self.selfView.addGestureRecognizer(self.longPressRec1!)
+        }
+        
+        if(self.longPressRec2 == nil){
+            self.longPressRec2 = UILongPressGestureRecognizer(target: self, action: #selector(screenViewMoved))
+            self.longPressRec2?.minimumPressDuration = 0.05
+            self.screenShareView.addGestureRecognizer(self.longPressRec2!)
         }
     }
     @objc func selfViewMoved(recognizer: UILongPressGestureRecognizer){
@@ -749,7 +891,18 @@ class VideoCallViewController: BaseViewController {
             
         }
     }
-
+    
+    @objc func screenViewMoved(recognizer: UILongPressGestureRecognizer){
+        let point = recognizer.location(in: self.view)
+        if(recognizer.state == .began){
+            self.screenShareView.center = point
+        }else if(recognizer.state == .changed){
+            self.screenShareView.center = point
+        }else if(recognizer.state == .ended){
+            
+        }
+    }
+    
     // MARK: Landscape
     private func viewOrientationChange(_ isLandscape:Bool,with size:CGSize) {
         if isLandscape {

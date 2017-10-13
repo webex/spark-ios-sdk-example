@@ -22,7 +22,7 @@ import UIKit
 import FontAwesome_swift
 
 class BaseNavigationViewController: UINavigationController,UIGestureRecognizerDelegate,UINavigationControllerDelegate {
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         if responds(to: #selector(getter: interactivePopGestureRecognizer)) {
@@ -149,16 +149,19 @@ class BaseViewController: UIViewController {
         let leftView = UIView.init(frame:CGRect.init(x: 0, y: 0, width: 44, height: 44))
         leftView.addSubview(previousButton)
         let leftButtonItem = UIBarButtonItem.init(customView: leftView)
+        if #available(iOS 11, *) {
+            navigationItem.leftBarButtonItem = leftButtonItem
+        }
+        else {
+            let fixBarSpacer = UIBarButtonItem.init(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
+            fixBarSpacer.width = -20 * (2 - Utils.WIDTH_SCALE)
+            navigationItem.leftBarButtonItems = [fixBarSpacer,leftButtonItem]
+        }
         
-        
-        let fixBarSpacer = UIBarButtonItem.init(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
-        fixBarSpacer.width = -20 * (2 - Utils.WIDTH_SCALE)
-        navigationItem.leftBarButtonItems = [fixBarSpacer,leftButtonItem]
     }
     func goBack() {
         navigationController?.popViewController(animated: true)
     }
-    
 }
 
 class BaseTableViewController: UITableViewController {
@@ -198,3 +201,14 @@ class BaseTableViewController: UITableViewController {
         navigationController?.setNavigationBarHidden(false, animated: true)
     }
 }
+
+class BaseNavigaionBar : UINavigationBar {
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        for view in subviews {
+            view.layoutMargins = .zero
+        }
+    }
+}
+
+
