@@ -70,6 +70,7 @@ class VideoCallViewController: BaseViewController {
     private let checkImage = UIImage.fontAwesomeIcon(name: .checkSquareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
     private var longPressRec1 : UILongPressGestureRecognizer?
     private var longPressRec2 : UILongPressGestureRecognizer?
+    private var first: Bool = true
     override var navigationTitle: String? {
         get {
             return "Call status:\(self.title ?? "Unkonw")"
@@ -119,27 +120,25 @@ class VideoCallViewController: BaseViewController {
     var currentCall: Call?
     
     // MARK: - Life cycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        switch videoCallRole {
-        case .CallReceiver(let remoteAddress):
-            self.didAnswerIncomingCall()
-            self.setupAvatarView(remoteAddress)
-            self.sparkPersonWithEmailString(emailStr: remoteAddress)
-        case .CallPoster(let remoteAddress):
-            self.didDialWithRemoteAddress(remoteAddress)
-            self.setupAvatarView(remoteAddress)
-            self.sparkPersonWithEmailString(emailStr: remoteAddress)
-        case .RoomCallPoster(let roomId, let roomName):
-            self.didDialWithRemoteAddress(roomId)
-            self.setupAvatarView(roomName)
-        }
-    }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        if first {
+            switch videoCallRole {
+            case .CallReceiver(let remoteAddress):
+                self.didAnswerIncomingCall()
+                self.setupAvatarView(remoteAddress)
+                self.sparkPersonWithEmailString(emailStr: remoteAddress)
+            case .CallPoster(let remoteAddress):
+                self.didDialWithRemoteAddress(remoteAddress)
+                self.setupAvatarView(remoteAddress)
+                self.sparkPersonWithEmailString(emailStr: remoteAddress)
+            case .RoomCallPoster(let roomId, let roomName):
+                self.didDialWithRemoteAddress(roomId)
+                self.setupAvatarView(roomName)
+            }
+            first = false
+        }
         self.updateUIStatus()
         /* SparkSDK: register callback functions for "Callstate" changing */
         self.sparkCallStatesProcess()
@@ -162,7 +161,7 @@ class VideoCallViewController: BaseViewController {
             return
         }
         
-        /* 
+        /*
          audioVideo as making a Video call,audioOnly as making Voice only call.The default is audio call.
          */
         var mediaOption = MediaOption.audioOnly()
@@ -209,10 +208,10 @@ class VideoCallViewController: BaseViewController {
         if !globalVideoSetting.isLoudSpeaker {
             self.loudSpeakerSwitch.isOn = false
         }
-        /* 
-        Answers this call.
-        This can only be invoked when this call is incoming and in rining status.
-        Otherwise error will occur and onError callback will be dispatched.
+        /*
+         Answers this call.
+         This can only be invoked when this call is incoming and in rining status.
+         Otherwise error will occur and onError callback will be dispatched.
          */
         self.currentCall?.answer(option: mediaOption) { [weak self] error in
             if let strongSelf = self {
@@ -263,11 +262,15 @@ class VideoCallViewController: BaseViewController {
                     if globalVideoSetting.isVideoEnabled() && !globalVideoSetting.isSelfViewShow {
                         strongSelf.toggleSendingVideo(strongSelf.sendingVideoSwitch)
                     }
+                    if self?.currentCall?.remoteSendingScreenShare ?? false {
+                        strongSelf.currentCall?.screenShareRenderView = self?.screenShareView
+                        strongSelf.showScreenShareView(true)
+                    }
                 }
                 
             }
             
-        
+            
             /* Callback when this *call* is disconnected (hangup, cancelled, get declined or other self device pickup the call). */
             call.onDisconnected = {[weak self] disconnectionType in
                 if let strongSelf = self {
@@ -329,42 +332,42 @@ class VideoCallViewController: BaseViewController {
                     strongSelf.updateAvatarViewVisibility()
                     switch mediaChangeType {
                         
-                    /* Local/Remote video rendering view size has changed */
+                        /* Local/Remote video rendering view size has changed */
                     case .localVideoViewSize,.remoteVideoViewSize:
                         break
-                    /* This might be triggered when the remote party muted or unmuted the audio. */
+                        /* This might be triggered when the remote party muted or unmuted the audio. */
                     case .remoteSendingAudio(let isSending):
                         strongSelf.receivingAudioSwitch.isOn = isSending
                         
-                    /* This might be triggered when the remote party muted or unmuted the video. */
+                        /* This might be triggered when the remote party muted or unmuted the video. */
                     case .remoteSendingVideo(let isSending):
                         strongSelf.receivingVideoSwitch.isOn = isSending
                         
-                    /* This might be triggered when the local party muted or unmuted the video. */
+                        /* This might be triggered when the local party muted or unmuted the video. */
                     case .sendingAudio(let isSending):
                         strongSelf.sendingAudioSwitch.isOn = isSending
                         
-                    /* This might be triggered when the local party muted or unmuted the aideo. */
+                        /* This might be triggered when the local party muted or unmuted the aideo. */
                     case .sendingVideo(let isSending):
                         strongSelf.sendingVideoSwitch.isOn = isSending
                         
-                    /* Camera FacingMode on local device has switched. */
+                        /* Camera FacingMode on local device has switched. */
                     case .cameraSwitched:
                         strongSelf.updateCheckBoxStatus()
                         
-                    /* Whether loud speaker on local device is on or not has switched. */
+                        /* Whether loud speaker on local device is on or not has switched. */
                     case .spearkerSwitched:
                         strongSelf.loudSpeakerSwitch.isOn = call.isSpeaker
                         
-                    /* Whether Screen share is blocked by local*/
+                        /* Whether Screen share is blocked by local*/
                     case .receivingScreenShare(let isReceiving):
                         self?.showScreenShareView(isReceiving)
                         break
                         
-                    /* Whether Remote began to send Screen share */
+                        /* Whether Remote began to send Screen share */
                     case .remoteSendingScreenShare(let startedSending):
                         if startedSending {
-                         self?.currentCall?.screenShareRenderView = self?.screenShareView
+                            self?.currentCall?.screenShareRenderView = self?.screenShareView
                         }
                         else {
                             self?.currentCall?.screenShareRenderView = nil
@@ -387,7 +390,7 @@ class VideoCallViewController: BaseViewController {
             /*
              Person list is empty with SIP email address
              Lists people in the authenticated user's organization.
-            */
+             */
             self.sparkSDK?.people.list(email: emailAddress, max: 1) { response in
                 var persons: [Person] = []
                 
@@ -554,7 +557,7 @@ class VideoCallViewController: BaseViewController {
             self.fetchAvatarImage(avatarUrl)
         }
     }
-
+    
     private func fetchAvatarImage(_ avatarUrl: String) {
         Utils.downloadAvatarImage(avatarUrl) { [weak self] avatarImage in
             if let strongSelf = self {
@@ -738,7 +741,7 @@ class VideoCallViewController: BaseViewController {
         alert.addAction(UIAlertAction(title: "End call", style: .default, handler: endCallHandler))
         present(alert, animated: true, completion: nil)
     }
-
+    
     override func goBack() {
         if self.isCallDisconnected() {
             _ = navigationController?.popViewController(animated: true)
@@ -795,18 +798,16 @@ class VideoCallViewController: BaseViewController {
         }
     }
     private func slideInStateView(slideInMsg: String){
-        DispatchQueue.main.sync {
-            self.slideInView?.isHidden = false
-            self.slideInMsgLabel?.text = slideInMsg
-            UIView.animate(withDuration: 0.25, animations: {
-                self.slideInView?.transform = CGAffineTransform.init(translationX: 0, y: 64)
-            }) { (_) in
-                UIView.animate(withDuration: 0.25, delay: 1.5, options: .curveEaseInOut, animations: {
-                    self.slideInView?.transform = CGAffineTransform.init(translationX: 0, y: 0)
-                }, completion: { (_) in
-                    self.slideInView?.isHidden = true
-                })
-            }
+        self.slideInView?.isHidden = false
+        self.slideInMsgLabel?.text = slideInMsg
+        UIView.animate(withDuration: 0.25, animations: {
+            self.slideInView?.transform = CGAffineTransform.init(translationX: 0, y: 64)
+        }) { (_) in
+            UIView.animate(withDuration: 0.25, delay: 1.5, options: .curveEaseInOut, animations: {
+                self.slideInView?.transform = CGAffineTransform.init(translationX: 0, y: 0)
+            }, completion: { (_) in
+                self.slideInView?.isHidden = true
+            })
         }
     }
     
@@ -901,7 +902,7 @@ class VideoCallViewController: BaseViewController {
             
         }
     }
-
+    
     // MARK: Landscape
     private func viewOrientationChange(_ isLandscape:Bool,with size:CGSize) {
         if isLandscape {
