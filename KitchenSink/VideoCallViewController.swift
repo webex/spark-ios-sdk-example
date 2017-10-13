@@ -170,7 +170,7 @@ class VideoCallViewController: BaseViewController {
             globalVideoSetting.sparkSDK = self.sparkSDK
         }
         if globalVideoSetting.isVideoEnabled() {
-            mediaOption = MediaOption.mediaAndScreenShare(media: (self.self.selfView!, self.remoteView!))
+            mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!))
         }
         self.callStatus = .initiated
         /* Makes a call to an intended recipient on behalf of the authenticated user.*/
@@ -198,7 +198,7 @@ class VideoCallViewController: BaseViewController {
         
         var mediaOption = MediaOption.audioOnly()
         if globalVideoSetting.isVideoEnabled() {
-            mediaOption = MediaOption.mediaAndScreenShare(media: (self.self.selfView!, self.remoteView!))
+            mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!))
         }
         
         if !globalVideoSetting.isSelfViewShow {
@@ -294,7 +294,29 @@ class VideoCallViewController: BaseViewController {
                         /* This might be triggered when membership declined the call */
                     case .declined(let memberShip):
                         strongSelf.slideInStateView(slideInMsg: memberShip.email! + " declined")
-                    default:
+                    case .sendingAudio(let memberShip):
+                        if memberShip.sendingAudio {
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " unmute audio")
+                        }
+                        else {
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " mute audio")
+                        }
+                        break
+                    case .sendingVideo(let memberShip):
+                        if memberShip.sendingVideo {
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " unmute video")
+                        }
+                        else {
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " mute video")
+                        }
+                        break
+                    case .sendingScreenShare(let memberShip):
+                        if memberShip.sendingScreenShare {
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " share screen")
+                        }
+                        else {
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " stop share")
+                        }
                         break
                     }
                 }
@@ -773,17 +795,18 @@ class VideoCallViewController: BaseViewController {
         }
     }
     private func slideInStateView(slideInMsg: String){
-
-        self.slideInView?.isHidden = false
-        self.slideInMsgLabel?.text = slideInMsg
-        UIView.animate(withDuration: 0.25, animations: {
-            self.slideInView?.transform = CGAffineTransform.init(translationX: 0, y: 64)
-        }) { (_) in
-            UIView.animate(withDuration: 0.25, delay: 1.5, options: .curveEaseInOut, animations: {
-                self.slideInView?.transform = CGAffineTransform.init(translationX: 0, y: 0)
-            }, completion: { (_) in
-                self.slideInView?.isHidden = true
-            })
+        DispatchQueue.main.sync {
+            self.slideInView?.isHidden = false
+            self.slideInMsgLabel?.text = slideInMsg
+            UIView.animate(withDuration: 0.25, animations: {
+                self.slideInView?.transform = CGAffineTransform.init(translationX: 0, y: 64)
+            }) { (_) in
+                UIView.animate(withDuration: 0.25, delay: 1.5, options: .curveEaseInOut, animations: {
+                    self.slideInView?.transform = CGAffineTransform.init(translationX: 0, y: 0)
+                }, completion: { (_) in
+                    self.slideInView?.isHidden = true
+                })
+            }
         }
     }
     
