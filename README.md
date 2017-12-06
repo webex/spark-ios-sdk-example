@@ -173,3 +173,6 @@ Below is code snippets of the SDK calling in the demo.
             }
     }
     ```
+# Buddies-App
+Here is another demo app-"Buddies", which is more implemented as production application, combined call functionalities with CallKit, included message/call functionalities UI-implementation which could be used as widgets.
+[GitHub-Buddies](https://github.com/ciscospark/spark-ios-sdk-example-buddies) 
