@@ -21,8 +21,18 @@
 		04AE182D1CDAD3D800A8F078 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04AE182C1CDAD3D800A8F078 /* Assets.xcassets */; };
 		04AE18301CDAD3D800A8F078 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 04AE182E1CDAD3D800A8F078 /* LaunchScreen.storyboard */; };
 		04D9882A1CEDAEBF00C18422 /* CallRateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D988291CEDAEBF00C18422 /* CallRateViewController.swift */; };
+		101B64D0202174810037A35C /* CreateGroupViewControlller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101B64CF202174810037A35C /* CreateGroupViewControlller.swift */; };
+		10324BB320103F4900F2D405 /* RoomListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10324BB220103F4900F2D405 /* RoomListViewController.swift */; };
+		103B734920172E8A001B7469 /* KitchensinkInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103B734820172E8A001B7469 /* KitchensinkInputView.swift */; };
+		1054FC162010807A0020BE19 /* RoomDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1054FC152010807A0020BE19 /* RoomDetailViewController.swift */; };
+		1054FC1A2010C9BD0020BE19 /* TestImage.png in Resources */ = {isa = PBXBuildFile; fileRef = 1054FC192010C9BD0020BE19 /* TestImage.png */; };
+		1054FC1C2010CADA0020BE19 /* thumbNail.png in Resources */ = {isa = PBXBuildFile; fileRef = 1054FC1B2010CADA0020BE19 /* thumbNail.png */; };
 		106A03191F3451CC00167542 /* SparkEnvirmonment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106A03171F3451CC00167542 /* SparkEnvirmonment.swift */; };
 		106A031A1F3451CC00167542 /* VideoAudioSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106A03181F3451CC00167542 /* VideoAudioSetting.swift */; };
+		106DA2FB201F19EE0069C9CE /* MessagePersonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106DA2FA201F19EE0069C9CE /* MessagePersonCell.swift */; };
+		107D247B201053900083C9CE /* MessageRoomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107D247A201053900083C9CE /* MessageRoomCell.swift */; };
+		10B3029620183CC700E8F96B /* MentionPeopleListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3029520183CC700E8F96B /* MentionPeopleListViewController.swift */; };
+		10B3029B2018476E00E8F96B /* MembershipCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3029A2018476E00E8F96B /* MembershipCell.swift */; };
 		10BFA40C1F4D2B9400602908 /* SpaceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BFA40B1F4D2B9400602908 /* SpaceTableViewCell.swift */; };
 		12A1611E1DA4EFA48208E5D8 /* Pods_KitchenSink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A779AB3A31B809D134C73D0C /* Pods_KitchenSink.framework */; };
 		5A82441E1DF9E5F900481A55 /* JWTLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A82441D1DF9E5F900481A55 /* JWTLoginViewController.swift */; };
@@ -53,8 +63,18 @@
 		04AE182F1CDAD3D800A8F078 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		04AE18311CDAD3D800A8F078 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		04D988291CEDAEBF00C18422 /* CallRateViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallRateViewController.swift; sourceTree = "<group>"; };
+		101B64CF202174810037A35C /* CreateGroupViewControlller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupViewControlller.swift; sourceTree = "<group>"; };
+		10324BB220103F4900F2D405 /* RoomListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomListViewController.swift; sourceTree = "<group>"; };
+		103B734820172E8A001B7469 /* KitchensinkInputView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KitchensinkInputView.swift; sourceTree = "<group>"; };
+		1054FC152010807A0020BE19 /* RoomDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomDetailViewController.swift; sourceTree = "<group>"; };
+		1054FC192010C9BD0020BE19 /* TestImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = TestImage.png; sourceTree = "<group>"; };
+		1054FC1B2010CADA0020BE19 /* thumbNail.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = thumbNail.png; sourceTree = "<group>"; };
 		106A03171F3451CC00167542 /* SparkEnvirmonment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SparkEnvirmonment.swift; sourceTree = "<group>"; };
 		106A03181F3451CC00167542 /* VideoAudioSetting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoAudioSetting.swift; sourceTree = "<group>"; };
+		106DA2FA201F19EE0069C9CE /* MessagePersonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagePersonCell.swift; sourceTree = "<group>"; };
+		107D247A201053900083C9CE /* MessageRoomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageRoomCell.swift; sourceTree = "<group>"; };
+		10B3029520183CC700E8F96B /* MentionPeopleListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentionPeopleListViewController.swift; sourceTree = "<group>"; };
+		10B3029A2018476E00E8F96B /* MembershipCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MembershipCell.swift; sourceTree = "<group>"; };
 		10BFA40B1F4D2B9400602908 /* SpaceTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpaceTableViewCell.swift; sourceTree = "<group>"; };
 		277E22BA829A2166B4679129 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		5A82441D1DF9E5F900481A55 /* JWTLoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JWTLoginViewController.swift; sourceTree = "<group>"; };
@@ -110,6 +130,7 @@
 				C785D3111E9494B400A5A648 /* UIKitExtension */,
 				106A03161F3451CC00167542 /* Configuration */,
 				101608D11F31792000B7559D /* Login */,
+				10324BB120103F2000F2D405 /* Messaging */,
 				101608D31F32E41E00B7559D /* Video/AudioSetup */,
 				101608D51F32E4A100B7559D /* InitiateCall */,
 				101608D61F32E52100B7559D /* WaitingCall */,
@@ -169,6 +190,21 @@
 			name = SendFeedBack;
 			sourceTree = "<group>";
 		};
+		10324BB120103F2000F2D405 /* Messaging */ = {
+			isa = PBXGroup;
+			children = (
+				103B734820172E8A001B7469 /* KitchensinkInputView.swift */,
+				10324BB220103F4900F2D405 /* RoomListViewController.swift */,
+				1054FC152010807A0020BE19 /* RoomDetailViewController.swift */,
+				10B3029520183CC700E8F96B /* MentionPeopleListViewController.swift */,
+				107D247A201053900083C9CE /* MessageRoomCell.swift */,
+				10B3029A2018476E00E8F96B /* MembershipCell.swift */,
+				106DA2FA201F19EE0069C9CE /* MessagePersonCell.swift */,
+				101B64CF202174810037A35C /* CreateGroupViewControlller.swift */,
+			);
+			path = Messaging;
+			sourceTree = "<group>";
+		};
 		106A03161F3451CC00167542 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
@@ -201,6 +237,8 @@
 		C785D30A1E9492CD00A5A648 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				1054FC192010C9BD0020BE19 /* TestImage.png */,
+				1054FC1B2010CADA0020BE19 /* thumbNail.png */,
 				C785D30F1E9494A300A5A648 /* Utils.swift */,
 				C785D3211E95EE6400A5A648 /* UserDefaultUtil.swift */,
 				C7710D191EC4432C000FA609 /* KSLogger.swift */,
@@ -285,9 +323,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1054FC1C2010CADA0020BE19 /* thumbNail.png in Resources */,
 				04AE18301CDAD3D800A8F078 /* LaunchScreen.storyboard in Resources */,
 				04AE182D1CDAD3D800A8F078 /* Assets.xcassets in Resources */,
 				04AE182B1CDAD3D800A8F078 /* Main.storyboard in Resources */,
+				1054FC1A2010C9BD0020BE19 /* TestImage.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -313,9 +353,34 @@
 			files = (
 			);
 			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/AlamofireObjectMapper/AlamofireObjectMapper.framework",
+				"${BUILT_PRODUCTS_DIR}/Cosmos/Cosmos.framework",
+				"${BUILT_PRODUCTS_DIR}/FontAwesome.swift/FontAwesome_swift.framework",
+				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
+				"${BUILT_PRODUCTS_DIR}/ObjectMapper/ObjectMapper.framework",
+				"${PODS_ROOT}/SparkSDK/Vendors/SparkSDKEncryptionKit.framework",
+				"${PODS_ROOT}/SparkSDK/Vendors/Wme.framework",
+				"${BUILT_PRODUCTS_DIR}/SparkSDK/SparkSDK.framework",
+				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
+				"${BUILT_PRODUCTS_DIR}/Toast-Swift/Toast_Swift.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AlamofireObjectMapper.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Cosmos.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FontAwesome_swift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainAccess.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectMapper.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SparkSDKEncryptionKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Wme.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SparkSDK.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Starscream.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Toast_Swift.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -343,13 +408,16 @@
 			files = (
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-KitchenSink-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -360,6 +428,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				10BFA40C1F4D2B9400602908 /* SpaceTableViewCell.swift in Sources */,
+				103B734920172E8A001B7469 /* KitchensinkInputView.swift in Sources */,
 				042A4A751D12532E002697D3 /* PersonTableViewCell.swift in Sources */,
 				C785D3171E9494CA00A5A648 /* UIKitExtension.swift in Sources */,
 				04D9882A1CEDAEBF00C18422 /* CallRateViewController.swift in Sources */,
@@ -369,18 +438,25 @@
 				C785D3101E9494A300A5A648 /* Utils.swift in Sources */,
 				04AE18281CDAD3D800A8F078 /* StartViewController.swift in Sources */,
 				5A82441E1DF9E5F900481A55 /* JWTLoginViewController.swift in Sources */,
+				1054FC162010807A0020BE19 /* RoomDetailViewController.swift in Sources */,
 				C7D086E81E9B6FAA00FC662B /* KSLabel.swift in Sources */,
+				10B3029B2018476E00E8F96B /* MembershipCell.swift in Sources */,
 				04419ABA1CE065E0002BAFC2 /* WaitingCallViewController.swift in Sources */,
 				106A03191F3451CC00167542 /* SparkEnvirmonment.swift in Sources */,
 				0471A25A1CDC5ECD00C6647E /* VideoCallViewController.swift in Sources */,
 				0471A25C1CDC655200C6647E /* InitiateCallViewController.swift in Sources */,
+				10324BB320103F4900F2D405 /* RoomListViewController.swift in Sources */,
 				0471A2561CDB429B00C6647E /* HomeTableViewController.swift in Sources */,
 				04AE18261CDAD3D800A8F078 /* AppDelegate.swift in Sources */,
+				101B64D0202174810037A35C /* CreateGroupViewControlller.swift in Sources */,
 				048969351CDB34AB008966FA /* VideoAudioSetupViewController.swift in Sources */,
 				C7710D1A1EC4432C000FA609 /* KSLogger.swift in Sources */,
+				10B3029620183CC700E8F96B /* MentionPeopleListViewController.swift in Sources */,
 				0471A25E1CDC6BF600C6647E /* CallToastViewController.swift in Sources */,
 				106A031A1F3451CC00167542 /* VideoAudioSetting.swift in Sources */,
+				106DA2FB201F19EE0069C9CE /* MessagePersonCell.swift in Sources */,
 				0471A2581CDC438300C6647E /* SparkLoginViewController.swift in Sources */,
+				107D247B201053900083C9CE /* MessageRoomCell.swift in Sources */,
 				C785D3221E95EE6400A5A648 /* UserDefaultUtil.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -503,6 +579,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = 3K8M2E3L9T;
 				INFOPLIST_FILE = KitchenSink/Info.plist;
@@ -521,6 +598,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = 3K8M2E3L9T;
 				INFOPLIST_FILE = KitchenSink/Info.plist;
