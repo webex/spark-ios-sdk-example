@@ -46,6 +46,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.navigationController?.navigationBar.isTranslucent = true
         self.setupView()
     }
     
