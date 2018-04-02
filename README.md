@@ -1,6 +1,6 @@
 # Kitchen Sink
 
-Kitchen Sink is a developer friendly sample implementation of Spark client SDK and showcases all SDK features. It focuses on how to call and use "Spark-SDK" APIs. Developers could directly cut, paste, and use the code from this sample. It basically implements “Spark-SDK” APIs by button by button.
+Kitchen Sink is a developer friendly sample implementation of Spark client SDK and showcases all SDK features. It focuses on how to call and use "Spark-SDK" APIs. Developers could directly cut, paste, and use the code from this sample. It basically implements “Spark-SDK” APIs by sequence.
 
 ## Screenshots 
 <ul>
