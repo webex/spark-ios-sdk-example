@@ -207,7 +207,7 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
     
     public func updateMessageAcitivty(_ message: MessageModel){
         do{
-            let jsonData = try JSONSerialization.data(withJSONObject: message.dictPresent(), options: .prettyPrinted)
+            let jsonData = try JSONSerialization.data(withJSONObject: message.jsonPresent(), options: .prettyPrinted)
             self.contentTextView?.text = String(data: jsonData, encoding: .utf8)
             if let files = message.files{
                 self.setUpFileContentsView(files: files)
