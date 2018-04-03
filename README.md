@@ -4,10 +4,10 @@ Kitchen Sink is a developer friendly sample implementation of Spark client SDK a
 
 ## Screenshots 
 <ul>
-<img src="https://github.com/ciscospark/spark-ios-sdk-example/blob/Feature/Messaging/ScreenShots/IMG_0613.jpg" width="20%" height="25%">
-<img src="https://github.com/ciscospark/spark-ios-sdk-example/blob/Feature/Messaging/ScreenShots/IMG_0618.jpg" width="20%" height="25%">
-<img src="https://github.com/ciscospark/spark-ios-sdk-example/blob/Feature/Messaging/ScreenShots/IMG_0614.jpg" width="20%" height="25%">
-<img src="https://github.com/ciscospark/spark-ios-sdk-example/blob/Feature/Messaging/ScreenShots/IMG_0616.jpg" width="20%" height="25%">
+<img src="https://github.com/ciscospark/spark-ios-sdk-example/blob/Feature/Messaging/ScreenShots/IMG_0613.jpg" width="25%" height="23%">
+<img src="https://github.com/ciscospark/spark-ios-sdk-example/blob/Feature/Messaging/ScreenShots/IMG_0618.jpg" width="25%" height="23%">
+<img src="https://github.com/ciscospark/spark-ios-sdk-example/blob/Feature/Messaging/ScreenShots/IMG_0614.jpg" width="25%" height="23%">
+<img src="https://github.com/ciscospark/spark-ios-sdk-example/blob/Feature/Messaging/ScreenShots/IMG_0616.jpg" width="25%" height="23%">
 </ul>
 
 1. ScreenShot-2: Main page of Application, listing main functions of this demo.
