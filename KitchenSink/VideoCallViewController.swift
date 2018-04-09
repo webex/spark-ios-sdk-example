@@ -44,6 +44,7 @@ class VideoCallViewController: BaseViewController {
     @IBOutlet private weak var sendingAudioSwitch: UISwitch!
     @IBOutlet private weak var receivingVideoSwitch: UISwitch!
     @IBOutlet private weak var receivingAudioSwitch: UISwitch!
+    @IBOutlet weak var screenShareSwitch: UISwitch!
     @IBOutlet weak var fullScreenButton: UIButton!
     @IBOutlet private weak var switchContainerView: UIView!
     @IBOutlet private weak var avatarContainerView: UIImageView!
@@ -71,6 +72,11 @@ class VideoCallViewController: BaseViewController {
     private var longPressRec1 : UILongPressGestureRecognizer?
     private var longPressRec2 : UILongPressGestureRecognizer?
     private var first: Bool = true
+    
+    
+    
+    
+    
     override var navigationTitle: String? {
         get {
             return "Call status:\(self.title ?? "Unkonw")"
@@ -169,7 +175,12 @@ class VideoCallViewController: BaseViewController {
             globalVideoSetting.sparkSDK = self.sparkSDK
         }
         if globalVideoSetting.isVideoEnabled() {
-            mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!))
+            if #available(iOS 11.2, *) {
+                mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!), screenShare: nil, applicationGroupIdentifier: "group.com.cisco.sparkSDK.demo")
+            }
+            else {
+               mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!))
+            }
         }
         self.callStatus = .initiated
         /* Makes a call to an intended recipient on behalf of the authenticated user.*/
@@ -197,7 +208,12 @@ class VideoCallViewController: BaseViewController {
         
         var mediaOption = MediaOption.audioOnly()
         if globalVideoSetting.isVideoEnabled() {
-            mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!))
+            if #available(iOS 11.2, *) {
+                mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!), screenShare: nil, applicationGroupIdentifier: "group.com.cisco.sparkSDK.demo")
+            }
+            else {
+                mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!))
+            }
         }
         
         if !globalVideoSetting.isSelfViewShow {
@@ -375,12 +391,33 @@ class VideoCallViewController: BaseViewController {
                         self?.showScreenShareView(startedSending)
                         
                         break
+                    case .sendingScreenShare(let startedSending):
+                        self?.screenShareSwitch.isOn = startedSending
                     default:
                         break
                     }
                     print("remoteMediaDidChange out")
                 }
             }
+            if #available(iOS 11.2, *) {
+                call.onBroadcasting = {
+                    if !(self.currentCall?.sendingScreenShare ?? false) {
+                        let alert = UIAlertController(title: "Share Screen", message: "KitchenSink will start capturing ereryting that's displayed on your screen.", preferredStyle: .alert)
+                            alert.addAction(UIAlertAction(title: "Start Now", style: .default, handler: {
+                            alert in
+                            self.currentCall?.shareScreen() {
+                                error in
+                                if error != nil {
+                                    print("==========share screen error:\(String(describing: error))")
+                                }
+                            }
+                        }))
+                        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+                        self.present(alert, animated: true, completion: nil)
+                    }
+                }
+            }
+            
         }
     }
     
@@ -452,6 +489,22 @@ class VideoCallViewController: BaseViewController {
     
     @IBAction private func hangUpBtnClicked(_ sender: AnyObject) {
         self.didHangUpCall()
+    }
+    
+    @IBAction func toggleScreenShare(_ sender: Any) {
+        if #available(iOS 11.2, *) {
+            if screenShareSwitch.isOn {
+                self.currentCall?.shareScreen() {
+                    error in
+                    print("ERROR: \(String(describing: error))")
+                }
+            } else {
+                self.currentCall?.unshareScreen() {
+                    error in
+                    print("ERROR: \(String(describing: error))")
+                }
+            }
+        }
     }
     
     // MARK: - UI Implementation
@@ -657,6 +710,7 @@ class VideoCallViewController: BaseViewController {
         self.sendingAudioSwitch.isOn = self.currentCall?.sendingAudio ?? true
         self.receivingVideoSwitch.isOn = self.currentCall?.receivingVideo ?? true
         self.receivingAudioSwitch.isOn = self.currentCall?.receivingAudio ?? true
+        self.screenShareSwitch.isOn = self.currentCall?.sendingScreenShare ?? false
         
         if !globalVideoSetting.isVideoEnabled() {
             self.frontCameraView.isUserInteractionEnabled = false
@@ -936,8 +990,6 @@ class VideoCallViewController: BaseViewController {
         }
         self.currentCall = nil
     }
-    
-    
 }
 
 // MARK: - DTMF dialpad view

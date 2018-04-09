@@ -25,7 +25,15 @@
 		106A031A1F3451CC00167542 /* VideoAudioSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106A03181F3451CC00167542 /* VideoAudioSetting.swift */; };
 		10BFA40C1F4D2B9400602908 /* SpaceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BFA40B1F4D2B9400602908 /* SpaceTableViewCell.swift */; };
 		12A1611E1DA4EFA48208E5D8 /* Pods_KitchenSink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A779AB3A31B809D134C73D0C /* Pods_KitchenSink.framework */; };
+		49559933A6DCA000BF908AA2 /* Pods_KitchenSinkBroadcastExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB0245FC633215E9FF87BE91 /* Pods_KitchenSinkBroadcastExtension.framework */; };
 		5A82441E1DF9E5F900481A55 /* JWTLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A82441D1DF9E5F900481A55 /* JWTLoginViewController.swift */; };
+		C762601C205F530800219F95 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C762601B205F530800219F95 /* ReplayKit.framework */; };
+		C762601F205F530800219F95 /* SampleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C762601E205F530800219F95 /* SampleHandler.swift */; };
+		C7626026205F530900219F95 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C762601B205F530800219F95 /* ReplayKit.framework */; };
+		C7626028205F530900219F95 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7626027205F530900219F95 /* UIKit.framework */; };
+		C762602B205F530900219F95 /* BroadcastSetupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C762602A205F530900219F95 /* BroadcastSetupViewController.swift */; };
+		C762602F205F530900219F95 /* KitchenSinkBroadcastExtensionSetupUI.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C7626025205F530900219F95 /* KitchenSinkBroadcastExtensionSetupUI.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C7626032205F530900219F95 /* KitchenSinkBroadcastExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C762601A205F530800219F95 /* KitchenSinkBroadcastExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C7710D1A1EC4432C000FA609 /* KSLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7710D191EC4432C000FA609 /* KSLogger.swift */; };
 		C785D3101E9494A300A5A648 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = C785D30F1E9494A300A5A648 /* Utils.swift */; };
 		C785D3171E9494CA00A5A648 /* UIKitExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C785D3141E9494CA00A5A648 /* UIKitExtension.swift */; };
@@ -35,6 +43,38 @@
 		C7D086E81E9B6FAA00FC662B /* KSLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D086E71E9B6FAA00FC662B /* KSLabel.swift */; };
 		C7D086EA1E9DE42000FC662B /* KSLargerHitAreaButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D086E91E9DE42000FC662B /* KSLargerHitAreaButton.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C762602D205F530900219F95 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 04AE181A1CDAD3D800A8F078 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C7626024205F530900219F95;
+			remoteInfo = KitchenSinkBroadcastExtensionSetupUI;
+		};
+		C7626030205F530900219F95 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 04AE181A1CDAD3D800A8F078 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C7626019205F530800219F95;
+			remoteInfo = KitchenSinkBroadcastExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C7626039205F530900219F95 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				C7626032205F530900219F95 /* KitchenSinkBroadcastExtension.appex in Embed App Extensions */,
+				C762602F205F530900219F95 /* KitchenSinkBroadcastExtensionSetupUI.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		042A4A741D12532E002697D3 /* PersonTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonTableViewCell.swift; sourceTree = "<group>"; };
@@ -57,11 +97,25 @@
 		106A03181F3451CC00167542 /* VideoAudioSetting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoAudioSetting.swift; sourceTree = "<group>"; };
 		10BFA40B1F4D2B9400602908 /* SpaceTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpaceTableViewCell.swift; sourceTree = "<group>"; };
 		277E22BA829A2166B4679129 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
+		3F6DB2FAAA83728B040A584D /* Pods-KitchenSinkBroadcastExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSinkBroadcastExtension.debug.xcconfig"; path = "Pods/Target Support Files/Pods-KitchenSinkBroadcastExtension/Pods-KitchenSinkBroadcastExtension.debug.xcconfig"; sourceTree = "<group>"; };
+		5A2FF5EE377E1C76CC00B2E9 /* Pods-KitchenSinkBroadcastExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSinkBroadcastExtension.release.xcconfig"; path = "Pods/Target Support Files/Pods-KitchenSinkBroadcastExtension/Pods-KitchenSinkBroadcastExtension.release.xcconfig"; sourceTree = "<group>"; };
 		5A82441D1DF9E5F900481A55 /* JWTLoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JWTLoginViewController.swift; sourceTree = "<group>"; };
 		64CD6C6BBEEF5EBA5E4702E7 /* Pods-KitchenSink.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink.debug.xcconfig"; path = "Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink.debug.xcconfig"; sourceTree = "<group>"; };
 		657C43FB45F7E9767BC98E93 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		87B55BD44833FEC88DC1F273 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A779AB3A31B809D134C73D0C /* Pods_KitchenSink.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C762601A205F530800219F95 /* KitchenSinkBroadcastExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KitchenSinkBroadcastExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		C762601B205F530800219F95 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
+		C762601E205F530800219F95 /* SampleHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleHandler.swift; sourceTree = "<group>"; };
+		C7626020205F530800219F95 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C7626025205F530900219F95 /* KitchenSinkBroadcastExtensionSetupUI.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KitchenSinkBroadcastExtensionSetupUI.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7626027205F530900219F95 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		C762602A205F530900219F95 /* BroadcastSetupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastSetupViewController.swift; sourceTree = "<group>"; };
+		C762602C205F530900219F95 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C762603A205F549F00219F95 /* KitchenSinkBroadcastExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KitchenSinkBroadcastExtension.entitlements; sourceTree = "<group>"; };
+		C76B30FC205F903700AE3250 /* KitchenSink.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KitchenSink.entitlements; sourceTree = "<group>"; };
+		C76B30FD205F904700AE3250 /* KitchenSinkBroadcastExtensionSetupUI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KitchenSinkBroadcastExtensionSetupUI.entitlements; sourceTree = "<group>"; };
+		C76D54AD2068E32200171029 /* iOSBroadcastExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iOSBroadcastExtension.framework; path = "../spark-ios-sdk/Vendors/iOSBroadcastExtension.framework"; sourceTree = "<group>"; };
 		C7710D191EC4432C000FA609 /* KSLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KSLogger.swift; path = Utils/KSLogger.swift; sourceTree = "<group>"; };
 		C785D30F1E9494A300A5A648 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Utils.swift; path = Utils/Utils.swift; sourceTree = "<group>"; };
 		C785D3141E9494CA00A5A648 /* UIKitExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIKitExtension.swift; path = UIKitExtension/UIKitExtension.swift; sourceTree = "<group>"; };
@@ -70,6 +124,7 @@
 		C785D32B1E9684C000A5A648 /* AppFeedbackViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppFeedbackViewController.swift; sourceTree = "<group>"; };
 		C7D086E71E9B6FAA00FC662B /* KSLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KSLabel.swift; path = UIKitExtension/KSLabel.swift; sourceTree = "<group>"; };
 		C7D086E91E9DE42000FC662B /* KSLargerHitAreaButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KSLargerHitAreaButton.swift; path = UIKitExtension/KSLargerHitAreaButton.swift; sourceTree = "<group>"; };
+		CB0245FC633215E9FF87BE91 /* Pods_KitchenSinkBroadcastExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSinkBroadcastExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D10621478BD9E68749DD77A3 /* Pods-KitchenSink.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink.release.xcconfig"; path = "Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -82,6 +137,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C7626017205F530800219F95 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C762601C205F530800219F95 /* ReplayKit.framework in Frameworks */,
+				49559933A6DCA000BF908AA2 /* Pods_KitchenSinkBroadcastExtension.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7626022205F530900219F95 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C7626026205F530900219F95 /* ReplayKit.framework in Frameworks */,
+				C7626028205F530900219F95 /* UIKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -89,6 +162,8 @@
 			isa = PBXGroup;
 			children = (
 				04AE18241CDAD3D800A8F078 /* KitchenSink */,
+				C762601D205F530800219F95 /* KitchenSinkBroadcastExtension */,
+				C7626029205F530900219F95 /* KitchenSinkBroadcastExtensionSetupUI */,
 				04AE18231CDAD3D800A8F078 /* Products */,
 				54914B81CE99B6BC8363D655 /* Pods */,
 				A9158AFF5A79BE6326DB8A14 /* Frameworks */,
@@ -99,6 +174,8 @@
 			isa = PBXGroup;
 			children = (
 				04AE18221CDAD3D800A8F078 /* KitchenSink.app */,
+				C762601A205F530800219F95 /* KitchenSinkBroadcastExtension.appex */,
+				C7626025205F530900219F95 /* KitchenSinkBroadcastExtensionSetupUI.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -106,6 +183,7 @@
 		04AE18241CDAD3D800A8F078 /* KitchenSink */ = {
 			isa = PBXGroup;
 			children = (
+				C76B30FC205F903700AE3250 /* KitchenSink.entitlements */,
 				C785D30A1E9492CD00A5A648 /* Utils */,
 				C785D3111E9494B400A5A648 /* UIKitExtension */,
 				106A03161F3451CC00167542 /* Configuration */,
@@ -185,6 +263,8 @@
 				277E22BA829A2166B4679129 /* Pods.release.xcconfig */,
 				64CD6C6BBEEF5EBA5E4702E7 /* Pods-KitchenSink.debug.xcconfig */,
 				D10621478BD9E68749DD77A3 /* Pods-KitchenSink.release.xcconfig */,
+				3F6DB2FAAA83728B040A584D /* Pods-KitchenSinkBroadcastExtension.debug.xcconfig */,
+				5A2FF5EE377E1C76CC00B2E9 /* Pods-KitchenSinkBroadcastExtension.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -192,10 +272,34 @@
 		A9158AFF5A79BE6326DB8A14 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C76D54AD2068E32200171029 /* iOSBroadcastExtension.framework */,
 				87B55BD44833FEC88DC1F273 /* Pods.framework */,
 				A779AB3A31B809D134C73D0C /* Pods_KitchenSink.framework */,
+				C762601B205F530800219F95 /* ReplayKit.framework */,
+				C7626027205F530900219F95 /* UIKit.framework */,
+				CB0245FC633215E9FF87BE91 /* Pods_KitchenSinkBroadcastExtension.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C762601D205F530800219F95 /* KitchenSinkBroadcastExtension */ = {
+			isa = PBXGroup;
+			children = (
+				C762603A205F549F00219F95 /* KitchenSinkBroadcastExtension.entitlements */,
+				C762601E205F530800219F95 /* SampleHandler.swift */,
+				C7626020205F530800219F95 /* Info.plist */,
+			);
+			path = KitchenSinkBroadcastExtension;
+			sourceTree = "<group>";
+		};
+		C7626029205F530900219F95 /* KitchenSinkBroadcastExtensionSetupUI */ = {
+			isa = PBXGroup;
+			children = (
+				C76B30FD205F904700AE3250 /* KitchenSinkBroadcastExtensionSetupUI.entitlements */,
+				C762602A205F530900219F95 /* BroadcastSetupViewController.swift */,
+				C762602C205F530900219F95 /* Info.plist */,
+			);
+			path = KitchenSinkBroadcastExtensionSetupUI;
 			sourceTree = "<group>";
 		};
 		C785D30A1E9492CD00A5A648 /* Utils */ = {
@@ -235,15 +339,54 @@
 				C67BA3D95E6683C9DCA04CE2 /* [CP] Embed Pods Frameworks */,
 				D702690831E3AE770BF4A333 /* [CP] Copy Pods Resources */,
 				04DF251D1D1D14DB002390D0 /* ShellScript */,
+				C7626039205F530900219F95 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				C762602E205F530900219F95 /* PBXTargetDependency */,
+				C7626031205F530900219F95 /* PBXTargetDependency */,
 			);
 			name = KitchenSink;
 			productName = KitchenSink;
 			productReference = 04AE18221CDAD3D800A8F078 /* KitchenSink.app */;
 			productType = "com.apple.product-type.application";
+		};
+		C7626019205F530800219F95 /* KitchenSinkBroadcastExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C7626038205F530900219F95 /* Build configuration list for PBXNativeTarget "KitchenSinkBroadcastExtension" */;
+			buildPhases = (
+				5B7EB4296DFAF1027C183E73 /* [CP] Check Pods Manifest.lock */,
+				C7626016205F530800219F95 /* Sources */,
+				C7626017205F530800219F95 /* Frameworks */,
+				C7626018205F530800219F95 /* Resources */,
+				CE86A9D0BA0C36622D23F0D2 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = KitchenSinkBroadcastExtension;
+			productName = KitchenSinkBroadcastExtension;
+			productReference = C762601A205F530800219F95 /* KitchenSinkBroadcastExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		C7626024205F530900219F95 /* KitchenSinkBroadcastExtensionSetupUI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C7626037205F530900219F95 /* Build configuration list for PBXNativeTarget "KitchenSinkBroadcastExtensionSetupUI" */;
+			buildPhases = (
+				C7626021205F530900219F95 /* Sources */,
+				C7626022205F530900219F95 /* Frameworks */,
+				C7626023205F530900219F95 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = KitchenSinkBroadcastExtensionSetupUI;
+			productName = KitchenSinkBroadcastExtensionSetupUI;
+			productReference = C7626025205F530900219F95 /* KitchenSinkBroadcastExtensionSetupUI.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -251,7 +394,7 @@
 		04AE181A1CDAD3D800A8F078 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0730;
+				LastSwiftUpdateCheck = 0920;
 				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = "Cisco Systems, Inc.";
 				TargetAttributes = {
@@ -259,6 +402,31 @@
 						CreatedOnToolsVersion = 7.3;
 						DevelopmentTeam = 3K8M2E3L9T;
 						LastSwiftMigration = 0820;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
+					};
+					C7626019205F530800219F95 = {
+						CreatedOnToolsVersion = 9.2;
+						DevelopmentTeam = 3K8M2E3L9T;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
+					};
+					C7626024205F530900219F95 = {
+						CreatedOnToolsVersion = 9.2;
+						DevelopmentTeam = 3K8M2E3L9T;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -276,6 +444,8 @@
 			projectRoot = "";
 			targets = (
 				04AE18211CDAD3D800A8F078 /* KitchenSink */,
+				C7626019205F530800219F95 /* KitchenSinkBroadcastExtension */,
+				C7626024205F530900219F95 /* KitchenSinkBroadcastExtensionSetupUI */,
 			);
 		};
 /* End PBXProject section */
@@ -288,6 +458,20 @@
 				04AE18301CDAD3D800A8F078 /* LaunchScreen.storyboard in Resources */,
 				04AE182D1CDAD3D800A8F078 /* Assets.xcassets in Resources */,
 				04AE182B1CDAD3D800A8F078 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7626018205F530800219F95 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7626023205F530900219F95 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -307,19 +491,81 @@
 			shellPath = /bin/sh;
 			shellScript = "if [ $CONFIGURATION == 'Debug' ]; then\nexit\nfi\n\nAPP_PATH=\"${TARGET_BUILD_DIR}/${WRAPPER_NAME}\"\n\n# This script loops through the frameworks embedded in the application and\n# removes unused architectures.\nfind \"$APP_PATH\" -name '*.framework' -type d | while read -r FRAMEWORK\ndo\nFRAMEWORK_EXECUTABLE_NAME=$(defaults read \"$FRAMEWORK/Info.plist\" CFBundleExecutable)\nFRAMEWORK_EXECUTABLE_PATH=\"$FRAMEWORK/$FRAMEWORK_EXECUTABLE_NAME\"\necho \"Executable is $FRAMEWORK_EXECUTABLE_PATH\"\n\nEXTRACTED_ARCHS=()\n\nfor ARCH in $ARCHS\ndo\necho \"Extracting $ARCH from $FRAMEWORK_EXECUTABLE_NAME\"\nlipo -extract \"$ARCH\" \"$FRAMEWORK_EXECUTABLE_PATH\" -o \"$FRAMEWORK_EXECUTABLE_PATH-$ARCH\"\nEXTRACTED_ARCHS+=(\"$FRAMEWORK_EXECUTABLE_PATH-$ARCH\")\ndone\n\necho \"Merging extracted architectures: ${ARCHS}\"\nlipo -o \"$FRAMEWORK_EXECUTABLE_PATH-merged\" -create \"${EXTRACTED_ARCHS[@]}\"\nrm \"${EXTRACTED_ARCHS[@]}\"\n\necho \"Replacing original executable with thinned version\"\nrm \"$FRAMEWORK_EXECUTABLE_PATH\"\nmv \"$FRAMEWORK_EXECUTABLE_PATH-merged\" \"$FRAMEWORK_EXECUTABLE_PATH\"\n\ndone";
 		};
+		5B7EB4296DFAF1027C183E73 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-KitchenSinkBroadcastExtension-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		C67BA3D95E6683C9DCA04CE2 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/AlamofireObjectMapper/AlamofireObjectMapper.framework",
+				"${BUILT_PRODUCTS_DIR}/Cosmos/Cosmos.framework",
+				"${BUILT_PRODUCTS_DIR}/FontAwesome.swift/FontAwesome_swift.framework",
+				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
+				"${BUILT_PRODUCTS_DIR}/ObjectMapper/ObjectMapper.framework",
+				"${PODS_ROOT}/../../spark-ios-sdk/Vendors/SparkSDKBroadcastUtil.framework",
+				"${PODS_ROOT}/../../spark-ios-sdk/Vendors/SparkSDKEncryptionKit.framework",
+				"${PODS_ROOT}/../../spark-ios-sdk/Vendors/Wme.framework",
+				"${BUILT_PRODUCTS_DIR}/SparkSDK/SparkSDK.framework",
+				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
+				"${BUILT_PRODUCTS_DIR}/Toast-Swift/Toast_Swift.framework",
+				"${BUILT_PRODUCTS_DIR}/SparkBroadcastExtensionKit/SparkBroadcastExtensionKit.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AlamofireObjectMapper.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Cosmos.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FontAwesome_swift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainAccess.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectMapper.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SparkSDKBroadcastUtil.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SparkSDKEncryptionKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Wme.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SparkSDK.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Starscream.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Toast_Swift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SparkBroadcastExtensionKit.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CE86A9D0BA0C36622D23F0D2 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-KitchenSinkBroadcastExtension/Pods-KitchenSinkBroadcastExtension-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		D702690831E3AE770BF4A333 /* [CP] Copy Pods Resources */ = {
@@ -343,13 +589,16 @@
 			files = (
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-KitchenSink-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -385,7 +634,36 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C7626016205F530800219F95 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C762601F205F530800219F95 /* SampleHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7626021205F530900219F95 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C762602B205F530900219F95 /* BroadcastSetupViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C762602E205F530900219F95 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C7626024205F530900219F95 /* KitchenSinkBroadcastExtensionSetupUI */;
+			targetProxy = C762602D205F530900219F95 /* PBXContainerItemProxy */;
+		};
+		C7626031205F530900219F95 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C7626019205F530800219F95 /* KitchenSinkBroadcastExtension */;
+			targetProxy = C7626030205F530900219F95 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		04AE18291CDAD3D800A8F078 /* Main.storyboard */ = {
@@ -504,8 +782,16 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = 3K8M2E3L9T;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Pods/SparkSDK",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = KitchenSink/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.SparkSDK.KitchenSinkDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -522,13 +808,141 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = 3K8M2E3L9T;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Pods/SparkSDK",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = KitchenSink/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.SparkSDK.KitchenSinkDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+		C7626033205F530900219F95 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3F6DB2FAAA83728B040A584D /* Pods-KitchenSinkBroadcastExtension.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtension/KitchenSinkBroadcastExtension.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3K8M2E3L9T;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = KitchenSinkBroadcastExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.SparkSDK.KitchenSinkDemo.KitchenSinkBroadcastExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C7626034205F530900219F95 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5A2FF5EE377E1C76CC00B2E9 /* Pods-KitchenSinkBroadcastExtension.release.xcconfig */;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtension/KitchenSinkBroadcastExtension.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3K8M2E3L9T;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = KitchenSinkBroadcastExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.SparkSDK.KitchenSinkDemo.KitchenSinkBroadcastExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C7626035205F530900219F95 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtensionSetupUI/KitchenSinkBroadcastExtensionSetupUI.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3K8M2E3L9T;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = KitchenSinkBroadcastExtensionSetupUI/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.SparkSDK.KitchenSinkDemo.KitchenSinkBroadcastExtensionSetupUI;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C7626036205F530900219F95 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtensionSetupUI/KitchenSinkBroadcastExtensionSetupUI.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3K8M2E3L9T;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = KitchenSinkBroadcastExtensionSetupUI/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.SparkSDK.KitchenSinkDemo.KitchenSinkBroadcastExtensionSetupUI;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -549,6 +963,24 @@
 			buildConfigurations = (
 				04AE18351CDAD3D800A8F078 /* Debug */,
 				04AE18361CDAD3D800A8F078 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C7626037205F530900219F95 /* Build configuration list for PBXNativeTarget "KitchenSinkBroadcastExtensionSetupUI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C7626035205F530900219F95 /* Debug */,
+				C7626036205F530900219F95 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C7626038205F530900219F95 /* Build configuration list for PBXNativeTarget "KitchenSinkBroadcastExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C7626033205F530900219F95 /* Debug */,
+				C7626034205F530900219F95 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
