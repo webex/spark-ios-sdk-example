@@ -305,36 +305,36 @@ class VideoCallViewController: BaseViewController {
                     switch memberShipChangeType {
                         /* This might be triggered when membership joined the call */
                     case .joined(let memberShip):
-                        strongSelf.slideInStateView(slideInMsg: memberShip.email! + " joined")
+                        strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " joined")
                         break
                         /* This might be triggered when membership left the call */
                     case .left(let memberShip):
-                        strongSelf.slideInStateView(slideInMsg: memberShip.email! + " left")
+                        strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " left")
                         /* This might be triggered when membership declined the call */
                     case .declined(let memberShip):
-                        strongSelf.slideInStateView(slideInMsg: memberShip.email! + " declined")
+                        strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " declined")
                     case .sendingAudio(let memberShip):
                         if memberShip.sendingAudio {
-                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " unmute audio")
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " unmute audio")
                         }
                         else {
-                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " mute audio")
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " mute audio")
                         }
                         break
                     case .sendingVideo(let memberShip):
                         if memberShip.sendingVideo {
-                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " unmute video")
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " unmute video")
                         }
                         else {
-                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " mute video")
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " mute video")
                         }
                         break
                     case .sendingScreenShare(let memberShip):
                         if memberShip.sendingScreenShare {
-                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " share screen")
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " share screen")
                         }
                         else {
-                            strongSelf.slideInStateView(slideInMsg: memberShip.email! + " stop share")
+                            strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " stop share")
                         }
                         break
                     }
@@ -391,6 +391,7 @@ class VideoCallViewController: BaseViewController {
                         self?.showScreenShareView(startedSending)
                         
                         break
+                        /* Whether local began to send Screen share */
                     case .sendingScreenShare(let startedSending):
                         self?.screenShareSwitch.isOn = startedSending
                     default:
@@ -400,6 +401,7 @@ class VideoCallViewController: BaseViewController {
                 }
             }
             if #available(iOS 11.2, *) {
+                /// Call back when broadcast extension connecting to this call.
                 call.onBroadcasting = {
                     if !(self.currentCall?.sendingScreenShare ?? false) {
                         let alert = UIAlertController(title: "Share Screen", message: "KitchenSink will start capturing ereryting that's displayed on your screen.", preferredStyle: .alert)
