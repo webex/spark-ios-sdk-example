@@ -119,19 +119,6 @@ class HomeTableViewController: BaseTableViewController {
             return
         }
         
-//
-//        self.sparkSDK?.activityClient?.messageActivityDetail(activityID: "4998f0e0-00e9-11e8-b910-4db2ca655772", completionHandler: { (response) in
-//            switch response.result{
-//            case .success(let value):
-//                print(value)
-//                break
-//            case .failure(let error):
-//                print(error)
-//                break
-//            }
-//        })
-//        return
-        
         /* check if the phone has already registerd to Cisco cloud */
         if self.isSparkPhoneRegisterd{
             

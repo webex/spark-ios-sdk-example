@@ -170,6 +170,7 @@ class VideoCallViewController: BaseViewController {
         }
         if globalVideoSetting.isVideoEnabled() {
             mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!))
+            self.sparkSDK?.phone.videoMaxBandwidth = globalVideoSetting.bandWidth
         }
         self.callStatus = .initiated
         /* Makes a call to an intended recipient on behalf of the authenticated user.*/
@@ -198,6 +199,7 @@ class VideoCallViewController: BaseViewController {
         var mediaOption = MediaOption.audioOnly()
         if globalVideoSetting.isVideoEnabled() {
             mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!))
+            self.sparkSDK?.phone.videoMaxBandwidth = globalVideoSetting.bandWidth
         }
         
         if !globalVideoSetting.isSelfViewShow {
@@ -208,6 +210,7 @@ class VideoCallViewController: BaseViewController {
         if !globalVideoSetting.isLoudSpeaker {
             self.loudSpeakerSwitch.isOn = false
         }
+        
         /*
          Answers this call.
          This can only be invoked when this call is incoming and in rining status.
