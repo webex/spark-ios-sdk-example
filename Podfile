@@ -5,7 +5,7 @@ use_frameworks!
 
 target 'KitchenSink' do
     platform :ios, '9.0'
-    pod 'SparkSDK', :path => '/Users/panzh/Desktop/gitTest/spark-ios-sdk'
+    pod 'SparkSDK', , :git => 'https://github.com/ciscospark/spark-ios-sdk.git', :branch => ‘Featrue/ScreenSharing’
     pod 'Cosmos', '~> 6.0.0'
     pod 'Toast-Swift', '~> 2.0.0'
     pod 'FontAwesome.swift','~> 1.2.0'
@@ -13,6 +13,6 @@ end
 
 
 target 'KitchenSinkBroadcastExtension' do
-    platform :ios, '11.0'
-    pod 'SparkBroadcastExtensionKit', :path => '/Users/panzh/Desktop/gitTest/spark-ios-sdk'
+    platform :ios, '11.2'
+    pod 'SparkBroadcastExtensionKit', :git => 'https://github.com/ciscospark/spark-ios-sdk.git', :branch => ‘Featrue/ScreenSharing’
 end
