@@ -73,10 +73,6 @@ class VideoCallViewController: BaseViewController {
     private var longPressRec2 : UILongPressGestureRecognizer?
     private var first: Bool = true
     
-    
-    
-    
-    
     override var navigationTitle: String? {
         get {
             return "Call status:\(self.title ?? "Unkonw")"
@@ -305,36 +301,36 @@ class VideoCallViewController: BaseViewController {
                     switch memberShipChangeType {
                         /* This might be triggered when membership joined the call */
                     case .joined(let memberShip):
-                        strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " joined")
+                        strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " joined")
                         break
                         /* This might be triggered when membership left the call */
                     case .left(let memberShip):
-                        strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " left")
+                        strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " left")
                         /* This might be triggered when membership declined the call */
                     case .declined(let memberShip):
-                        strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " declined")
+                        strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " declined")
                     case .sendingAudio(let memberShip):
                         if memberShip.sendingAudio {
-                            strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " unmute audio")
+                            strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " unmute audio")
                         }
                         else {
-                            strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " mute audio")
+                            strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " mute audio")
                         }
                         break
                     case .sendingVideo(let memberShip):
                         if memberShip.sendingVideo {
-                            strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " unmute video")
+                            strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " unmute video")
                         }
                         else {
-                            strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " mute video")
+                            strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " mute video")
                         }
                         break
                     case .sendingScreenShare(let memberShip):
                         if memberShip.sendingScreenShare {
-                            strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " share screen")
+                            strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " share screen")
                         }
                         else {
-                            strongSelf.slideInStateView(slideInMsg: memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership") + " stop share")
+                            strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " stop share")
                         }
                         break
                     }
@@ -529,6 +525,12 @@ class VideoCallViewController: BaseViewController {
         
         tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:)))
         self.backCameraView.addGestureRecognizer(tapGesture)
+        
+        
+        //screen share switch
+        if #available(iOS 11.2, *) {
+            self.screenShareSwitch.isEnabled = true
+        }
         
     }
     
