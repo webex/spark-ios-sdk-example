@@ -24,11 +24,11 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setupView()
-        self.registerActivityControll()
+        self.registerMessageCallBack()
     }
     
-    // MARK: - SparkSDK: AcitivityClient
-    private func registerActivityControll(){
+    // MARK: - SparkSDK: register Message receive CallBack
+    private func registerMessageCallBack(){
         self.sparkSDK?.messages?.onMessage = {message in
             self.updateMessageAcitivty(message)
         }
@@ -68,6 +68,7 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
             finalStr = "\(finalStr!)\(membership.personDisplayName!)"
         }
         
+        self.setUpFileContentsView(files: [])
         if let room = self.roomModel{
             self.sparkSDK?.messages?.post(roomId: room.id!,text: finalStr,mentions: mentions, files: files, uploadProgressHandler:{
                 (file, progress) in
@@ -206,15 +207,18 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
     
     public func updateMessageAcitivty(_ message: MessageModel){
         do{
-            let jsonData = try JSONSerialization.data(withJSONObject: message.dictPresent(), options: .prettyPrinted)
+            let jsonData = try JSONSerialization.data(withJSONObject: message.jsonPresent(), options: .prettyPrinted)
             self.contentTextView?.text = String(data: jsonData, encoding: .utf8)
+            if let files = message.files{
+                self.setUpFileContentsView(files: files)
+            }
         }catch{}
     }
     
     public func setUpFileContentsView(files: [FileObjectModel]){
 
         self.fileContentsView?.removeFromSuperview()
-        self.fileContentsView = UIScrollView(frame: CGRect(x: 10, y: 315, width: kScreenWidth-20, height: 120))
+        self.fileContentsView = UIScrollView(frame: CGRect(x: 10, y: 370, width: kScreenWidth-20, height: 120))
         self.fileContentsView?.backgroundColor = UIColor.init(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
   
         self.view.addSubview(self.fileContentsView!)
@@ -225,11 +229,11 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
         self.fileContentsView?.contentSize = CGSize(width: 100*(self.receivedFiles?.count)!, height: 120)
         for index in 0..<files.count{
             let file = files[index]
-            let tempView = UIView(frame: CGRect(x: 100*index, y: 0, width: 100, height: 100))
+            let tempView = UIView(frame: CGRect(x: 100*index, y: 10, width: 100, height: 100))
             tempView.tag = 10000+index
             tempView.backgroundColor = UIColor.lightGray
             self.fileContentsView?.addSubview(tempView)
-            if(file.mimeType?.contains("image/"))!{
+            if(file.fileType == FileType.Image){
                 self.downLoadThumbnail(file, onView: tempView)
             }else{
                 let titleLabel = UILabel(frame: CGRect(x: 10, y: 10, width: tempView.frame.size.width-20, height: tempView.frame.size.height-20))

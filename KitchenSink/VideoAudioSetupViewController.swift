@@ -36,6 +36,9 @@ class VideoAudioSetupViewController: BaseViewController {
     @IBOutlet weak var frontImage: UIImageView!
     @IBOutlet weak var backImage: UIImageView!
     @IBOutlet weak var loudSpeakerLabel: UILabel!
+    @IBOutlet weak var bandwidthTitleLabel: UILabel!
+    @IBOutlet weak var bandWidthLabel: UILabel!
+    @IBOutlet weak var bandwidthImg: UIImageView!
     @IBOutlet weak var selfViewHiddenHelpLabelHeight: NSLayoutConstraint!
     @IBOutlet weak var selfViewHiddenHelpLabel: KSLabel!
     @IBOutlet weak var videoSetupBackoundViewTop: NSLayoutConstraint!
@@ -51,7 +54,9 @@ class VideoAudioSetupViewController: BaseViewController {
     @IBOutlet var widthScaleConstraintCollection: [NSLayoutConstraint]!
     @IBOutlet var heightScaleConstraintCollection: [NSLayoutConstraint]!
     @IBOutlet weak var preview: MediaRenderView!
+    @IBOutlet weak var bandwidthBackView: UIView!
     private let uncheckImage = UIImage.fontAwesomeIcon(name: .squareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
+    private let arrowImage = UIImage.fontAwesomeIcon(name: .angleRight, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
     private let checkImage = UIImage.fontAwesomeIcon(name: .checkSquareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
     private let selfViewSetupHeightContant = 320 * Utils.HEIGHT_SCALE
     private let selfViewSetupHelpLabelHeightContant = 54 * Utils.HEIGHT_SCALE
@@ -110,7 +115,6 @@ class VideoAudioSetupViewController: BaseViewController {
         fixBarSpacer.width = -10 * (2 - Utils.WIDTH_SCALE)
         navigationItem.rightBarButtonItems = [fixBarSpacer,rightButtonItem]
         
-        
         //checkbox init
         var tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:)))
         audioView.addGestureRecognizer(tapGesture)
@@ -139,6 +143,11 @@ class VideoAudioSetupViewController: BaseViewController {
         updateCameraStatus(false)
         updateLoudspeakerStatus()
         
+        //bandwidth label
+        bandwidthImg.image = arrowImage
+        tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCameraBandwidthGestureEvent(sender:)))
+        bandwidthBackView.addGestureRecognizer(tapGesture)
+        updateBandwidthView()
     }
     // MARK: hand checkbox change
     @IBAction func loudSpeakerSwitchChange(_ sender: Any) {
@@ -175,12 +184,84 @@ class VideoAudioSetupViewController: BaseViewController {
                 globalVideoSetting.facingMode = .environment
                 globalVideoSetting.isSelfViewShow = true
             }
-            
+
             updateCameraStatus()
         }
     }
+    func handleCameraBandwidthGestureEvent(sender: UITapGestureRecognizer){
+        let alertController = UIAlertController(title: "Band Width", message: nil, preferredStyle: .actionSheet)
+        
+        let action1 = UIAlertAction(title: "177Kbs", style: .default, handler: { (action) -> Void in
+            globalVideoSetting.bandWidth = 177000
+            self.updateBandwidthView()
+        })
+        let action2 = UIAlertAction(title: "384Kbps", style: .default, handler: { (action) -> Void in
+            globalVideoSetting.bandWidth  = 384000
+            self.updateBandwidthView()
+        })
+        let action3 = UIAlertAction(title: "768Kbs", style: .default, handler: { (action) -> Void in
+            globalVideoSetting.bandWidth  = 768000
+            self.updateBandwidthView()
+        })
+        let action4 = UIAlertAction(title: "2Mbps", style: .default, handler: { (action) -> Void in
+            globalVideoSetting.bandWidth  = 2000000
+            self.updateBandwidthView()
+        })
+        let action5 = UIAlertAction(title: "3Mbps", style: .default, handler: { (action) -> Void in
+            globalVideoSetting.bandWidth  = 3000000
+            self.updateBandwidthView()
+        })
+        let action6 = UIAlertAction(title: "4Mbps", style: .default, handler: { (action) -> Void in
+            globalVideoSetting.bandWidth  = 4000000
+            self.updateBandwidthView()
+        })
+        
+        let cancelButton = UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) -> Void in
+            
+        })
+        
+        alertController.addAction(action1)
+        alertController.addAction(action2)
+        alertController.addAction(action3)
+        alertController.addAction(action4)
+        alertController.addAction(action5)
+        alertController.addAction(action6)
+        alertController.addAction(cancelButton)
+
+        self.navigationController!.present(alertController, animated: true, completion: nil)
+    }
     
-    
+    func updateBandwidthView(){
+        var bandWidthStr : String = ""
+        if let bandwidth = sparkSDK?.phone.videoMaxBandwidth{
+            switch Int(bandwidth) {
+            case 177000 :
+                bandWidthStr = "177Kbps "
+                break
+            case 384000 :
+                bandWidthStr = "384Kbps "
+                break
+            case 768000 :
+                bandWidthStr = "768Kbps "
+                break
+            case 2000000 :
+                bandWidthStr = "2Mbps "
+                break
+            case 3000000 :
+                bandWidthStr = "3Mbps "
+                break
+            case 4000000:
+                bandWidthStr = "4Mbps "
+                break
+            default:
+                bandWidthStr = "720p "
+                break
+            }
+            bandWidthLabel.text = bandWidthStr
+        }else{
+            bandWidthLabel.text = ""
+        }
+    }
     func updateCallCapStatus() {
         if !globalVideoSetting.isVideoEnabled() {
             audioImage.image = checkImage

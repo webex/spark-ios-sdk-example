@@ -64,6 +64,15 @@ class VideoAudioSetting {
         }
     }
     
+    var bandWidth: UInt32{
+        get {
+            return self.sparkSDK?.phone.videoMaxBandwidth ?? 386000
+        }
+        set(newValue){
+            self.sparkSDK?.phone.videoMaxBandwidth = newValue
+        }
+    }
+    
     /// True as making a Video call,Flase as making Voice only call.The default is Video call.
     func setVideoEnabled(_ enable: Bool) {
         videoEnabled = enable
