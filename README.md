@@ -1,6 +1,19 @@
 # Kitchen Sink
 
-Kitchen Sink is a developer friendly sample implementation of Spark client SDK and showcases all SDK features.
+Kitchen Sink is a developer friendly sample implementation of Spark client SDK and showcases all SDK features. It focuses on how to call and use "Spark-SDK" APIs. Developers could directly cut, paste, and use the code from this sample. It basically implements “Spark-SDK” APIs by sequence.
+
+## Screenshots 
+<ul>
+<img src="https://github.com/ciscospark/spark-ios-sdk-example/blob/Feature/Messaging/ScreenShots/IMG_0613.jpg" width="22%" height="23%">
+<img src="https://github.com/ciscospark/spark-ios-sdk-example/blob/Feature/Messaging/ScreenShots/IMG_0618.jpg" width="22%" height="23%">
+<img src="https://github.com/ciscospark/spark-ios-sdk-example/blob/Feature/Messaging/ScreenShots/IMG_0614.jpg" width="22%" height="23%">
+<img src="https://github.com/ciscospark/spark-ios-sdk-example/blob/Feature/Messaging/ScreenShots/IMG_0616.jpg" width="22%" height="23%">
+</ul>
+
+1. ScreenShot-2: Main page of Application, listing main functions of this demo.
+1. ScreenShot-1: Calling peopel/room page.
+1. ScreenShot-3: Iniciate call page, contains call recent/search/email/group.
+1. ScreenShot-4: Show messaing APIs with present payloads.
 
 ## Download App
 You can download our Demo App from TestFlight.
