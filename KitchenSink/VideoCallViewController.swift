@@ -175,7 +175,7 @@ class VideoCallViewController: BaseViewController {
                 mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!), screenShare: nil, applicationGroupIdentifier: "group.com.cisco.sparkSDK.demo")
             }
             else {
-               mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!))
+                mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!))
             }
             self.sparkSDK?.phone.videoMaxBandwidth = globalVideoSetting.bandWidth
         }
@@ -393,32 +393,31 @@ class VideoCallViewController: BaseViewController {
                         /* Whether local began to send Screen share */
                     case .sendingScreenShare(let startedSending):
                         self?.screenShareSwitch.isOn = startedSending
+                    case .onBroadcasting(let isBroadcasting):
+                        if #available(iOS 11.2, *), isBroadcasting == true {
+                            if !(self?.currentCall?.sendingScreenShare ?? false) {
+                                let alert = UIAlertController(title: "Share Screen", message: "KitchenSink will start capturing ereryting that's displayed on your screen.", preferredStyle: .alert)
+                                alert.addAction(UIAlertAction(title: "Start Now", style: .default, handler: {
+                                    alert in
+                                    self?.currentCall?.shareScreen() {
+                                        error in
+                                        if error != nil {
+                                            print("share screen error:\(String(describing: error))")
+                                        }
+                                    }
+                                }))
+                                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+                                self?.present(alert, animated: true, completion: nil)
+                            }
+                        } else {
+                            print("share screen stop broadcasting")
+                        }
                     default:
                         break
                     }
                     print("remoteMediaDidChange out")
                 }
             }
-            if #available(iOS 11.2, *) {
-                /// Call back when broadcast extension connecting to this call.
-                call.onBroadcasting = {
-                    if !(self.currentCall?.sendingScreenShare ?? false) {
-                        let alert = UIAlertController(title: "Share Screen", message: "KitchenSink will start capturing ereryting that's displayed on your screen.", preferredStyle: .alert)
-                            alert.addAction(UIAlertAction(title: "Start Now", style: .default, handler: {
-                            alert in
-                            self.currentCall?.shareScreen() {
-                                error in
-                                if error != nil {
-                                    print("==========share screen error:\(String(describing: error))")
-                                }
-                            }
-                        }))
-                        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-                        self.present(alert, animated: true, completion: nil)
-                    }
-                }
-            }
-            
         }
     }
     
