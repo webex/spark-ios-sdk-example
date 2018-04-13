@@ -45,7 +45,8 @@ class MessageRoomCell: UITableViewCell {
             self.layer.addSublayer(self.line!)
         }
     }
-    func message(_ sender: UIButton) {
+    
+    @objc func message(_ sender: UIButton) {
         roomListVC.messageWithRoom(self.roomModel)
     }
     

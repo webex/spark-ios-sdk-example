@@ -136,7 +136,7 @@ class KitchensinkInputView: UIView, UIImagePickerControllerDelegate , UINavigati
     
     
     // MARK: UI Logic Implementation
-    func keyBoardWillAppear(notification: Notification){
+    @objc func keyBoardWillAppear(notification: Notification){
         let userInfo = notification.userInfo!
         let keyboardFrame:NSValue = userInfo[UIKeyboardFrameEndUserInfoKey] as! NSValue
         let keyboardRectangle = keyboardFrame.cgRectValue
@@ -148,7 +148,7 @@ class KitchensinkInputView: UIView, UIImagePickerControllerDelegate , UINavigati
         }
     }
     
-    func keyBoardWillDisappear(notification: Notification){
+    @objc func keyBoardWillDisappear(notification: Notification){
         self.control?.removeFromSuperview()
         UIView.animate(withDuration: 0.25) {
             self.transform = CGAffineTransform(translationX: 0, y: 0)

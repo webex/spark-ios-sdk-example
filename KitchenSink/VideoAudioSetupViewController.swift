@@ -155,7 +155,7 @@ class VideoAudioSetupViewController: BaseViewController {
         globalVideoSetting.isLoudSpeaker = speakerSwitch.isOn
     }
     
-    func handleCapGestureEvent(sender:UITapGestureRecognizer) {
+    @objc func handleCapGestureEvent(sender:UITapGestureRecognizer) {
         if let view = sender.view {
             if view == audioView {
                 globalVideoSetting.setVideoEnabled(false)
@@ -170,7 +170,7 @@ class VideoAudioSetupViewController: BaseViewController {
         }
     }
     
-    func handleCameraGestureEvent(sender:UITapGestureRecognizer) {
+    @objc func handleCameraGestureEvent(sender:UITapGestureRecognizer) {
         if let view = sender.view {
             if view == frontCameraView {
                 globalVideoSetting.facingMode = .user
@@ -188,7 +188,8 @@ class VideoAudioSetupViewController: BaseViewController {
             updateCameraStatus()
         }
     }
-    func handleCameraBandwidthGestureEvent(sender: UITapGestureRecognizer){
+    
+    @objc func handleCameraBandwidthGestureEvent(sender: UITapGestureRecognizer){
         let alertController = UIAlertController(title: "Band Width", message: nil, preferredStyle: .actionSheet)
         
         let action1 = UIAlertAction(title: "177Kbs", style: .default, handler: { (action) -> Void in
@@ -423,8 +424,8 @@ class VideoAudioSetupViewController: BaseViewController {
         })
     }
     
-    func gotoInitiateCallView() {
-        if let initiateCallViewController = storyboard?.instantiateViewController(withIdentifier: "InitiateCallViewController") as? InitiateCallViewController! {
+    @objc func gotoInitiateCallView() {
+        if let initiateCallViewController = (storyboard?.instantiateViewController(withIdentifier: "InitiateCallViewController") as? InitiateCallViewController) {
             initiateCallViewController.sparkSDK = self.sparkSDK
             navigationController?.pushViewController(initiateCallViewController, animated: true)
         }

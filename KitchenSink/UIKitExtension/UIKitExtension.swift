@@ -21,22 +21,30 @@
 import Foundation
 import UIKit
 extension UIFont {
-    static let lightFontDesc: [String:Any] = [UIFontDescriptorFamilyAttribute: "Arial",UIFontWidthTrait : UIFontWeightLight]
-    static let boldFontDesc: [String:Any] = [UIFontDescriptorFamilyAttribute: "Arial",UIFontWidthTrait : UIFontWeightBold]
+    static let fontFamilyDesc: [UIFontDescriptor.AttributeName:Any] = [UIFontDescriptor.AttributeName.family: "Arial"]
     
     static func buttonLightFont(ofSize size:CGFloat) -> UIFont {
-        return UIFont.init(descriptor: UIFontDescriptor(fontAttributes:lightFontDesc), size: size)
+        return withWeight(fromDescriptor: UIFontDescriptor(fontAttributes:fontFamilyDesc), weight: .light,size: size)
     }
     
     static func labelLightFont(ofSize size:CGFloat) -> UIFont {
-        return UIFont.init(descriptor: UIFontDescriptor(fontAttributes:lightFontDesc), size: size)
+        return withWeight(fromDescriptor: UIFontDescriptor(fontAttributes:fontFamilyDesc), weight: .light,size: size)
     }
     static func textViewLightFont(ofSize size:CGFloat) -> UIFont {
-        return UIFont.init(descriptor: UIFontDescriptor(fontAttributes:lightFontDesc), size: size)
+        return withWeight(fromDescriptor: UIFontDescriptor(fontAttributes:fontFamilyDesc), weight: .light,size: size)
     }
     
     static func navigationBoldFont(ofSize size:CGFloat) -> UIFont {
-        return UIFont.init(descriptor: UIFontDescriptor(fontAttributes:boldFontDesc), size: size)
+        return withWeight(fromDescriptor: UIFontDescriptor(fontAttributes:fontFamilyDesc), weight: .bold,size: size)
+    }
+    
+    static private func withWeight(fromDescriptor:UIFontDescriptor, weight: UIFont.Weight, size:CGFloat) -> UIFont {
+        var attributes = fromDescriptor.fontAttributes
+        var traits = (attributes[.traits] as? [UIFontDescriptor.TraitKey: Any]) ?? [:]
+        traits[.weight] = weight
+        attributes[.traits] = traits
+        let descriptor = UIFontDescriptor(fontAttributes: attributes)
+        return UIFont(descriptor: descriptor, size: size)
     }
 }
 

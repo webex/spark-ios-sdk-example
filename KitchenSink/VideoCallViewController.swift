@@ -231,7 +231,7 @@ class VideoCallViewController: BaseViewController {
         self.currentCall?.answer(option: mediaOption) { [weak self] error in
             if let strongSelf = self {
                 if error != nil {
-                    strongSelf.view.makeToast("Call statue error:\(error!)", duration: 2, position: ToastPosition.center, title: nil, image: nil, style: nil)
+                    strongSelf.view.makeToast("Call statue error:\(error!)", duration: 2, position: ToastPosition.center, title: nil, image: nil, style: ToastStyle.init())
                     { bRet in
                         
                     }
@@ -249,7 +249,7 @@ class VideoCallViewController: BaseViewController {
         self.currentCall?.hangup() { [weak self] error in
             if let strongSelf = self {
                 if error != nil {
-                    strongSelf.view.makeToast("Call statue error:\(error!)", duration: 2, position: ToastPosition.center, title: nil, image: nil, style: nil)
+                    strongSelf.view.makeToast("Call statue error:\(error!)", duration: 2, position: ToastPosition.center, title: nil, image: nil, style: ToastStyle.init())
                     { bRet in
                         
                     }
@@ -810,7 +810,7 @@ class VideoCallViewController: BaseViewController {
         }
     }
     
-    func handleCapGestureEvent(sender:UITapGestureRecognizer) {
+    @objc func handleCapGestureEvent(sender:UITapGestureRecognizer) {
         // Switch the camera facing mode selected for this *call*.
         if let view = sender.view {
             if view == frontCameraView {

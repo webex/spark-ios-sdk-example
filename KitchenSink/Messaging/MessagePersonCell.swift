@@ -55,7 +55,7 @@ class MessagePersonCell: UITableViewCell {
         }
     }
 
-    func message(_ sender: UIButton) {
+    @objc func message(_ sender: UIButton) {
         if let model = self.personModel{
             UserDefaultsUtil.addMessagePersonHistory(self.personModel!)
             roomListVC.messageWithPerson(model)
