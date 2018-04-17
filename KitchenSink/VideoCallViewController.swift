@@ -91,6 +91,8 @@ class VideoCallViewController: BaseViewController {
             return navigationController!.isNavigationBarHidden
         }
     }
+    
+    
     override var shouldAutorotate: Bool {
         return true
     }
@@ -393,30 +395,42 @@ class VideoCallViewController: BaseViewController {
                         /* Whether local began to send Screen share */
                     case .sendingScreenShare(let startedSending):
                         self?.screenShareSwitch.isOn = startedSending
-                    case .onBroadcasting(let isBroadcasting):
-                        if #available(iOS 11.2, *), isBroadcasting == true {
-                            if !(self?.currentCall?.sendingScreenShare ?? false) {
-                                let alert = UIAlertController(title: "Share Screen", message: "KitchenSink will start capturing ereryting that's displayed on your screen.", preferredStyle: .alert)
-                                alert.addAction(UIAlertAction(title: "Start Now", style: .default, handler: {
-                                    alert in
-                                    self?.currentCall?.shareScreen() {
-                                        error in
-                                        if error != nil {
-                                            print("share screen error:\(String(describing: error))")
-                                        }
-                                    }
-                                }))
-                                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-                                self?.present(alert, animated: true, completion: nil)
-                            }
-                        } else {
-                            print("share screen stop broadcasting")
-                        }
                     default:
                         break
                     }
                     print("remoteMediaDidChange out")
                 }
+            }
+            
+            
+            /* when the iOS broadcasting status of this *call* have changed */
+            call.oniOSBroadcastingChanged = {
+                event in
+                if #available(iOS 11.2, *) {
+                    switch event {
+                    case .extensionConnected :
+                        if !(self.currentCall?.sendingScreenShare ?? false) {
+                            let alert = UIAlertController(title: "Share Screen", message: "KitchenSink will start capturing ereryting that's displayed on your screen.", preferredStyle: .alert)
+                            alert.addAction(UIAlertAction(title: "Start Now", style: .default, handler: {
+                                alert in
+                                self.currentCall?.startSharing() {
+                                    error in
+                                    if error != nil {
+                                        print("share screen error:\(String(describing: error))")
+                                    }
+                                }
+                            }))
+                            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+                            self.present(alert, animated: true, completion: nil)
+                        }
+                        break
+                    case .extensionDisconnected:
+                        print("share screen stop broadcasting")
+                        break
+                    }
+                    
+                }
+                
             }
         }
     }
@@ -494,12 +508,12 @@ class VideoCallViewController: BaseViewController {
     @IBAction func toggleScreenShare(_ sender: Any) {
         if #available(iOS 11.2, *) {
             if screenShareSwitch.isOn {
-                self.currentCall?.shareScreen() {
+                self.currentCall?.startSharing() {
                     error in
                     print("ERROR: \(String(describing: error))")
                 }
             } else {
-                self.currentCall?.unshareScreen() {
+                self.currentCall?.stopSharing() {
                     error in
                     print("ERROR: \(String(describing: error))")
                 }
@@ -532,6 +546,8 @@ class VideoCallViewController: BaseViewController {
         //screen share switch
         if #available(iOS 11.2, *) {
             self.screenShareSwitch.isEnabled = true
+        } else {
+            self.screenShareSwitch.isEnabled = false
         }
         
     }

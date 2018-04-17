@@ -376,7 +376,6 @@
 				04AE18201CDAD3D800A8F078 /* Resources */,
 				C67BA3D95E6683C9DCA04CE2 /* [CP] Embed Pods Frameworks */,
 				D702690831E3AE770BF4A333 /* [CP] Copy Pods Resources */,
-				04DF251D1D1D14DB002390D0 /* ShellScript */,
 				C7626039205F530900219F95 /* Embed App Extensions */,
 			);
 			buildRules = (
@@ -518,19 +517,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		04DF251D1D1D14DB002390D0 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if [ $CONFIGURATION == 'Debug' ]; then\nexit\nfi\n\nAPP_PATH=\"${TARGET_BUILD_DIR}/${WRAPPER_NAME}\"\n\n# This script loops through the frameworks embedded in the application and\n# removes unused architectures.\nfind \"$APP_PATH\" -name '*.framework' -type d | while read -r FRAMEWORK\ndo\nFRAMEWORK_EXECUTABLE_NAME=$(defaults read \"$FRAMEWORK/Info.plist\" CFBundleExecutable)\nFRAMEWORK_EXECUTABLE_PATH=\"$FRAMEWORK/$FRAMEWORK_EXECUTABLE_NAME\"\necho \"Executable is $FRAMEWORK_EXECUTABLE_PATH\"\n\nEXTRACTED_ARCHS=()\n\nfor ARCH in $ARCHS\ndo\necho \"Extracting $ARCH from $FRAMEWORK_EXECUTABLE_NAME\"\nlipo -extract \"$ARCH\" \"$FRAMEWORK_EXECUTABLE_PATH\" -o \"$FRAMEWORK_EXECUTABLE_PATH-$ARCH\"\nEXTRACTED_ARCHS+=(\"$FRAMEWORK_EXECUTABLE_PATH-$ARCH\")\ndone\n\necho \"Merging extracted architectures: ${ARCHS}\"\nlipo -o \"$FRAMEWORK_EXECUTABLE_PATH-merged\" -create \"${EXTRACTED_ARCHS[@]}\"\nrm \"${EXTRACTED_ARCHS[@]}\"\n\necho \"Replacing original executable with thinned version\"\nrm \"$FRAMEWORK_EXECUTABLE_PATH\"\nmv \"$FRAMEWORK_EXECUTABLE_PATH-merged\" \"$FRAMEWORK_EXECUTABLE_PATH\"\n\ndone";
-		};
 		5B7EB4296DFAF1027C183E73 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -562,9 +548,9 @@
 				"${BUILT_PRODUCTS_DIR}/FontAwesome.swift/FontAwesome_swift.framework",
 				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
 				"${BUILT_PRODUCTS_DIR}/ObjectMapper/ObjectMapper.framework",
-				"${PODS_ROOT}/../../spark-ios-sdk/Vendors/SparkSDKBroadcastUtil.framework",
-				"${PODS_ROOT}/../../spark-ios-sdk/Vendors/SparkSDKEncryptionKit.framework",
-				"${PODS_ROOT}/../../spark-ios-sdk/Vendors/Wme.framework",
+				"${PODS_ROOT}/SparkSDK/Vendors/SparkSDKBroadcastUtil.framework",
+				"${PODS_ROOT}/SparkSDK/Vendors/SparkSDKEncryptionKit.framework",
+				"${PODS_ROOT}/SparkSDK/Vendors/Wme.framework",
 				"${BUILT_PRODUCTS_DIR}/SparkSDK/SparkSDK.framework",
 				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",

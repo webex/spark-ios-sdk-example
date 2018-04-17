@@ -1054,7 +1054,7 @@
                                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bFE-wb-n1y" userLabel="selfView">
                                         <rect key="frame" x="0.0" y="165" width="414" height="235"/>
                                         <subviews>
-                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KvM-Ze-GeK" customClass="MediaRenderView">
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KvM-Ze-GeK" customClass="MediaRenderView" customModule="SparkSDK">
                                                 <rect key="frame" x="132" y="-46" width="150" height="250"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                 <constraints>
