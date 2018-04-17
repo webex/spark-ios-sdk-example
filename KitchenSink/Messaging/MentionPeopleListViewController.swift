@@ -48,7 +48,7 @@ class MentionPeopleListViewController: UIViewController, UITableViewDataSource, 
     }
 
     // MARK: UI Implementation
-    public func dismissVC(){
+    @objc public func dismissVC(){
         if let completionBlock = self.completionBlock{
             completionBlock(nil)
         }

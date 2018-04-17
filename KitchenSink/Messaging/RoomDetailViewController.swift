@@ -17,7 +17,7 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
     private var contentTextView: UITextView?
     private var fileContentsView: UIScrollView?
     private var textInputView: KitchensinkInputView?
-    private var receivedFiles: [FileObjectModel]? = [FileObjectModel]()
+    private var receivedFiles: [RemoteFile]? = [RemoteFile]()
     
     /// saparkSDK reperesent for the SparkSDK API instance
     var sparkSDK: Spark?
@@ -29,8 +29,15 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
     
     // MARK: - SparkSDK: register Message receive CallBack
     private func registerMessageCallBack(){
-        self.sparkSDK?.messages?.onMessage = {message in
-            self.updateMessageAcitivty(message)
+        self.sparkSDK?.messages.onEvent = { event in
+            switch event {
+            case .messageReceived(let message):
+                self.updateMessageAcitivty(message)
+                break
+            case .messageDeleted(_):
+                break
+            }
+            
         }
     }
     
@@ -38,8 +45,8 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
     public func sendMessage(_ textStr: String?,_ memberShip : Membership? ,_ image: [String: Any]?){
         self.title = "Sending.."
         var finalStr : String?
-        var files : [FileObjectModel]?
-        var mentions : [MessageMentionModel]?
+        var files : [LocalFile]?
+        var mentions : [Mention]? = [Mention]()
         if let text = textStr{
             finalStr = text
         }else{
@@ -52,29 +59,30 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
                 let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
                 let imageURL = docDir.appendingPathComponent("tempImage.jpeg")
                 try imageData?.write(to: imageURL)
-                let fileModel = FileObjectModel(name: "tempImage.jpeg", localFileUrl: imageURL.absoluteString)
-                files = [FileObjectModel]()
+                let fileModel = LocalFile.init(path: imageURL.absoluteString, name: "tempImage.jpeg") {
+                    progress in
+                    DispatchQueue.main.async {
+                        let progressStr = "Sending.. Uploaded: \(progress*100)"+"%"
+                        self.title = progressStr
+                    }
+                }
+                
+                files = [LocalFile]()
                 files?.append(fileModel)
-                fileModel.image = ThumbNailImageModel(localFileUrl: imageURL.absoluteString, width: 600, height: 320)
+                //                fileModel.thumb = RemoteFileThumbnail(localFileUrl: imageURL.absoluteString, width: 600, height: 320)
             }catch{
                 print("image convert failed")
                 return
             }
         }
-        if let membership = memberShip{
-            let mention = MessageMentionModel.createPeopleMentionItem(personId: membership.id)
-            mentions = [MessageMentionModel]()
-            mentions?.append(mention)
+        if let membership = memberShip , let memberShipId = memberShip?.id{
+            mentions?.append(Mention.person(memberShipId))
             finalStr = "\(finalStr!)\(membership.personDisplayName!)"
         }
         
         self.setUpFileContentsView(files: [])
         if let room = self.roomModel{
-            self.sparkSDK?.messages?.post(roomId: room.id!,text: finalStr,mentions: mentions, files: files, uploadProgressHandler:{
-                (file, progress) in
-                    let progressStr = "Sending.. Uploaded: \(progress*100)"+"%"
-                    self.title = progressStr
-            },completionHandler: { (response) in
+            self.sparkSDK?.messages.post(roomId: room.id!,text: finalStr,mentions: mentions, files: files,completionHandler: { (response) in
                 switch response.result{
                 case .success(let meesage):
                     /// Send Message Call Back Code Here
@@ -90,79 +98,70 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
                 }}
             )
         }else if let email = self.emailAddress{
-            self.sparkSDK?.messages?.post(email: email,
-                                          text: finalStr,
-                                          mentions: mentions,
-                                          files: files,
-            uploadProgressHandler:{ (file, progress) in
-                let progressStr = "Sending.. Uploaded: \(progress*100)"+"%"
-                self.title = progressStr
-            },completionHandler: { (response) in
-                switch response.result{
-                case .success(let message):
-                    /// Send Message Call Back Code Here
-                    self.title = "Sent Sucess!"
-                    self.roomId = message.roomId
-                    break
-                case .failure(let error):
-                    DispatchQueue.main.async {
-                        print(error)
-                        self.title = "Sent Fail!"
-                    }
-                    break
-                }
+            self.sparkSDK?.messages.post(email: email,
+                                         text: finalStr,
+                                         mentions: mentions,
+                                         files: files,
+                                         completionHandler: { (response) in
+                                            switch response.result{
+                                            case .success(let message):
+                                                /// Send Message Call Back Code Here
+                                                self.title = "Sent Sucess!"
+                                                self.roomId = message.roomId
+                                                break
+                                            case .failure(let error):
+                                                DispatchQueue.main.async {
+                                                    print(error)
+                                                    self.title = "Sent Fail!"
+                                                }
+                                                break
+                                            }
             })
         }
     }
     
     // MARK: - SparkSDK: Download File
-    public func downLoadFile(file: FileObjectModel, onView: UIView){
+    public func downLoadFile(file: RemoteFile, onView: UIView){
         let progressLabel = UILabel(frame: CGRect(x: 0, y: 0, width: onView.frame.size.width, height: 30))
         progressLabel.textAlignment = .center
         progressLabel.textColor = UIColor.black
         onView.addSubview(progressLabel)
-        if let roomId = self.roomId{
-            self.sparkSDK?.messages?.downLoadFile(roomId: roomId, file: file, downLoadProgressHandler: { (progress) in
-                DispatchQueue.main.async {
-                    progressLabel.text = String(Int(progress*100)) + "%"
-                }
-            }, completionHandler: { (file, state) in
-                if(state == FileDownLoadState.DownloadSuccess){
-                    let webView = UIWebView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: kScreenHeight))
-                    webView.loadRequest(URLRequest(url: URL(string: file.localFileUrl!)!))
-                    let webVC = UIViewController()
-                    webVC.view = webView
-                    self.navigationController?.pushViewController(webVC, animated: true)
-                }
-            })
+        
+        self.sparkSDK?.messages.downloadFile(file: file) {
+            result in
+            switch result {
+            case .success(let url):
+                let webView = UIWebView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: kScreenHeight))
+                webView.loadRequest(URLRequest(url: url))
+                let webVC = UIViewController()
+                webVC.view = webView
+                self.navigationController?.pushViewController(webVC, animated: true)
+                break
+            default:
+                break
+            }
         }
+        
     }
-
-    public func downLoadThumbnail(_ file: FileObjectModel, onView: UIView){
+    
+    public func downLoadThumbnail(_ file: RemoteFile, onView: UIView){
         let progressLabel = UILabel(frame: CGRect(x: 0, y: 0, width: onView.frame.size.width, height: onView.frame.size.height))
         progressLabel.textAlignment = .center
         progressLabel.textColor = UIColor.black
         onView.addSubview(progressLabel)
-       
-        if let roomId = self.roomId{
-            self.sparkSDK?.messages?.downLoadThumbNail(roomId: roomId, file: file, downLoadProgressHandler: { (progress) in
-                DispatchQueue.main.async {
-                    progressLabel.text = String(Int(progress*100)) + "%"
-                }
-            }, completionHandler: { (file, state) in
-                
-                if(state == FileDownLoadState.DownloadSuccess){
-                    progressLabel.removeFromSuperview()
-                    guard let localUrl = file.image?.localFileUrl else{
-                        return
-                    }
-                    let image = UIImage(contentsOfFile: localUrl)
-                    let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: onView.frame.size.width, height: onView.frame.size.height))
-                    imageView.image = image
-                    imageView.backgroundColor = UIColor.red
-                    onView.addSubview(imageView)
-                }
-            })
+        
+        self.sparkSDK?.messages.downloadThumbnail(file: file) { result in
+            switch result {
+            case .success(let url):
+                progressLabel.removeFromSuperview()
+                let image = UIImage(contentsOfFile: url.absoluteString)
+                let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: onView.frame.size.width, height: onView.frame.size.height))
+                imageView.image = image
+                imageView.backgroundColor = UIColor.red
+                onView.addSubview(imageView)
+            default:
+                break
+            }
         }
     }
     
@@ -196,7 +195,7 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
         self.fileContentsView = UIScrollView(frame: CGRect(x: 10, y: 370, width: kScreenWidth-20, height: 100))
         self.fileContentsView?.backgroundColor = UIColor.init(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
         self.view.addSubview(self.fileContentsView!)
-
+        
         self.textInputView = KitchensinkInputView(frame: CGRect(x:0,y:kScreenHeight-kNavHeight-40,width: kScreenWidth, height: 40), backVC: self)
         self.textInputView?.sendBtnClickBlock = { (textStr: String?, mention : Membership? , image: [String: Any]?) in
             self.textInputView?.textView?.text = ""
@@ -205,22 +204,25 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
         self.view.addSubview(self.textInputView!)
     }
     
-    public func updateMessageAcitivty(_ message: MessageModel){
-        do{
-            let jsonData = try JSONSerialization.data(withJSONObject: message.jsonPresent(), options: .prettyPrinted)
-            self.contentTextView?.text = String(data: jsonData, encoding: .utf8)
-            if let files = message.files{
-                self.setUpFileContentsView(files: files)
-            }
-        }catch{}
+    public func updateMessageAcitivty(_ message: Message?){
+        guard message != nil else {
+            return
+        }
+        if let msg = message {
+          self.contentTextView?.text = "\(msg))"
+        }
+        if let files = message?.files {
+            self.setUpFileContentsView(files: files)
+        }
+        
     }
     
-    public func setUpFileContentsView(files: [FileObjectModel]){
-
+    public func setUpFileContentsView(files: [RemoteFile]){
+        
         self.fileContentsView?.removeFromSuperview()
         self.fileContentsView = UIScrollView(frame: CGRect(x: 10, y: 370, width: kScreenWidth-20, height: 120))
         self.fileContentsView?.backgroundColor = UIColor.init(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
-  
+        
         self.view.addSubview(self.fileContentsView!)
         self.view.bringSubview(toFront: self.textInputView!)
         
@@ -233,7 +235,7 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
             tempView.tag = 10000+index
             tempView.backgroundColor = UIColor.lightGray
             self.fileContentsView?.addSubview(tempView)
-            if(file.fileType == FileType.Image){
+            if(file.thumbnail != nil){
                 self.downLoadThumbnail(file, onView: tempView)
             }else{
                 let titleLabel = UILabel(frame: CGRect(x: 10, y: 10, width: tempView.frame.size.width-20, height: tempView.frame.size.height-20))
@@ -252,7 +254,7 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
         let file = self.receivedFiles![index]
         self.downLoadFile(file: file, onView: recognizer.view!)
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
