@@ -185,7 +185,45 @@ Below is code snippets of the SDK calling in the demo.
                 //...
             }
     }
+    
+    /* 
+     Sharing screen in this call
+    */
+    self.currentCall?.oniOSBroadcastingChanged = {
+        event in
+        if #available(iOS 11.2, *) {
+            switch event {
+            case .extensionConnected :
+                call.startSharing() {
+                    error in
+                    // ...
+                }
+                break
+            case .extensionDisconnected:
+                call.stopSharing() {
+                    error in
+                    // ...
+                }
+                break
+            }
+        }
+    }
     ```
+1. Enable and using screen share
+
+    4.1 Add screen recording to control center:
+    
+        4.1.1 Open Settings -> Control Center -> Customize Controls
+        
+        4.1.2 Tap '+' on Screen Recording
+        
+    4.2 To share your screen in KitchenShink:
+    
+        4.2.1 Swipe up to open Control Center
+        
+        4.2.2 Long press on recoridng button
+        
+        4.2.3 select the KitchenSinkBroadcastExtension, tap Start Broadcast button
 # Buddies-App
 Here is another demo app-"Buddies", which is more implemented as production application, combined call functionalities with CallKit, included message/call UI-implementation which could be used as widgets.
 [GitHub-Buddies](https://github.com/ciscospark/spark-ios-sdk-example-buddies) 
