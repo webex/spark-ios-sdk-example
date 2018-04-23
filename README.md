@@ -209,7 +209,7 @@ Below is code snippets of the SDK calling in the demo.
         }
     }
     ```
-1. Enable and using screen share
+1. Enable and using screen share on your iPhone
 
     4.1 Add screen recording to control center:
     
