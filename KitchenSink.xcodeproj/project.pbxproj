@@ -375,7 +375,6 @@
 				04AE181F1CDAD3D800A8F078 /* Frameworks */,
 				04AE18201CDAD3D800A8F078 /* Resources */,
 				C67BA3D95E6683C9DCA04CE2 /* [CP] Embed Pods Frameworks */,
-				D702690831E3AE770BF4A333 /* [CP] Copy Pods Resources */,
 				C7626039205F530900219F95 /* Embed App Extensions */,
 			);
 			buildRules = (
@@ -397,7 +396,6 @@
 				C7626016205F530800219F95 /* Sources */,
 				C7626017205F530800219F95 /* Frameworks */,
 				C7626018205F530800219F95 /* Resources */,
-				CE86A9D0BA0C36622D23F0D2 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -548,9 +546,9 @@
 				"${BUILT_PRODUCTS_DIR}/FontAwesome.swift/FontAwesome_swift.framework",
 				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
 				"${BUILT_PRODUCTS_DIR}/ObjectMapper/ObjectMapper.framework",
-				"${PODS_ROOT}/SparkSDK/Vendors/SparkSDKBroadcastUtil.framework",
-				"${PODS_ROOT}/SparkSDK/Vendors/SparkSDKEncryptionKit.framework",
-				"${PODS_ROOT}/SparkSDK/Vendors/Wme.framework",
+				"${PODS_ROOT}/SparkSDK/Frameworks/Sbu.framework",
+				"${PODS_ROOT}/SparkSDK/Frameworks/Seu.framework",
+				"${PODS_ROOT}/SparkSDK/Frameworks/Wme.framework",
 				"${BUILT_PRODUCTS_DIR}/SparkSDK/SparkSDK.framework",
 				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
@@ -565,8 +563,8 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FontAwesome_swift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainAccess.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectMapper.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SparkSDKBroadcastUtil.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SparkSDKEncryptionKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sbu.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Seu.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Wme.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SparkSDK.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Starscream.framework",
@@ -577,36 +575,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		CE86A9D0BA0C36622D23F0D2 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-KitchenSinkBroadcastExtension/Pods-KitchenSinkBroadcastExtension-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		D702690831E3AE770BF4A333 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		DF6EFD13F9B0CB0663775320 /* [CP] Check Pods Manifest.lock */ = {

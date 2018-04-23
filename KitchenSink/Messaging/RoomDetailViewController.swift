@@ -58,18 +58,22 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
                 let imageData = UIImageJPEGRepresentation(selectedImage, 1.0)
                 let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
                 let imageURL = docDir.appendingPathComponent("tempImage.jpeg")
-                try imageData?.write(to: imageURL)
-                let fileModel = LocalFile.init(path: imageURL.absoluteString, name: "tempImage.jpeg") {
-                    progress in
-                    DispatchQueue.main.async {
-                        let progressStr = "Sending.. Uploaded: \(progress*100)"+"%"
-                        self.title = progressStr
+                if let url = URL.init(string:imageURL.path) {
+                    try imageData?.write(to: imageURL)
+                    let thumbnail = LocalFile.Thumbnail.init(path: url.path, width: 320, height: 480)
+                    let fileModel = LocalFile.init(path: url.path, name: "tempImage.jpeg",thumbnail:thumbnail) {
+                        progress in
+                        DispatchQueue.main.async {
+                            let progressStr = "Sending.. Uploaded: \(progress*100)"+"%"
+                            self.title = progressStr
+                        }
+                    }
+                    files = [LocalFile]()
+                    if let file = fileModel {
+                        files?.append(file)
                     }
                 }
                 
-                files = [LocalFile]()
-                files?.append(fileModel)
-                //                fileModel.thumb = RemoteFileThumbnail(localFileUrl: imageURL.absoluteString, width: 600, height: 320)
             }catch{
                 print("image convert failed")
                 return
@@ -97,11 +101,12 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
                     break
                 }}
             )
-        }else if let email = self.emailAddress{
-            self.sparkSDK?.messages.post(email: email,
+        }else if let email = self.emailAddress,let emailAddress = EmailAddress.fromString(email){
+            self.sparkSDK?.messages.post(personEmail: emailAddress,
                                          text: finalStr,
                                          mentions: mentions,
                                          files: files,
+                                         queue: nil,
                                          completionHandler: { (response) in
                                             switch response.result{
                                             case .success(let message):
@@ -122,15 +127,29 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
     
     // MARK: - SparkSDK: Download File
     public func downLoadFile(file: RemoteFile, onView: UIView){
-        let progressLabel = UILabel(frame: CGRect(x: 0, y: 0, width: onView.frame.size.width, height: 30))
+        let progressTag = 256
+        let progressLabel:UILabel
+        if let existLabel:UILabel = onView.viewWithTag(progressTag) as? UILabel {
+            progressLabel = existLabel
+        } else {
+            progressLabel = UILabel(frame: CGRect(x: 0, y: 0, width: onView.frame.size.width, height: 30))
+        }
+        
+        
         progressLabel.textAlignment = .center
         progressLabel.textColor = UIColor.black
+        progressLabel.tag = progressTag
         onView.addSubview(progressLabel)
         
-        self.sparkSDK?.messages.downloadFile(file: file) {
+        self.sparkSDK?.messages.downloadFile(file,progressHandler:{
+            progress in
+            progressLabel.text = "\(String.init(format: "%.2f", progress * 100) )%"
+            print("=====received progress:\(String.init(format: "%.2f", progress * 100))")
+        }) {
             result in
             switch result {
             case .success(let url):
+                progressLabel.text = "100%"
                 let webView = UIWebView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: kScreenHeight))
                 webView.loadRequest(URLRequest(url: url))
                 let webVC = UIViewController()
@@ -150,11 +169,11 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
         progressLabel.textColor = UIColor.black
         onView.addSubview(progressLabel)
         
-        self.sparkSDK?.messages.downloadThumbnail(file: file) { result in
+        self.sparkSDK?.messages.downloadThumbnail(for: file) { result in
             switch result {
             case .success(let url):
                 progressLabel.removeFromSuperview()
-                let image = UIImage(contentsOfFile: url.absoluteString)
+                let image = UIImage(contentsOfFile: url.path)
                 let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: onView.frame.size.width, height: onView.frame.size.height))
                 imageView.image = image
                 imageView.backgroundColor = UIColor.red
@@ -209,7 +228,7 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
             return
         }
         if let msg = message {
-          self.contentTextView?.text = "\(msg))"
+            self.contentTextView?.text = "\(msg))"
         }
         if let files = message?.files {
             self.setUpFileContentsView(files: files)
@@ -253,6 +272,7 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
         let index = (recognizer.view?.tag)! - 10000
         let file = self.receivedFiles![index]
         self.downLoadFile(file: file, onView: recognizer.view!)
+        
     }
     
     override func didReceiveMemoryWarning() {
