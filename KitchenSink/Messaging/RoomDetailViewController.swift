@@ -88,10 +88,11 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
         if let room = self.roomModel{
             self.sparkSDK?.messages.post(roomId: room.id!,text: finalStr,mentions: mentions, files: files,completionHandler: { (response) in
                 switch response.result{
-                case .success(let meesage):
+                case .success(let message):
                     /// Send Message Call Back Code Here
                     self.title = "Sent Sucess!"
-                    self.roomId = meesage.roomId
+                    self.roomId = message.roomId
+                    self.updateMessageAcitivty(message)
                     break
                 case .failure(let error):
                     DispatchQueue.main.async {
@@ -113,6 +114,7 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
                                                 /// Send Message Call Back Code Here
                                                 self.title = "Sent Sucess!"
                                                 self.roomId = message.roomId
+                                                self.updateMessageAcitivty(message)
                                                 break
                                             case .failure(let error):
                                                 DispatchQueue.main.async {
