@@ -105,7 +105,6 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
         }else if let email = self.emailAddress,let emailAddress = EmailAddress.fromString(email){
             self.sparkSDK?.messages.post(personEmail: emailAddress,
                                          text: finalStr,
-                                         mentions: mentions,
                                          files: files,
                                          queue: nil,
                                          completionHandler: { (response) in
