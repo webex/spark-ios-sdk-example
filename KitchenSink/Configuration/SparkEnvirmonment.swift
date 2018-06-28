@@ -29,4 +29,3 @@ class SparkEnvirmonment {
     ///Uri is that a user will be redirected to when completing an OAuth grant flow
     static let RedirectUri = "KitchenSink://response"
 }
-

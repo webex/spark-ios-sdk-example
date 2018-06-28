@@ -170,7 +170,7 @@ class JWTLoginViewController: BaseViewController {
         jwtTextFieldChanged(jwtTextField)
     }
     
-    func keyboardWillShow(notification:NSNotification) {
+    @objc func keyboardWillShow(notification:NSNotification) {
         guard imageTopToSuperView.constant != 0 else {
             return
         }
@@ -193,7 +193,7 @@ class JWTLoginViewController: BaseViewController {
         }
     }
     
-    func keyboardWillHide(notification:NSNotification) {
+    @objc func keyboardWillHide(notification:NSNotification) {
         if imageTopToSuperView.constant != topToSuperView {
             UIView.animate(withDuration: 0.5) { [weak self] in
                 if let strongSelf = self {

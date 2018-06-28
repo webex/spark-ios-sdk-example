@@ -56,7 +56,7 @@ class PersonTableViewCell: UITableViewCell {
         avatarImageView.layer.cornerRadius = avatarImageHeight.constant/2
     }
     
-    func dial(_ sender: UIButton) {
+    @objc func dial(_ sender: UIButton) {
         initiateCallViewController.dialWithEmailAddress(address!)
     }
 }

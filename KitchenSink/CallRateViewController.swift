@@ -124,7 +124,7 @@ class CallRateViewController: BaseViewController, UITextViewDelegate {
     
     
     // MARK: Keyboard show/hide
-    func keyboardWillShow(notification:NSNotification) {
+    @objc func keyboardWillShow(notification:NSNotification) {
         guard titleTopToSuperViewConstraint.constant != 0 else {
             return
         }
@@ -148,7 +148,7 @@ class CallRateViewController: BaseViewController, UITextViewDelegate {
         }
     }
     
-    func keyboardWillHide(notification:NSNotification) {
+    @objc func keyboardWillHide(notification:NSNotification) {
         if titleTopToSuperViewConstraint.constant != topToSuperView {
             UIView.animate(withDuration: 0.5) { [weak self] in
                 if let strongSelf = self {

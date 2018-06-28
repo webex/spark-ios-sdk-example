@@ -100,7 +100,7 @@ class WaitingCallViewController: BaseViewController {
     
     fileprivate func presentVideoCallView() {
                 
-        if let videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController! {
+        if let videoCallViewController = (storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController) {
             videoCallViewController.currentCall = self.receivedCall
             videoCallViewController.videoCallRole = VideoCallRole.CallReceiver((self.receivedCall?.from?.email)!)
             videoCallViewController.sparkSDK = self.sparkSDK
@@ -120,7 +120,7 @@ class WaitingCallViewController: BaseViewController {
     
     func startWaitingAnimation() {
         stopWaitingAnimation()
-        waittingTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(waitingAnimation), userInfo: nil, repeats: true)
+        waittingTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.waitingAnimation), userInfo: nil, repeats: true)
     }
     
     func stopWaitingAnimation() {
@@ -132,9 +132,9 @@ class WaitingCallViewController: BaseViewController {
         }
     }
     
-    func waitingAnimation() {
+    @objc func waitingAnimation() {
         if let labelText = animationLabel.text {
-            if labelText.characters.count > 2 {
+            if labelText.count > 2 {
                 animationLabel.text = ""
             }
             else {

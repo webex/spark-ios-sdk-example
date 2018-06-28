@@ -21,6 +21,7 @@
 import UIKit
 import SparkSDK
 
+
 class HomeTableViewController: BaseTableViewController {
     
     // MARK: - UI outlets variables
@@ -61,11 +62,13 @@ class HomeTableViewController: BaseTableViewController {
     // MARK: - SparkSDK: SparkPhone register | SparkUser get profile
     
     func sparkRegisterPhone() {
-        /*  
+        /*
          Registers this phone to Cisco Spark cloud on behalf of the authenticated user.
          It also creates the websocket and connects to Cisco Spark cloud.
          - note: make sure register device before calling
          */
+        let uuid = NSUUID().uuidString
+        print(uuid)
         self.sparkSDK?.phone.register() { [weak self] error in
             if let strongSelf = self {
                 if error != nil {
@@ -144,8 +147,6 @@ class HomeTableViewController: BaseTableViewController {
             self.sparkSDK = nil
             self.navigationController?.popToRootViewController(animated: true)
         }
-
-        
     }
     
     
@@ -195,9 +196,17 @@ class HomeTableViewController: BaseTableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        if indexPath.section == 1 && indexPath.row == 4 {
+        if indexPath.section == 1 && indexPath.row == 5 {
             self.logoutButtonClicked()
+        }else if indexPath.section == 1 && indexPath.row == 0{
+            self.messageBtnClicked()
         }
+    }
+    
+    @IBAction func messageBtnClicked(){
+        let messageVC = RoomListViewController()
+        messageVC.sparkSDK = self.sparkSDK
+        self.navigationController?.pushViewController(messageVC, animated: true)
     }
     
     fileprivate func updateUserStatusLabel(person: Person?) {
@@ -207,7 +216,6 @@ class HomeTableViewController: BaseTableViewController {
         }else{
             self.statusLabel.text = "Fetching user profile failed."
         }
-
     }
     fileprivate func updateCloudConnectionSateUpdate(_ stateString: String){
         self.cloudConnectionStateLabel.text = "Registration to Cisco cloud : " + stateString
@@ -219,3 +227,4 @@ class HomeTableViewController: BaseTableViewController {
         present(alert, animated: true, completion: nil)
     }
 }
+

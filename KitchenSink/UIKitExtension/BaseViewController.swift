@@ -121,7 +121,7 @@ class BaseViewController: UIViewController {
         
     }
     
-    func dissmissKeyboard() {
+    @objc func dissmissKeyboard() {
         self.view.endEditing(true)
     }
     
@@ -159,7 +159,7 @@ class BaseViewController: UIViewController {
         }
         
     }
-    func goBack() {
+    @objc func goBack() {
         navigationController?.popViewController(animated: true)
     }
 }
@@ -190,12 +190,15 @@ class BaseTableViewController: UITableViewController {
         super.viewDidLoad()
         initView()
     }
+    
     func initView() {
         
     }
-    func dissmissKeyboard() {
+    
+    @objc func dissmissKeyboard() {
         self.view.endEditing(true)
     }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: true)

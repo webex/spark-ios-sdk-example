@@ -46,6 +46,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.navigationController?.navigationBar.isTranslucent = true
         self.setupView()
     }
     
@@ -70,7 +71,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     }
     
     fileprivate func presentVideoCallView(_ remoteAddr: String) {
-        if let videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController! {
+        if let videoCallViewController = (storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController) {
             videoCallViewController.videoCallRole = VideoCallRole.CallPoster(remoteAddr)
             videoCallViewController.sparkSDK = self.sparkSDK
             navigationController?.pushViewController(videoCallViewController, animated: true)
@@ -78,7 +79,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     }
     
     fileprivate func presentRoomVideoCallView(_ roomId: String, _ roomName: String) {
-        if let videoCallViewController = storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController! {
+        if let videoCallViewController = (storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController) {
             videoCallViewController.videoCallRole = VideoCallRole.RoomCallPoster(roomId, roomName)
             videoCallViewController.sparkSDK = self.sparkSDK
             navigationController?.pushViewController(videoCallViewController, animated: true)
@@ -263,7 +264,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     func updateSearchResults(for searchController: UISearchController) {
         let searchString = searchController.searchBar.text!
         
-        if searchString.characters.count < 3 {
+        if searchString.count < 3 {
             searchResult?.removeAll()
             tableView.reloadData()
             return

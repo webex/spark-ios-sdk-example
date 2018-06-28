@@ -42,7 +42,7 @@ class SpaceTableViewCell: UITableViewCell {
         }
     }
     
-    func dial(_ sender: UIButton) {
+    @objc func dial(_ sender: UIButton) {
         initiateCallViewController.dialRoomWithRoomId(roomId!, roomName!)
     }
 

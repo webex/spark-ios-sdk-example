@@ -58,7 +58,7 @@ class SparkLoginViewController: BaseViewController {
          */
         if (self.sparkSDK?.authenticator as! OAuthAuthenticator).authorized{
             self.sparkSDK?.authenticator.accessToken{ res in
-                print("\(res)")
+                print("\(res ?? "")")
                 
             }
             self.loginSuccessProcess()

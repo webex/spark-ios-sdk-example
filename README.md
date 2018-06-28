@@ -1,6 +1,19 @@
 # Kitchen Sink
 
-Kitchen Sink is a developer friendly sample implementation of Spark client SDK and showcases all SDK features.
+Kitchen Sink is a developer friendly sample implementation of Spark client SDK and showcases all SDK features. It focuses on how to call and use "Spark-SDK" APIs. Developers could directly cut, paste, and use the code from this sample. It basically implements “Spark-SDK” APIs by sequence.
+
+## Screenshots 
+<ul>
+<img src="https://github.com/webex/spark-ios-sdk-example/blob/develop/ScreenShots/IMG_0613.jpg" width="22%" height="23%">
+<img src="https://github.com/webex/spark-ios-sdk-example/blob/develop/ScreenShots/IMG_0618.jpg" width="22%" height="23%">
+<img src="https://github.com/webex/spark-ios-sdk-example/blob/develop/ScreenShots/IMG_0614.jpg" width="22%" height="23%">
+<img src="https://github.com/webex/spark-ios-sdk-example/blob/develop/ScreenShots/IMG_0616.jpg" width="22%" height="23%">
+</ul>
+
+1. ScreenShot-1: Main page of Application, listing main functions of this demo.
+1. ScreenShot-2: Calling peopel/room page.
+1. ScreenShot-3: Iniciate call page, contains call recent/search/email/group.
+1. ScreenShot-4: Show messaing APIs with present payloads.
 
 ## Download App
 You can download our Demo App from TestFlight.
@@ -172,7 +185,45 @@ Below is code snippets of the SDK calling in the demo.
                 //...
             }
     }
+    
+    /* 
+     Sharing screen in this call
+    */
+    self.currentCall?.oniOSBroadcastingChanged = {
+        event in
+        if #available(iOS 11.2, *) {
+            switch event {
+            case .extensionConnected :
+                call.startSharing() {
+                    error in
+                    // ...
+                }
+                break
+            case .extensionDisconnected:
+                call.stopSharing() {
+                    error in
+                    // ...
+                }
+                break
+            }
+        }
+    }
     ```
+1. Enable and using screen share on your iPhone
+
+    4.1 Add screen recording to control center:
+    
+        4.1.1 Open Settings -> Control Center -> Customize Controls
+        
+        4.1.2 Tap '+' on Screen Recording
+        
+    4.2 To share your screen in KitchenShink:
+    
+        4.2.1 Swipe up to open Control Center
+        
+        4.2.2 Long press on recoridng button
+        
+        4.2.3 select the KitchenSinkBroadcastExtension, tap Start Broadcast button
 # Buddies-App
 Here is another demo app-"Buddies", which is more implemented as production application, combined call functionalities with CallKit, included message/call UI-implementation which could be used as widgets.
 [GitHub-Buddies](https://github.com/ciscospark/spark-ios-sdk-example-buddies) 

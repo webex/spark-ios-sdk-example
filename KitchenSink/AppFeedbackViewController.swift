@@ -102,7 +102,7 @@ class AppFeedbackViewController: BaseViewController, MFMailComposeViewController
     }
     
     
-    func sendMail() {
+    @objc func sendMail() {
         let mailComposeViewController = configuredMailComposeViewController()
         if MFMailComposeViewController.canSendMail() {
             present(mailComposeViewController, animated: true, completion: nil)
