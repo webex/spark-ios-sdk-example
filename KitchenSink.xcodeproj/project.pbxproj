@@ -37,6 +37,7 @@
 		12A1611E1DA4EFA48208E5D8 /* Pods_KitchenSink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A779AB3A31B809D134C73D0C /* Pods_KitchenSink.framework */; };
 		49559933A6DCA000BF908AA2 /* Pods_KitchenSinkBroadcastExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB0245FC633215E9FF87BE91 /* Pods_KitchenSinkBroadcastExtension.framework */; };
 		5A82441E1DF9E5F900481A55 /* JWTLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A82441D1DF9E5F900481A55 /* JWTLoginViewController.swift */; };
+		C70FD7AC20F4BA1600F62201 /* ParticipantTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70FD7AB20F4BA1600F62201 /* ParticipantTableViewCell.swift */; };
 		C762601C205F530800219F95 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C762601B205F530800219F95 /* ReplayKit.framework */; };
 		C762601F205F530800219F95 /* SampleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C762601E205F530800219F95 /* SampleHandler.swift */; };
 		C7626026205F530900219F95 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C762601B205F530800219F95 /* ReplayKit.framework */; };
@@ -124,6 +125,7 @@
 		657C43FB45F7E9767BC98E93 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		87B55BD44833FEC88DC1F273 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A779AB3A31B809D134C73D0C /* Pods_KitchenSink.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C70FD7AB20F4BA1600F62201 /* ParticipantTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantTableViewCell.swift; sourceTree = "<group>"; };
 		C762601A205F530800219F95 /* KitchenSinkBroadcastExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KitchenSinkBroadcastExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C762601B205F530800219F95 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
 		C762601E205F530800219F95 /* SampleHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleHandler.swift; sourceTree = "<group>"; };
@@ -359,6 +361,7 @@
 				C7D086E91E9DE42000FC662B /* KSLargerHitAreaButton.swift */,
 				042A4A741D12532E002697D3 /* PersonTableViewCell.swift */,
 				10BFA40B1F4D2B9400602908 /* SpaceTableViewCell.swift */,
+				C70FD7AB20F4BA1600F62201 /* ParticipantTableViewCell.swift */,
 			);
 			name = UIKitExtension;
 			sourceTree = "<group>";
@@ -546,9 +549,9 @@
 				"${BUILT_PRODUCTS_DIR}/FontAwesome.swift/FontAwesome_swift.framework",
 				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
 				"${BUILT_PRODUCTS_DIR}/ObjectMapper/ObjectMapper.framework",
-				"${PODS_ROOT}/SparkSDK/Frameworks/Sbu.framework",
-				"${PODS_ROOT}/SparkSDK/Frameworks/Seu.framework",
-				"${PODS_ROOT}/SparkSDK/Frameworks/Wme.framework",
+				"${PODS_ROOT}/../../spark-ios-sdk/Frameworks/Sbu.framework",
+				"${PODS_ROOT}/../../spark-ios-sdk/Frameworks/Seu.framework",
+				"${PODS_ROOT}/../../spark-ios-sdk/Frameworks/Wme.framework",
 				"${BUILT_PRODUCTS_DIR}/SparkSDK/SparkSDK.framework",
 				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
@@ -629,6 +632,7 @@
 				10B3029620183CC700E8F96B /* MentionPeopleListViewController.swift in Sources */,
 				0471A25E1CDC6BF600C6647E /* CallToastViewController.swift in Sources */,
 				106A031A1F3451CC00167542 /* VideoAudioSetting.swift in Sources */,
+				C70FD7AC20F4BA1600F62201 /* ParticipantTableViewCell.swift in Sources */,
 				106DA2FB201F19EE0069C9CE /* MessagePersonCell.swift in Sources */,
 				0471A2581CDC438300C6647E /* SparkLoginViewController.swift in Sources */,
 				107D247B201053900083C9CE /* MessageRoomCell.swift in Sources */,

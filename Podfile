@@ -13,7 +13,7 @@ end
 
 target 'KitchenSink' do
     platform :ios, '10.0'
-    pod 'SparkSDK', :git => 'https://github.com/webex/spark-ios-sdk.git', :branch => ‘develop’
+    pod 'SparkSDK', :git => 'https://github.com/webex/spark-ios-sdk.git', :branch => ‘Feature/MultiStream’
     pod 'Cosmos', '~> 15.0'
     pod 'Toast-Swift', '~> 3.0'
     pod 'FontAwesome.swift','~> 1.3'

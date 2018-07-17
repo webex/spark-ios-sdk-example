@@ -46,7 +46,6 @@ class VideoCallViewController: BaseViewController {
     @IBOutlet private weak var receivingAudioSwitch: UISwitch!
     @IBOutlet weak var screenShareSwitch: UISwitch!
     @IBOutlet weak var fullScreenButton: UIButton!
-    @IBOutlet private weak var switchContainerView: UIView!
     @IBOutlet private weak var avatarContainerView: UIImageView!
     @IBOutlet private weak var remoteViewHeight: NSLayoutConstraint!
     @IBOutlet private weak var selfViewWidth: NSLayoutConstraint!
@@ -60,6 +59,25 @@ class VideoCallViewController: BaseViewController {
     @IBOutlet var labelFontScaleCollection: [UILabel]!
     private var slideInView: UIView?
     private var slideInMsgLabel: UILabel?
+    @IBOutlet weak var callFunctionTabBar: UITabBar!
+    
+    @IBOutlet weak var auxVideosContainerView: UIView!
+    
+    @IBOutlet weak var participantsTableView: UITableView!
+    @IBOutlet weak var participantsView: UIView!
+    
+    @IBOutlet weak var callControlItem: UITabBarItem!
+    
+    @IBOutlet weak var auxiliaryVideoItem: UITabBarItem!
+    
+    @IBOutlet weak var participantsItem: UITabBarItem!
+
+
+    @IBOutlet var auxVideoMuteViews: [UIView]!
+    @IBOutlet var auxVideoNameLabels: [UILabel]!
+    @IBOutlet var auxVideoViews: [MediaRenderView]!
+    @IBOutlet weak var callControlView: UIView!
+    
     private var callStatus:CallStatus = .initiated
     private var isFullScreen: Bool = false
     private let avatarImageView = UIImageView()
@@ -67,11 +85,15 @@ class VideoCallViewController: BaseViewController {
     private let remoteDisplayNameLabel = UILabel()
     private let fullScreenImage = UIImage.fontAwesomeIcon(name: .expand, textColor: UIColor.white, size: CGSize.init(width: 44, height: 44))
     private let normalScreenImage = UIImage.fontAwesomeIcon(name: .compress, textColor: UIColor.white, size: CGSize.init(width: 44, height: 44))
-    private let uncheckImage = UIImage.fontAwesomeIcon(name: .squareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
-    private let checkImage = UIImage.fontAwesomeIcon(name: .checkSquareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
+    private static let uncheckImage = UIImage.fontAwesomeIcon(name: .squareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
+    private static let checkImage = UIImage.fontAwesomeIcon(name: .checkSquareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
     private var longPressRec1 : UILongPressGestureRecognizer?
     private var longPressRec2 : UILongPressGestureRecognizer?
     private var first: Bool = true
+    private var participantArray: [CallMembership] = []
+    private var personInfoArray: [Person] = []
+    private var subscribedAuxViews: [MediaRenderView] = []
+    private var auxiliaryVideoUI: [AuxiliaryVideoUICollection] = []
     
     override var navigationTitle: String? {
         get {
@@ -339,6 +361,7 @@ class VideoCallViewController: BaseViewController {
                         }
                         break
                     }
+                    self?.updateParticipantTable()
                 }
             }
             
@@ -378,23 +401,56 @@ class VideoCallViewController: BaseViewController {
                         
                         /* Whether Screen share is blocked by local*/
                     case .receivingScreenShare(let isReceiving):
-                        self?.showScreenShareView(isReceiving)
+                        strongSelf.showScreenShareView(isReceiving)
                         break
                         
                         /* Whether Remote began to send Screen share */
                     case .remoteSendingScreenShare(let startedSending):
                         if startedSending {
-                            self?.currentCall?.screenShareRenderView = self?.screenShareView
+                            strongSelf.currentCall?.screenShareRenderView = self?.screenShareView
                         }
                         else {
-                            self?.currentCall?.screenShareRenderView = nil
+                            strongSelf.currentCall?.screenShareRenderView = nil
                         }
-                        self?.showScreenShareView(startedSending)
+                        strongSelf.showScreenShareView(startedSending)
                         
                         break
                         /* Whether local began to send Screen share */
                     case .sendingScreenShare(let startedSending):
-                        self?.screenShareSwitch.isOn = startedSending
+                        strongSelf.screenShareSwitch.isOn = startedSending
+                        
+                    case .activeSpeakerChangedEvent(_):
+                        strongSelf.updateActiveSpeakerView()
+                        break
+                    case .remoteAuxVideosCount(let count):
+                        strongSelf.auxiliaryVideoItem.badgeValue = count == 0 ? nil:String(count)
+                        if count > strongSelf.auxiliaryVideoUI.filter({$0.inUse}).count {
+                            if let videoUI = strongSelf.auxiliaryVideoUI.filter({!$0.inUse}).first {
+                                strongSelf.currentCall?.subscribeRemoteAuxVideo(view: videoUI.mediaRenderView) {
+                                    result in
+                                    switch result {
+                                    case .success(let remoteAuxVideo):
+                                        videoUI.remoteAuxVideo = remoteAuxVideo
+                                        strongSelf.updateAuxiliaryUI(remoteAuxVideo: remoteAuxVideo)
+                                    case .failure(let error):
+                                        print("ERROR: \(String(describing: error))")
+                                        break
+                                    }
+                                }
+                            }
+                        } else if count < strongSelf.auxiliaryVideoUI.filter({$0.inUse}).count {
+                            if let videoUI = strongSelf.auxiliaryVideoUI.filter({$0.inUse}).last, let remoteAuxVideo = videoUI.remoteAuxVideo {
+                                strongSelf.currentCall?.unsubscribeRemoteAuxVideo(remoteAuxVideo: remoteAuxVideo) {
+                                    error in
+                                    if error != nil {
+                                        print("ERROR: \(String(describing: error))")
+                                    } else {
+                                        videoUI.remoteAuxVideo = nil
+                                    }
+                                }
+                            }
+                        }
+                        break
                     default:
                         break
                     }
@@ -432,6 +488,19 @@ class VideoCallViewController: BaseViewController {
                 }
                 
             }
+            
+            call.onRemoteAuxVideoChanged = {
+                event in
+                switch event {
+                case .remoteAuxVideoPersonChangedEvent(let remoteAuxVideo), .receivingAuxVideoEvent(let remoteAuxVideo), .remoteAuxSendingVideoEvent(let remoteAuxVideo):
+                    self.updateAuxiliaryUI(remoteAuxVideo: remoteAuxVideo)
+                    break
+                case .remoteAuxVideoSizeChangedEvent(let remoteAuxVideo):
+                    print("Auxiliary video size changed:\(remoteAuxVideo.remoteAuxVideoSize)")
+                    break
+                }
+            }
+            
         }
     }
     
@@ -550,32 +619,54 @@ class VideoCallViewController: BaseViewController {
             self.screenShareSwitch.isEnabled = false
         }
         
+        //tab bar image
+        self.participantsItem.image =
+            UIImage.fontAwesomeIcon(name: .group, textColor: UIColor.labelGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
+        self.participantsItem.selectedImage =
+            UIImage.fontAwesomeIcon(name: .group, textColor: UIColor.buttonBlueHightlight(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
+        self.callControlItem.image =
+            UIImage.fontAwesomeIcon(name: .cogs, textColor: UIColor.labelGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
+        self.callControlItem.selectedImage =
+            UIImage.fontAwesomeIcon(name: .cogs, textColor: UIColor.buttonBlueHightlight(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
+        self.auxiliaryVideoItem.image =
+            UIImage.fontAwesomeIcon(name: .fileMovieO, textColor: UIColor.labelGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
+        self.auxiliaryVideoItem.selectedImage =
+            UIImage.fontAwesomeIcon(name: .fileMovieO, textColor: UIColor.buttonBlueHightlight(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
+        
+        callFunctionTabBar.delegate = self
+        self.participantsTableView.dataSource = self
+        self.participantsTableView.delegate = self
+        self.callFunctionTabBar.selectedItem = callControlItem
+        
+        for index in 0..<self.auxVideoViews.count {
+            self.auxiliaryVideoUI.append(AuxiliaryVideoUICollection.init(nameLabel: auxVideoNameLabels[index], muteView: auxVideoMuteViews[index], mediaRenderView: auxVideoViews[index]))
+        }
     }
     
     func updateCheckBoxStatus() {
         guard globalVideoSetting.isVideoEnabled() != false else {
-            self.backCameraImage.image = uncheckImage
-            self.frontCameraImage.image = uncheckImage
+            self.backCameraImage.image = VideoCallViewController.uncheckImage
+            self.frontCameraImage.image = VideoCallViewController.uncheckImage
             return
         }
         
         if let isFacingMode =  self.currentCall?.facingMode {
             if isFacingMode == .user {
-                self.backCameraImage.image = uncheckImage
-                self.frontCameraImage.image = checkImage
+                self.backCameraImage.image = VideoCallViewController.uncheckImage
+                self.frontCameraImage.image = VideoCallViewController.checkImage
             }
             else {
-                self.backCameraImage.image = checkImage
-                self.frontCameraImage.image = uncheckImage
+                self.backCameraImage.image = VideoCallViewController.checkImage
+                self.frontCameraImage.image = VideoCallViewController.uncheckImage
             }
         }
         else if globalVideoSetting.facingMode == .user {
-            self.backCameraImage.image = uncheckImage
-            self.frontCameraImage.image = checkImage
+            self.backCameraImage.image = VideoCallViewController.uncheckImage
+            self.frontCameraImage.image = VideoCallViewController.checkImage
         }
         else {
-            self.backCameraImage.image = checkImage
-            self.frontCameraImage.image = uncheckImage
+            self.backCameraImage.image = VideoCallViewController.checkImage
+            self.frontCameraImage.image = VideoCallViewController.uncheckImage
         }
     }
     
@@ -683,6 +774,7 @@ class VideoCallViewController: BaseViewController {
             if self.isCallDisconnected() {
                 self.hideCallView()
             }
+            self.updateParticipantTable()
         }
         
     }
@@ -722,6 +814,7 @@ class VideoCallViewController: BaseViewController {
         }
         
         self.disconnectionTypeLabel.text = disconnectionTypeLabel.text! + disconnectionTypeString
+        self.view.bringSubview(toFront: self.disconnectionTypeLabel)
         self.disconnectionTypeLabel.isHidden = false
     }
     
@@ -755,7 +848,7 @@ class VideoCallViewController: BaseViewController {
     
     private func hideCallView() {
         self.showSelfView(false)
-        self.showCallControllView(false)
+        self.hideControlView(true)
     }
     
     private func showSelfView(_ shown: Bool) {
@@ -766,17 +859,43 @@ class VideoCallViewController: BaseViewController {
         self.screenShareView.isHidden = !shown
     }
     
-    private func showCallControllView(_ shown: Bool) {
+    private func showCallFunctionViews() {
         if self.isCallDisconnected() {
-            self.switchContainerView.isHidden = true
-            self.hangupButton.isHidden = true
+            self.callControlView.isHidden = true
+            self.participantsView.isHidden = true
+            self.auxVideosContainerView.isHidden = true
+            self.callFunctionTabBar.isHidden = true
         } else {
-            self.switchContainerView.isHidden = !shown
-            self.hangupButton.isHidden = !shown
-            self.hideDialpadButton(!shown)
+            if self.callFunctionTabBar.selectedItem?.tag == TabBarItemType.callControl.rawValue {
+                self.view.bringSubview(toFront: self.callControlView)
+                self.callControlView.isHidden = false
+                self.participantsView.isHidden = true
+                self.auxVideosContainerView.isHidden = true
+            } else if self.callFunctionTabBar.selectedItem?.tag == TabBarItemType.auxiliaryVide.rawValue {
+                self.view.bringSubview(toFront: self.auxVideosContainerView)
+                self.callControlView.isHidden = true
+                self.participantsView.isHidden = true
+                self.auxVideosContainerView.isHidden = false
+            } else if self.callFunctionTabBar.selectedItem?.tag == TabBarItemType.participants.rawValue {
+                self.view.bringSubview(toFront: self.participantsView)
+                self.callControlView.isHidden = true
+                self.participantsView.isHidden = false
+                self.auxVideosContainerView.isHidden = true
+            }
+            
+            self.hideDialpadButton(false)
+            self.callFunctionTabBar.isHidden = false
         }
     }
     
+    private func hideCallFunctionViews() {
+        self.callControlView.isHidden = true
+        self.participantsView.isHidden = true
+        self.auxVideosContainerView.isHidden = true
+        self.callFunctionTabBar.isHidden = true
+        self.hideDialpadButton(true)
+    }
+
     private func showAvatarContainerView(_ shown: Bool) {
         self.avatarContainerView.isHidden = !shown
     }
@@ -854,6 +973,38 @@ class VideoCallViewController: BaseViewController {
     
     private func isCallDisconnected() -> Bool {
         return callStatus == .disconnected
+    }
+    
+    private func updateParticipantTable() {
+        self.participantArray = self.currentCall?.memberships.filter({$0.state == .joined}) ?? []
+        self.participantsTableView.reloadData()
+    }
+    
+    private func updateActiveSpeakerView() {
+        self.participantsTableView.reloadData()
+    }
+    
+    private func updateAuxiliaryUI(remoteAuxVideo:RemoteAuxVideo) {
+        print("=====updateAuxiliaryUI in=====")
+        if let auxiliaryUI = self.auxiliaryVideoUI.filter({ remoteAuxVideo.containRenderView(view:$0.mediaRenderView)}).first {
+            if let oldPerson = self.personInfoArray.filter({$0.id == remoteAuxVideo.person?.personId}).first {
+                auxiliaryUI.update(person: oldPerson)
+            } else if let personId = remoteAuxVideo.person?.personId {
+                print("======personID:\(personId)=======")
+                self.sparkSDK?.people.get(personId: personId) { [weak self] response in
+                    if self != nil {
+                        switch response.result {
+                        case .success(let person):
+                            auxiliaryUI.update(person: person)
+                            self?.personInfoArray.append(person)
+                        case .failure:
+                            print("======get person info failure=======")
+                            break
+                        }
+                    }
+                }
+            }
+        }
     }
     
     // MARK: Slide In View SetUp
@@ -939,9 +1090,18 @@ class VideoCallViewController: BaseViewController {
     }
     private func hideControlView(_ isHidden: Bool) {
         self.fullScreenButton.isHidden = UIDevice.current.orientation.isLandscape
-        self.disconnectionTypeLabel.isHidden = (isHidden == false ? !isCallDisconnected():isHidden)
-        self.showCallControllView(!isHidden)
-        navigationController?.isNavigationBarHidden = isHidden
+        if isHidden {
+            self.hideCallFunctionViews()
+        } else {
+            self.showCallFunctionViews()
+        }
+        if self.isCallDisconnected() && !UIDevice.current.orientation.isLandscape {
+            self.disconnectionTypeLabel.isHidden = false
+            navigationController?.isNavigationBarHidden = false
+        } else {
+            self.disconnectionTypeLabel.isHidden = isHidden
+            navigationController?.isNavigationBarHidden = isHidden
+        }
     }
     
     private func addMoveReconizerOnSelfViewAndScreenShareView(){
@@ -1046,4 +1206,186 @@ extension VideoCallViewController : UICollectionViewDelegate {
         let dtmfEvent = dialButton.text
         self.currentCall?.send(dtmf: dtmfEvent!, completionHandler: nil)
     }
+}
+
+extension VideoCallViewController :UITabBarDelegate {
+    enum TabBarItemType: Int {
+        case callControl = 0
+        case auxiliaryVide = 1
+        case participants = 2
+    }
+    
+    func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
+        if item.tag == TabBarItemType.callControl.rawValue {
+            self.view.bringSubview(toFront: self.callControlView)
+            self.callControlView.isHidden = false
+            self.auxVideosContainerView.isHidden = true
+            self.participantsView.isHidden = true
+        } else if item.tag == TabBarItemType.auxiliaryVide.rawValue {
+            self.view.bringSubview(toFront: self.auxVideosContainerView)
+            self.callControlView.isHidden = true
+            self.auxVideosContainerView.isHidden = false
+            self.participantsView.isHidden = true
+        } else if item.tag == TabBarItemType.participants.rawValue {
+            self.view.bringSubview(toFront: self.participantsView)
+            self.callControlView.isHidden = true
+            self.auxVideosContainerView.isHidden = true
+            self.participantsView.isHidden = false
+        }
+    }
+    
+    
+    private class AuxiliaryVideoUICollection {
+        var avatarImageView: UIImageView
+        let nameLabel: UILabel
+        let muteView: UIView
+        let mediaRenderView: MediaRenderView
+        var remoteAuxVideo: RemoteAuxVideo? {
+            didSet {
+                if remoteAuxVideo == nil {
+                    cleanUp()
+                }
+            }
+        }
+        let noVideoView: UIView
+        
+        var inUse: Bool {
+            get {
+                return remoteAuxVideo != nil
+            }
+        }
+        
+        private var currentPerson: Person?
+        private var currentAvatar: UIImage?
+        
+        init(nameLabel: UILabel, muteView: UIView, mediaRenderView: MediaRenderView) {
+            self.nameLabel = nameLabel
+            self.muteView = muteView
+            self.mediaRenderView = mediaRenderView
+            self.noVideoView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: self.mediaRenderView.frame.size.width, height: self.mediaRenderView.frame.size.height))
+            self.noVideoView.backgroundColor = self.mediaRenderView.backgroundColor
+            self.remoteAuxVideo = nil
+            self.avatarImageView = UIImageView.init(frame: CGRect.init(x: 0, y: 0, width: self.mediaRenderView.frame.size.width, height: self.mediaRenderView.frame.size.height))
+            self.muteView.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:))))
+            self.muteView.isHidden = true
+            self.currentPerson = nil
+        }
+        
+        private func cleanUp() {
+            self.nameLabel.text = "Waiting.."
+            self.muteView.isHidden = true
+            self.avatarImageView.image = nil
+            self.avatarImageView.removeFromSuperview()
+            self.noVideoView.removeFromSuperview()
+            self.mediaRenderView.addSubview(self.noVideoView)
+            self.currentPerson = nil
+        }
+        
+        func update(person:Person) {
+            if let remoteAux = self.remoteAuxVideo {
+                self.muteView.isHidden = false
+                self.nameLabel.text = person.displayName
+                print("===remoteAux isReceivingVideo=\(remoteAux.isReceivingVideo) isSendingVideo=\(remoteAux.isSendingVideo)===")
+                if remoteAux.isReceivingVideo && remoteAux.isSendingVideo {
+                    self.noVideoView.removeFromSuperview()
+                    self.avatarImageView.removeFromSuperview()
+                } else if !remoteAux.isReceivingVideo && remoteAux.isSendingVideo {
+                    self.avatarImageView.removeFromSuperview()
+                    self.nameLabel.text = "Waiting.."
+                    self.mediaRenderView.addSubview(self.noVideoView)
+                }else {
+                    self.noVideoView.addSubview(self.avatarImageView)
+                    if self.currentPerson?.id != person.id {
+                        Utils.downloadAvatarImage(person.avatar, completionHandler: {
+                            self.avatarImageView.image = $0
+                            self.currentAvatar = $0
+                            self.currentPerson = person
+                        })
+                    } else {
+                        self.avatarImageView.image = self.currentAvatar
+                    }
+                    self.mediaRenderView.addSubview(self.noVideoView)
+                }
+                self.updateCheckbox()
+            }
+        }
+        
+        @objc func handleCapGestureEvent(sender:UITapGestureRecognizer) {
+            if let view = sender.view , view == muteView, let auxVideo = self.remoteAuxVideo {
+                auxVideo.isReceivingVideo = !auxVideo.isReceivingVideo
+                if let person = self.currentPerson {
+                    self.update(person: person)
+                } else {
+                    self.avatarImageView.removeFromSuperview()
+                    self.nameLabel.text = "Waiting.."
+                    self.mediaRenderView.addSubview(self.noVideoView)
+                    self.updateCheckbox()
+                }
+            }
+        }
+        
+        private func updateCheckbox() {
+            if let imageView = muteView.viewWithTag(1) as? UIImageView, let auxVideo = self.remoteAuxVideo {
+                if auxVideo.isReceivingVideo {
+                    imageView.image = checkImage
+                } else {
+                    imageView.image = uncheckImage
+                }
+            }
+        }
+    }
+}
+
+extension VideoCallViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 100 * Utils.HEIGHT_SCALE
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if tableView == self.participantsTableView {
+            self.participantsItem.badgeValue = self.participantArray.count == 0 ? nil:String(self.participantArray.count)
+            return self.participantArray.count
+        }
+        return 0
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "ParticipantCell", for: indexPath) as! ParticipantTableViewCell
+        
+        let dataSource: [CallMembership]?
+        dataSource = self.participantArray
+        
+        func updateCellInfo(cell: ParticipantTableViewCell, person: Person?, callmembership: CallMembership) {
+            if let cellPerson = person {
+                Utils.downloadAvatarImage(cellPerson.avatar, completionHandler: {
+                    cell.avatarImageView.image = $0
+                })
+                cell.nameLabel.text = cellPerson.displayName
+                cell.activeSpeakerLabel.isHidden = !callmembership.isActiveSpeaker
+                cell.audioStatusImage.isHighlighted = !callmembership.sendingAudio
+                cell.videoStatusImage.isHighlighted = !callmembership.sendingVideo
+            }
+        }
+        
+        if let participant = dataSource?[indexPath.row] {
+            if let oldPerson = self.personInfoArray.filter({$0.id == participant.personId}).first {
+                updateCellInfo(cell: cell, person: oldPerson, callmembership: participant)
+            } else if let personId = participant.personId {
+                self.sparkSDK?.people.get(personId: personId) { [weak self] response in
+                    if self != nil {
+                        switch response.result {
+                        case .success(let person):
+                            updateCellInfo(cell: cell,person: person,callmembership: participant)
+                            self?.personInfoArray.append(person)
+                        case .failure:
+                            break
+                        }
+                    }
+                }
+            }
+        }
+        return cell
+    }
+    
+    
 }

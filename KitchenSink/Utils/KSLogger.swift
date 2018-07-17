@@ -14,7 +14,7 @@ public class KSLogger : Logger {
     public func log(message: LogMessage) {
         //log level control
         switch message.level {
-        case .debug,.warning,.error,.no:
+        case .debug,.warning,.error,.no,.info:
             print(message)
         default:
             break;
